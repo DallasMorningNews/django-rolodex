@@ -15,7 +15,7 @@ Quick start
 INSTALLED_APPS = (
     ...
     'rolodex',
-'rest_framework',
+    'rest_framework',
 )
 ```
 
