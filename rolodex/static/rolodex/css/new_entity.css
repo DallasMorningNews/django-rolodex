@@ -1,0 +1,218 @@
+@import url(http://fonts.googleapis.com/css?family=Carter+One|Special+Elite|Raleway);
+
+h1{
+	text-align: center;
+	font-family: 'Special Elite';
+	font-size: 70px;
+}
+
+p input{
+	font-family: arial,sans-serif;
+}
+
+
+#name{
+	padding:10px;
+	margin:10px;
+	font-size: 20px;
+	border:2px solid #880000;
+	border-radius: 15px;
+	background-color: rgba(0,0,0,.1);
+}
+h4{
+	font-size: 20px;
+	text-align: center;
+	font-family: 'Special Elite';
+	font-style:italic;
+}
+h5{
+	color:red;
+	font-style: italic;
+	text-align: center;
+	font-size: 20px;
+	font-family: Arial, sans-serif;
+}
+input.submit{
+	width:300px;
+	text-align: center;
+	margin:10px 30px;
+	font-family: 'Special Elite';
+}
+
+input.submit:hover{
+-moz-box-shadow: 0px 0px 10px #880000;
+-webkit-box-shadow: 0px 0px 10px #880000;
+box-shadow: 0px 0px 10px #880000;
+}
+
+
+.formDiv{
+	max-width:300px;
+	margin:0 auto;
+
+}
+div.alignR{
+	text-align: right;
+	margin-right: 50px;
+}
+.formDiv p.secondary{
+	font-size: 16px;
+	color:#333;
+}
+
+.demoRail{
+	width:400px;
+	float:left;
+}
+.contactRail{
+	width:350px;
+	float:left;
+}
+
+/*Form Styles*/
+.addform{
+	max-width:300px;
+	margin:0 auto;
+}
+.addform ul{
+	max-width:300px;
+	margin:10px auto;
+	text-align: right;
+	list-style-type: none;
+}
+.addform input, .addform select, .addform textarea{
+	width:200px;
+}
+/*.professional input, .professional select{
+	width: 250px;
+display: block;
+margin: 0 auto;
+}*/
+
+h2{
+	text-align: center;
+	font-family: 'Raleway',sans-serif;
+}
+
+.addform li{
+	margin:5px 0px;
+}
+
+
+.form-actions{
+	margin: 15px auto 0px;
+	width: 200px;
+	text-align: center;
+	font-size: 20px;
+}
+
+ul.contact{
+	padding-right: 10px;
+}
+ul.center li input,ul.center li select{
+	display:block;
+	margin:0 auto;
+	min-width: 240px;
+}
+ul.center li input{
+	text-align: center;
+}
+.addform li.title{
+	text-align: center;
+	font-family: 'Special Elite',serif;
+	color:white;
+	font-size: 18px;
+	background:#36788e;
+	line-height: 26px;
+}
+.required{
+	font-weight: bold;
+}
+.instruction, .addform li.instruction{
+	text-align: left;
+	font-size: 11px;
+	line-height: 12px;
+	font-family: arial,sans-serif;
+	margin:0 7px;
+	padding:5px;
+	border-radius:4px;
+	background-color: lightgrey;
+}
+li.delete{
+	font-style: italic;
+	color:black;
+	color:#880000;
+	font-size: 12px;
+}
+li.delete input{
+	width:35px;
+	height:18px;
+	vertical-align: bottom;
+}
+
+
+.primary{
+	font-style: italic;
+	color:grey;
+	margin:0px;
+	font-size: 14px;
+	text-align: center;
+}
+.notes textarea{
+	height:50px;
+}
+input.add{
+	display:block;
+	margin:0 auto;
+	background: white;
+	border:1px solid grey;
+	border-radius:2px;
+	font-size: 16px;
+}
+
+
+#form-error{
+	background-color: #FFCCCC;
+	border-radius:4px;
+	font-family: 'Raleway', sans-serif;
+	font-size: 14px;
+	padding:1px 5px;
+	margin:0 auto;
+	width:250px;
+}
+#form-error p{
+	margin:0px;
+	line-height: 14px;
+	font-size: 16px;
+	padding:5px;
+	font-style: italic;
+
+}
+#form-error ul{
+	margin:0px;
+}
+#form-error li{
+	font-weight: bold;
+	text-align: left;
+}
+
+@media (max-width: 400px) {
+	h1{
+		font-size: 48px;
+		margin-top: 32px;
+		margin-bottom: 0px;
+	}
+	h2{
+		margin-top: 12px;
+	}
+	.addform li{
+		font-size: 13px;
+	}
+	.addform input, .addform select, .addform textarea{
+		width:180px;
+	}
+	ul.contact{
+		padding-right: 15px;
+	}
+
+}

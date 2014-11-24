@@ -1,0 +1,170 @@
+{%extends "rolodex/base.html" %}
+{%load staticfiles%}
+{%block head%}
+
+
+<script src="{% static 'js/jquery-ui.min.js'%}"></script>
+<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css'%}" />
+<script src="{% static 'rolodex/js/selectize.min.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/selectize.css'%}">
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/entity.css'%}">
+<script src="{% static 'js/d3.v3.min.js'%}"></script>
+
+{%endblock%}
+
+{%block content%}
+
+<style>
+.link {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1px;
+  stroke-dasharray:4,4;
+}
+.link.primary{
+  stroke: #0EBFE9;
+  stroke-dasharray:0;
+  stroke-width: 2.5px;
+}
+.node circle {
+  stroke: #fff;
+  stroke-width: 2px;
+}
+.node.primary circle,.lab.primary{
+  fill:#0EBFE9 !important;
+  font-weight: bold;
+}
+text{
+  font: 10px sans-serif;
+  cursor:pointer;
+}
+</style>
+
+<div id="midrail">
+<div id="networkCanvas"></div>
+<h1>{{node.firstName}} {{node.lastName}}</h1>
+<div class="professional">
+  {%if node.role%}
+  <span>
+  {{node.role|title}}</span><br/>
+  {%endif%}
+  {%if node.position%}
+  {{node.position}}<br/>
+  {%endif%}
+  {%if node.department%}
+  {{node.department|title}}<br/>
+  {%endif%}
+</div>
+
+
+<div class="change">
+<a href="{%url 'rolodex_edit_person' node.pk%}">Edit Info</a>
+</div>
+
+
+
+
+<div id="contactHead" class="clickable">Contacts</div>
+<div id="contactSlide" class="bioBank">
+
+{%for contact in node.contacts%}
+{%if contact.role%}
+<h6>{{contact.role}}</h6>
+{%endif%}
+<ul>
+  <li><span class="type">{{contact.type}}:</span> 
+  {%if contact.type == "email"%}
+  <a href="mailto:{{contact.contact}}">{{contact.contact}}</a>
+  {%elif contact.type == "link" %}
+  <a href="{{contact.contact}}">{{contact.contact}}</a>
+  {%else%}
+  {{contact.contact}}
+  {%endif%}
+  </li>
+  <li class="notes">{{contact.notes}}</li>
+</ul>
+
+
+
+
+{%endfor%}
+  <div class="change">
+    <a href="{%url 'rolodex_edit_person' node.pk%}">Edit Contacts</a>
+  </div>
+</div>
+
+
+<div id="relationHead" class="clickable">Relationships</div>
+<div id="relationSlide" class="bioBank">
+<h6>Organizations</h6>
+<div class="relation_container clearfix">
+<div class="relations">
+{%for r in node.relations.orgs%}
+<span><a href="{%url 'rolodex_org' r.relation.pk%}">{{r.relation.orgName}}</a></span><br/><div class="relation_type">{{r.type}}</div><br/>
+{%endfor%}
+</div>
+</div>
+<h6>People</h6>
+<div class="relation_container clearfix">
+<div class="relations">
+{%for r in node.relations.people%}
+<span><a href="{%url 'rolodex_person' r.relation.pk%}">{{r.relation.firstName}} {{r.relation.lastName}}</a></span><br/><div class="relation_type">{{r.type}}{%if r.relation.role%}{%if r.type%} - {%endif%}{{r.relation.role.role}}{%endif%}</div><br/>
+{%endfor%}
+</div>
+</div>
+  <div class="change">
+    <a href="{%url 'rolodex_new_person_relation' node.pk%}">Add Relationship</a>
+  </div>
+</div>
+
+
+
+
+
+
+<script type="text/javascript">
+  $(".bioBank").hide();
+  $("#contactHead").click(function(){$("#contactSlide").slideToggle("slow");scrolldown();});
+  $("#relationHead").click(function(){$("#relationSlide").slideToggle("slow");scrolldown();});
+  $("#searchPosition").click(function(){$("#peepPosition").slideToggle("slow");scrolldown();});
+
+
+
+function scrolldown(){
+  var y = $(window).scrollTop();  
+    $("html, body").animate({ scrollTop: y + 75 }, 600);
+}
+
+
+
+</script>
+
+<script>
+var replaceP = '{% url "rolodex_person" "foobarbaz" %}',
+	replaceO = '{% url "rolodex_org" "foobarbaz" %}',
+  nodeID="{{node.firstName}} {{node.lastName}}",
+  nodePRIME = "{{node.primary}}";
+</script>
+<script src="{% static 'rolodex/js/nodeNet.js'%}"></script>
+<script type="text/javascript">
+  $('#networkCanvas').html("<img class='waitingGIF' src=\"{%static 'rolodex/images/waiting.gif'%}\">");
+  $.ajax({
+    type:"GET",
+    dataType:"json",
+    url:"{%url 'rolodex_person_network' node.pk %}",
+    success: function(d){
+      $('#networkCanvas').html("");
+      chartNetwork(d);
+    }
+  });
+</script>
+
+
+
+<div class="breadcrumb-container">
+<ul class="breadcrumb">
+	<li><a href="{% url 'rolodex_home' %}">Home</a></li>
+	<li><a>{{node.lastName}}, {{node.firstName}}</a></li>
+</ul>
+</div>
+{%endblock%}

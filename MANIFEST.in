@@ -1,0 +1,5 @@
+include LICENSE
+include README.rst
+recursive-include rolodex/static *
+recursive-include rolodex/templates *
+recursive-include rolodex/docs *

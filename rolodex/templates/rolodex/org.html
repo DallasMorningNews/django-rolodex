@@ -1,0 +1,185 @@
+{%extends "rolodex/base.html" %}
+{%load staticfiles%}
+{%block head%}
+
+
+<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}" />
+<script src="{% static 'rolodex/js/selectize.min.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/selectize.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/entity.css' %}">
+<script src="{% static 'js/d3.v3.min.js'%}"></script>
+
+{%endblock%}
+
+{%block content%}
+
+<style>
+.link {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1px;
+  stroke-dasharray:4,4;
+}
+.link.primary{
+  stroke: #0EBFE9;
+  stroke-dasharray:0;
+  stroke-width: 2.5px;
+}
+.node circle {
+  stroke: #fff;
+  stroke-width: 2px;
+}
+.node.primary circle,.lab.primary{
+	fill:#0EBFE9 !important;
+	font-weight: bold;
+}
+text {
+  font: 10px sans-serif;
+  cursor:pointer;
+}
+</style>
+<div id="midrail">
+<div id="networkCanvas"></div>
+<h1>{{node.orgName}}</h1>
+<div class="change">
+<a href="{%url 'rolodex_edit_org' node.pk%}">Edit Info</a>
+</div>
+
+
+
+<div id="contactHead" class="clickable">Contacts</div>
+<div id="contactSlide" class="bioBank">
+
+{%for contact in node.contacts%}
+{%if contact.role%}
+<h6>{{contact.role}}</h6>
+{%endif%}
+<ul>
+  <li><span class="type">{{contact.type}}<br></span> 
+  {%if contact.type == "email"%}
+  <a href="mailto:{{contact.contact}}">{{contact.contact}}</a>
+  {%elif contact.type == "link" %}
+  <a href="{{contact.contact}}">{{contact.contact}}</a>
+  {%else%}
+  {{contact.contact}}
+  {%endif%}
+  </li>
+  <li class="notes">{{contact.notes}}</li>
+</ul>
+
+
+
+
+{%endfor%}
+  <div class="change">
+    <a href="{%url 'rolodex_edit_org' node.pk%}">Edit Contacts</a>
+  </div>
+</div>
+
+
+<div id="relationHead" class="clickable">Relationships</div>
+<div id="relationSlide" class="bioBank">
+<h6>Organizations</h6>
+<div class="relation_container clearfix">
+<div class="relations">
+{%for r in node.relations.orgs%}
+<span><a href="{%url 'rolodex_org' r.relation.pk%}">{{r.relation.orgName}}</a></span><br/><div class="relation_type">{{r.type}}</div><br/>
+{%endfor%}
+</div>
+</div>
+<h6>People</h6>
+<div class="relation_container clearfix">
+<div class="relations">
+{%for r in node.relations.people%}
+<span><a href="{%url 'rolodex_person' r.relation.pk%}">{{r.relation.firstName}} {{r.relation.lastName}}</a></span><br/><div class="relation_type">{{r.type}}{%if r.relation.role%}{%if r.type%} - {%endif%}{{r.relation.role.role}}{%endif%}</div><br/>
+{%endfor%}
+</div>
+</div>
+  <div class="change">
+    <a href="{%url 'rolodex_new_org_relation' node.pk%}">Add Relationship</a>
+  </div>
+</div>
+
+<div id="searchPosition" class="clickable">Search Employees</div>
+<div id="peepPosition" class="bioBank">
+          <div id="peepDiv" class="searchbox">
+        <select id="peepSelect">
+            <option value=""></option>
+            {%for peep in node.employees%}
+             <option value="{{peep.id}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
+            {%endfor%}    
+        </select>
+        <div class="buttonDiv">
+        <a class="goLink" href="">Go</a>
+        </div>
+        </div>
+</div>
+
+
+
+</div>
+
+<script type="text/javascript">
+  $(".bioBank").hide();
+
+  $("#contactHead").click(function(){$("#contactSlide").slideToggle("slow");scrolldown();});
+  $("#relationHead").click(function(){$("#relationSlide").slideToggle("slow");scrolldown();});
+  $("#searchPosition").click(function(){$("#peepPosition").slideToggle("slow");scrolldown();});
+
+
+function scrolldown(){
+  var y = $(window).scrollTop();  
+    $("html, body").animate({ scrollTop: y + 75 }, 600);
+}
+
+var PeepDict={};
+{%for peep in node.employees%}
+PeepDict['{{peep.id}}']="{%url 'rolodex_person' peep.id%}";
+{%endfor%}
+
+var $peepSelect = $('#peepSelect').selectize({
+    placeholder: 'Search people...',
+    maxOptions:10,
+    optgroupLabelField:'org',
+    selectOnTab:true,
+    searchField:['org','text'],
+    onChange: function(value){
+        var option =PeepDict[$("#peepSelect").find(':selected').val()]; 
+        $("#peepDiv .goLink").attr("href",option);
+    },
+});
+
+var peepSelect = $peepSelect[0].selectize;
+
+
+</script>
+
+
+<script>
+var replaceP = '{% url "rolodex_person" "foobarbaz" %}',
+	replaceO = '{% url "rolodex_org" "foobarbaz" %}',
+	nodeID="{{node.orgName}}",
+	nodePRIME = "{{node.primary}}";
+</script>
+<script src="{% static 'rolodex/js/nodeNet.js'%}"></script>
+<script type="text/javascript">
+  $('#networkCanvas').html("<img class='waitingGIF' src=\"{%static 'rolodex/images/waiting.gif'%}\">");
+  $.ajax({
+    type:"GET",
+    dataType:"json",
+    url:"{%url 'rolodex_org_network' node.pk %}",
+    success: function(d){
+      $('#networkCanvas').html("");
+      chartNetwork(d);
+    }
+  });
+</script>
+
+<div class="breadcrumb-container">
+<ul class="breadcrumb">
+	<li><a href="{% url 'rolodex_home' %}">Home</a></li>
+	<li><a>{{node.orgName}}</a></li>
+</ul>
+</div>
+{%endblock%}

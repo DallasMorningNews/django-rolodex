@@ -1,0 +1,190 @@
+{%extends "rolodex/base.html" %}
+{%load staticfiles%}
+{%block head%}
+
+<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css'%}" />
+<script src="{% static 'rolodex/js/selectize.min.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/selectize.css'% }">
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/new_entity.css' %}">
+
+{%endblock%}
+
+{%block content%}
+
+{% if edit %}
+    <h1>{{personNode.firstName}} {{personNode.lastName}}</h1>
+{% else %}
+    <h1>Add Person</h1>
+{% endif %}
+
+
+
+
+<div id="midrail">
+{%if success%}
+<div class="instruction">Person added! Add another?</div>
+{%endif%}
+<div class="formDiv">
+
+<h2>Identify</h2>
+
+{% if edit %}
+<form action="/rolodex/edit-person/{{personNode.id}}/" method="Post">
+{% else %}
+<form action="/rolodex/add-person/{{orgNode}}/" method="Post">
+{% endif %}
+
+{%csrf_token%}
+{% if form.errors or formset.errors %}
+<div id="form-error">
+    <p>Whoops, there was a mistake... Correct it below and try again.</p>
+</div>
+{%endif%}
+
+<div class="personal addform">
+{% if form.errors %}
+<div id="form-error">
+    <ul>
+    <li>{{ form.non_field_errors|striptags }}</li>
+    {% for field in form %}
+    {%if field.errors%}
+    <li>{{field.label}}: {{ field.errors|striptags }}</li>
+    {%endif%}
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+<ul>
+    <li class="title">Personal</li>
+    <li class="required">Last Name: {{form.lastName}}</li>
+    <li class="required">First Name: {{form.firstName}} </li>
+    <li>Gender: {{form.gender}}</li>
+</ul>
+</div>
+<div class="professional addform">
+    <ul>
+        <li class="title">Professional</li>
+        <li class="primary">@ {{primary.orgName}}</li>
+        <li>Role: {{form.role}}</li>
+        <li>Position: {{form.position}}</li>
+        
+        <li>Department*: {{form.department}}</li>
+        <li class="instruction">Pro-tip: Consider whether a department should be its own org, linked to a parent org.</li>
+    </ul>
+</div>
+
+
+
+<h2>Contact</h2>
+<div class="outside freetext">
+    <p class="instruction">Contacts include links to a homepage and social media sites, phone and fax numbers, as well as email and physical addresses. 
+</div>
+{% load formset_tags %}
+
+<div id="formset" data-formset-prefix="{{ formset.prefix }}">
+{{formset.management_form}}
+
+    <div data-formset-body>
+        {% for form in formset %}
+            <div data-formset-form class="contactsForm addform">
+                {% if form.errors %}
+                <div id="form-error">
+                    <ul>
+                    <li>{{ form.non_field_errors|striptags }}</li>
+                    {% for field in form %}
+                    {%if field.errors%}
+                    <li>{{field.label}}: {{ field.errors|striptags }}</li>
+                    {%endif%}
+                    {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                {{ form.id }}
+                {{ form.person }}
+                {{ form.org }}
+                <ul class="contact">
+                    <li class="required">Type:{{ form.type }}</li>
+                    <li class="required">Contact: {{ form.contact }}</li>
+                    <li class="notes">Notes: {{ form.notes }}</li>
+                    <li class="delete">Check to delete this contact: {{form.DELETE}}</li>
+                </ul>
+
+            </div>
+        {% endfor %}
+    </div>
+
+<!--FORM TEMPLATE-->
+    <script type="form-template" data-formset-empty-form>
+        {% escapescript %}
+
+            <div data-formset-form class="contactsForm addform">
+                {% if form.errors %}
+                <div id="form-error">
+                    <ul>
+                    <li>{{ form.non_field_errors|striptags }}</li>
+                    {% for field in form %}
+                    {%if field.errors%}
+                    <li>{{field.label}}: {{ field.errors|striptags }}</li>
+                    {%endif%}
+                    {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                {{ formset.empty_form.id }}
+                {{ formset.empty_form.person }}
+                {{ formset.empty_form.org }}
+                <ul class="contact">
+                    <li class="required">Type:{{ formset.empty_form.type }}</li>
+                    <li class="required">Contact: {{ formset.empty_form.contact }}</li>
+                    <li class="notes">Notes: {{ formset.empty_form.notes }}</li>
+                    <li class="delete">Check to delete this contact: {{formset.empty_form.DELETE}}</li>
+
+                </ul>
+
+            </div>
+
+        {% endescapescript %}
+    </script>
+
+    <!-- This button will add a new form when clicked -->
+    <input class="add" type="button" value="Add a contact" data-formset-add>
+
+<script>jQuery(function($) {
+    $("#formset").formset({
+        animateForms: true
+    });
+});</script>
+
+
+</div>
+
+
+
+<div class="form-actions">
+{% if edit %}
+    <button type="submit" class="btn btn-primary">Update {{personNode.firstName}}</button>
+{% else %}
+    <button type="submit" class="btn btn-primary">Add Person</button>
+{% endif %}
+</div>
+
+</form>
+
+</div>
+</div>
+
+
+<div class="breadcrumb-container">
+<ul class="breadcrumb">
+	<li><a href="{% url 'rolodex_home' %}">Home</a></li>
+    {%if edit%}
+    <li><a>{{personNode.lastName}}, {{personNode.firstName}}</a></li>
+    {%else%}
+	<li><a>Add Person</a></li>
+    {%endif%}
+</ul>
+</div>
+{%endblock%}

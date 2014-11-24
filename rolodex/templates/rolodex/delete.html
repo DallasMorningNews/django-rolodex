@@ -1,0 +1,68 @@
+{%extends "rolodex/base.html" %}
+{%load staticfiles%}
+{%block head%}
+
+{%endblock%}
+
+{%block content%}
+<img class="reaper" src="{%static 'rolodex/images/reaper.png'%}">
+{%if org%}
+<h1>Are you absolutely sure you want to delete {{org.orgName}}?</h1>
+{%else%}
+<h1> Are you absolutely sure you want to delete {{peep.firstName}} {{peep.lastName}}?</h1>
+{%endif%}
+<div id="midrail">
+{%if org%}
+<form action="{%url 'rolodex_delete_org' org.pk %}" method="Post">
+{% else %}
+<form action="{%url 'rolodex_delete_person' peep.pk %}" method="Post">
+{%endif%}
+  {% csrf_token %}
+  <div class="buttonsDiv">
+    <a href="{%url 'rolodex_home'%}"><div class="safezone">No, get me outta here.</div></a>
+  <button type="submit" class="dangerzone btn">Yes, I'm sure.</button>
+</button>
+  </div>
+</form>
+
+</div>
+
+
+<style type="text/css">
+	.dangerzone{
+		color:#880000;
+		font: 22px bold 'Raleway',sans-serif;
+		padding:2px 5px;
+		margin:0 10px;
+	}
+	.safezone{
+		color:#36788e;
+		font: 22px bold 'Raleway',sans-serif;
+		padding:2px 5px;
+		margin:10px 10px;
+	}
+	.buttonsDiv{
+		margin:20px auto;
+		display:block;
+		text-align: center;
+	}
+	h1{
+		margin-top:30px;
+		font-size:22px;
+		font-family: 'Raleway',sans-serif;
+		text-align: center;
+	}
+	.reaper{
+		display: block;
+		margin:20px auto 0px;
+		max-width: 250px;
+	}
+</style>
+
+<div class="breadcrumb-container">
+<ul class="breadcrumb">
+	<li><a href="{% url 'rolodex_home' %}">Rolodex</a></li>
+    <li><a>Delete</a></li>
+</ul>
+</div>
+{%endblock%}

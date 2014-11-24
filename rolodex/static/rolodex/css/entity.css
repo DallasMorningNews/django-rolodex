@@ -1,0 +1,149 @@
+@import url(http://fonts.googleapis.com/css?family=Carter+One|Special+Elite|Raleway);
+
+h1,h2,h3,h4,h5{
+	text-align: center;
+	font-family: 'Special Elite';
+}
+h1{
+	font-size: 70px;
+}
+h2{
+	font-size:45px;
+}
+h5{
+	font-size: 24px;
+}
+
+.waitingGIF{
+	display: block;
+	margin:50px auto;
+	vertical-align: middle;
+}
+#networkCanvas{
+	height:250px;
+}
+
+
+.professional{
+	text-align: center;
+	font-size: 12px;
+	color: #333;
+	font-family: 'Raleway';
+	line-height: 12px;
+}
+
+.professional span{
+	font-weight: bold;
+	font-size: 16px;
+	color:#8C1717;
+}
+
+.bioBank{
+	margin:0 auto;
+	text-align:center;
+}
+
+.change{
+	text-align: center;
+	font-family: 'Special Elite';
+	font-size: 20px;
+	margin-top: 15px;
+}
+.change a{
+	margin:10px 10px 0px;
+	color:#888;
+}
+.change a:hover{
+	color:#880000;
+	text-decoration: none;
+}
+
+#peepPosition{
+	padding:0px 10px;
+	text-align: left;
+	height:50px;
+	display:block;
+}
+#networkCanvas{
+	width:500px;
+	margin:0 auto;
+	float:left;
+}
+#networkCanvas svg.nodeCanvas{
+	width:500px;
+	margin:0 auto;
+}
+
+
+.bioBank h6{
+	text-align: center;
+	font-family:'Special Elite',serif;
+	color:#333;
+	font-size: 18px;
+	text-decoration: underline;
+	margin-top: 10px;
+	margin-bottom: 0px;
+}
+
+.bioBank ul{
+	list-style-type: none;
+	font-family:'Raleway',sans-serif;
+}
+.bioBank li{
+	font-size: 16px;
+	color:black;
+}
+.bioBank li .type{
+	color:#333;
+	font-size: 12px;
+	margin-right:10px;
+}
+.bioBank li.notes{
+	color:#333;
+	font-size: 12px;
+	font-weight: bold;
+}
+.bioBank .relation_container{
+	max-width:500px;
+	margin:0 auto;
+}
+.bioBank .relations{
+	font-family: 'Raleway', sans-serif;
+	font-size: 10px;
+	text-align: center;
+	margin:1px auto;
+	font-style: italic;
+	display:inline-block;
+}
+.bioBank .relations span{
+	font-size: 18px;
+	font-style: normal;
+}
+.bioBank .relations span a{
+	color:#36788e;
+	font-weight: bolder;
+}
+.bioBank .relations .relation_type{
+	text-align: center;
+	width:100%;
+	margin-top: -5px;
+}
+
+#networkCanvas{
+		display: inline;
+	}
+
+@media (max-width: 550px){
+	#networkCanvas{
+		display:none;
+	}
+}
+
+@media (max-width: 400px) {
+	h1{
+		font-size: 48px;
+		margin-top: 32px;
+		margin-bottom: 0px;
+	}
+	
+}

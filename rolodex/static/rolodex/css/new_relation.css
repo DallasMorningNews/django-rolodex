@@ -1,0 +1,91 @@
+h1,h2,h3,h4,h5{
+	text-align: center;
+	font-family: 'Special Elite';
+}
+h1{
+	font-size: 70px;
+}
+h2{
+	font-size:45px;
+}
+h5{
+	font-size: 24px;
+}
+
+h4{
+	font-family: 'Raleway',sans-serif;
+	color:#333;
+}
+
+
+.relationform{
+	margin: 0px auto;
+	padding: 0px 5px;
+	max-width: 370px;
+	font-family: 'Raleway',sans-serif;
+}
+.relationform .type select{
+	max-width:250px;
+	min-width: 210px;
+}
+.relationform .type{
+	display:block;
+	margin:0 auto;
+	max-width:370px;
+}
+.button{
+	background: white;
+	border:1px solid black;
+	border-radius:2px;
+	display:block;
+	margin:0 auto;
+}
+
+.instruction{
+	text-align: center;
+	font-size: 13px;
+	line-height: 12px;
+	font-family: arial,sans-serif;
+	margin:0 7px;
+	padding:5px;
+	border-radius:4px;
+	background-color: lightgrey;
+}
+
+#form-error{
+	background-color: #FFCCCC;
+	border-radius:4px;
+	font-family: 'Raleway', sans-serif;
+	font-size: 14px;
+	padding:1px 5px;
+	margin:0 auto;
+	width:250px;
+}
+#form-error p{
+	margin:0px;
+	line-height: 14px;
+	font-size: 16px;
+	padding:5px;
+	font-style: italic;
+
+}
+#form-error ul{
+	margin:0px;
+}
+#form-error li{
+	font-weight: bold;
+	text-align: left;
+}
+
+
+@media (max-width: 400px) {
+	h1{
+		font-size: 48px;
+		margin-top: 32px;
+		margin-bottom: 0px;
+	}
+	h4{
+		font-size: 16px;
+	}
+	
+}

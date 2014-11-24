@@ -1,0 +1,162 @@
+{%extends "rolodex/base.html" %}
+{%load staticfiles%}
+{%block head%}
+
+
+<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}" />
+<script src="{% static 'rolodex/js/selectize.min.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/selectize.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/home.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/new_relation.css' %}">
+
+{%endblock%}
+
+{%block content%}
+<div id="midrail">
+
+{%if orgNode%}
+<h1>{{orgNode.orgName}}</h1>
+{%else%}
+<h1>{{peepNode.firstName}} {{peepNode.lastName}}</h1>
+{%endif%}
+
+{%if saved%} 
+<div class="instruction">Relationship created. Add another?</div>
+{%endif%}
+
+{% if pForm.errors %}
+<div id="form-error">
+    <p>Whoops, there was a mistake...</p>
+    <ul>
+    <li>{{ pForm.non_field_errors|striptags }}</li>
+    {% for field in pForm %}
+    {%if field.errors%}
+    <li>{{field.label}}: {{ field.errors|striptags }}</li>
+    {%endif%}
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{% if orgForm.errors %}
+<div id="form-error">
+    <p>Whoops, there was a mistake... </p>
+    <ul>
+    <li>{{ orgForm.non_field_errors|striptags }}</li>
+    {% for field in pForm %}
+    {%if field.errors%}
+    <li>{{field.label}}: {{ field.errors|striptags }}</li>
+    {%endif%}
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<h4>Add relationship to either an organization or a person.</h4>
+
+
+
+
+
+
+<div class="clickable" id="2Org_select">Organization</div>
+<div id="2Org_formDiv" class="relationform">
+{%if orgNode%}
+<form action="/rolodex/add-relationship/org/{{orgNode.pk}}/" method="Post">
+<input type="hidden" value="{{orgNode.pk}}" name="from_ent">
+{%else%}
+<form action="/rolodex/add-relationship/person/{{peepNode.pk}}/" method="Post">
+<input type="hidden" value="{{peepNode.pk}}" name="from_ent">
+{%endif%}
+
+{% csrf_token %}
+
+<input type="hidden" value="2Org" name="formType">
+
+<div id="node2org">
+    <select id="orgNode" name="to_ent">
+         <option value=""></option>
+    {%for org in orgs%}
+        <option value="{{org.id}}">{{org.orgName}}</option>
+    {%endfor%}
+    </select>
+</div>
+<div class="type">Type: {{orgForm.relation}}</div>
+<br><input class="button" type="submit" value="Add Relationship" />
+</form>
+</div>
+
+
+<div class="clickable" id="2P_select">Person</div>
+<div id="2P_formDiv" class="relationform">
+{%if orgNode%}
+<form action="/rolodex/add-relationship/org/{{orgNode.pk}}/" method="Post">
+<input type="hidden" value="{{orgNode.pk}}" name="from_ent">
+{%else%}
+<form action="/rolodex/add-relationship/person/{{peepNode.pk}}/" method="Post">
+<input type="hidden" value="{{peepNode.pk}}" name="from_ent">
+{%endif%}
+{% csrf_token %}
+<input type="hidden" value="2P" name="formType">
+<div id="node2p">
+	<select id="personNode" name="to_ent">
+        <option value=""></option>
+    {%for org in orgs%}
+    <optgroup label="{{org.orgName}}">
+        {%for peep in peeps%}
+        {%if peep.orgName == org.orgName%}
+            <option value="{{peep.id}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
+        {%endif%}
+        {%endfor%}    
+    </optgroup>
+    {%endfor%}
+    </select>
+</div>
+<div class="type">Type: {{pForm.relation}}</div>
+<br><input class="button" type="submit" value="Add Relationship" />
+</form>
+</div>
+
+
+</div>
+
+<script>
+$(".relationform").hide();
+$("#2Org_select").click(function(){$("#2Org_formDiv").slideToggle("slow");$("#2P_formDiv").slideUp("slow");scrolldown();});
+$("#2P_select").click(function(){$("#2P_formDiv").slideToggle("slow");$("#2Org_formDiv").slideUp("slow");scrolldown();});
+
+function scrolldown(){
+  var y = $(window).scrollTop();  
+    $("html, body").animate({ scrollTop: y + 75 }, 600);
+};
+
+
+$('#orgNode').selectize({
+    placeholder: 'Search organizations...',
+    maxOptions:10,
+    selectOnTab:true,
+});
+
+$('#personNode').selectize({
+    placeholder: 'Search people...',
+    maxOptions:10,
+    optgroupLabelField:'org',
+    selectOnTab:true,
+    searchField:['org','text'],
+});
+
+
+</script>
+
+<div class="breadcrumb-container">
+<ul class="breadcrumb">
+	<li><a href="{% url 'rolodex_home' %}">Home</a></li>
+    {%if orgNode%}
+    <li><a href="{% url 'rolodex_org' orgNode.pk %}">{{orgNode.orgName}}</a></li>
+    {%else%}
+    <li><a href="{% url 'rolodex_person' peepNode.pk %}">{{peepNode.lastName}}, {{peepNode.firstName}}</a></li>
+    {%endif%}
+	<li><a>Add</a></li>
+</ul>
+</div>
+{%endblock%}

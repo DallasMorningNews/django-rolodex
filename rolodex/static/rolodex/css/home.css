@@ -1,0 +1,33 @@
+
+h1{
+	text-align: center;
+	font-family: 'Audiowide',serif;
+	font-size: 50px;
+}
+
+.optgroup-header{
+	font-weight: bold;
+}
+div.optgroup .option{
+	padding-left: 20px;
+}
+
+
+a.noUnderline:hover{
+	text-decoration: none;
+}
+
+.dmnLogo{
+	width:150px;
+	display:block;
+	margin:0 auto;
+	bottom:10px;
+}
+.creditText{
+	font-family: 'Raleway',sans-serif;
+	font-size: 12px;
+	text-align: center;
+	bottom:40px;
+	display:block;
+	margin:50px auto 0px;
+}

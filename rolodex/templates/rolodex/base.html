@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html class="no-js"> 
+    <head>
+    {%load staticfiles%}
+    <script src="{% static 'rolodex/js/jquery-1.11.1.min.js'%}"></script>
+    <script src="{%static 'rolodex/js/jquery.formset.min.js'%}"></script>
+    <script src="{% static 'rolodex/js/jquery.sticky.js'%}"></script>
+    <script src="{%static 'rolodex/js/jQuery.succinct.min.js'%}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/base.css'%}"\>
+     <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css'%}"\>
+    {%block head%}
+    {%endblock%}
+    <title>Rolodex</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    </head>
+
+    <body>
+{%block topnav%}
+<div id="stickyNav">
+	<img src="{%static 'rolodex/images/card.png'%}">
+	<a href="{% url 'rolodex_home' %}">Rolodex</a>
+</div>
+{%endblock%}
+
+<div class="body">
+    {% block content %}{%endblock%}
+</div>
+
+<script>
+  $(document).ready(function(){
+    $("#stickyNav").sticky({topSpacing:0});
+    $('.breadcrumb li a').succinct({size: 12});
+  });
+</script>
+
+
+
+
+    </body>
+</html>
