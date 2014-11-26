@@ -138,7 +138,18 @@ h5{
 	width:100%;
 	margin-top: -5px;
 }
+.bioBank .relations .relation_delete{
+	color:#880000;
+	cursor:pointer;
+	font-style: normal;
+	border: 1px solid grey;
+	border-radius: 5px;
+	margin: 0px 10px;
+}
+.bioBank .relations .relation_delete:hover{
 
+	box-shadow: 0 0 5px red;
+}
 #networkCanvas{
 		display: inline;
 	}

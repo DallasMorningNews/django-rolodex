@@ -23,7 +23,15 @@ def secure(view):
 
 def orgRelatePeep(peeps):
 	for peep in peeps:
-		peep.orgName=peep.org_relations.filter(p_to_org__relation=EMPLOYMENT)[0].orgName
+		employers = peep.org_relations.filter(p_to_org__relation=EMPLOYMENT)
+		if len(employers) > 0:
+			peep.orgName=employers[0].orgName
+		else:
+			'''
+			If person has no primary org relationship, or if it has been deleted, we list
+			them with N/A for the purposes of the search boxes on home and relation page.
+			'''
+			peep.orgName="N/A"
 	return peeps
 
 @secure
@@ -168,7 +176,11 @@ def org_map(request,org_id):
 @secure
 def search_person(request,p_id):
 	node = Person.objects.get(id=p_id)
-	node.primary = node.org_from_p.filter(relation=EMPLOYMENT)[0].to_ent.orgName
+	employer = node.org_from_p.filter(relation=EMPLOYMENT)
+	if len(employer)>0:
+		node.primary = employer[0].to_ent.orgName
+	else:
+		node.primary = "N/A"
 	node.contacts = node.person_contact.all()
 	node.relations = node.get_relations_with_type()
 	return render_to_response('rolodex/person.html',{'node':node,},context_instance=RequestContext(request))
@@ -224,6 +236,32 @@ def new_person_relation(request,Node):
 	peeps = orgRelatePeep(peeps)
 	peepNode = Person.objects.get(pk=Node)
 	return render_to_response('rolodex/new_relation.html',{'peepNode':peepNode,'pForm':p2pForm,'orgForm':p2orgForm,'saved':saved,'peeps':peeps,'orgs':orgs},context_instance=RequestContext(request))
+
+@secure
+def delete_relationship(request):
+	'''
+	Delete relationships via AJAX on entity pages.
+	'''
+	if request.POST:
+		if request.POST['from_type']=='p':
+			if request.POST['to_type'] == 'p':
+				from_ent = Person.objects.get(id=request.POST['from_ent'])
+				to_ent = Person.objects.get(id=request.POST['to_ent'])
+				from_ent.remove_p2p(to_ent)
+			else:
+				from_ent = Person.objects.get(id=request.POST['from_ent'])
+				to_ent = Org.objects.get(id=request.POST['to_ent'])
+				from_ent.remove_p2org(to_ent)
+		else:
+			if request.POST['to_type'] == 'p':
+				from_ent = Org.objects.get(id=request.POST['from_ent'])
+				to_ent = Person.objects.get(id=request.POST['to_ent'])
+				from_ent.remove_org2p(to_ent)
+			else:
+				from_ent = Org.objects.get(id=request.POST['from_ent'])
+				to_ent = Org.objects.get(id=request.POST['to_ent'])
+				from_ent.remove_org2org(to_ent)
+	return HttpResponse("Done.")
 
 @secure
 def new_org_relation(request,Node):

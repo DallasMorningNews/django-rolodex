@@ -78,17 +78,59 @@
 <h6>Organizations</h6>
 <div class="relation_container clearfix">
 <div class="relations">
+
 {%for r in node.relations.orgs%}
-<span><a href="{%url 'rolodex_org' r.relation.pk%}">{{r.relation.orgName}}</a></span><br/><div class="relation_type">{{r.type}}</div><br/>
+{% spaceless %}
+<div class="rel_O{{r.relation.pk}}">
+<span><a href="{%url 'rolodex_org' r.relation.pk%}">{{r.relation.orgName}}</a></span><br/><div class="relation_type">{{r.type}}</div>
+<div class="relation_delete">Delete this relationship</div><br/>
+</div>
+<script type="text/javascript">
+  $(".rel_O{{r.relation.pk}}").click(function(){
+      $.post("{%url 'rolodex_delete_relation'%}",
+          {
+            from_ent:"{{node.pk}}",
+            from_type:"p",
+            to_ent:"{{r.relation.pk}}",
+            to_type:"o",
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+          },
+          function(){$(".rel_O{{r.relation.pk}}").slideUp("slow");} 
+      );
+  })
+</script>
+{% endspaceless %}
 {%endfor%}
+
 </div>
 </div>
 <h6>People</h6>
 <div class="relation_container clearfix">
 <div class="relations">
+
 {%for r in node.relations.people%}
-<span><a href="{%url 'rolodex_person' r.relation.pk%}">{{r.relation.firstName}} {{r.relation.lastName}}</a></span><br/><div class="relation_type">{{r.type}}{%if r.relation.role%}{%if r.type%} - {%endif%}{{r.relation.role.role}}{%endif%}</div><br/>
+{% spaceless %}
+<div class="rel_P{{r.relation.pk}}">
+<span><a href="{%url 'rolodex_person' r.relation.pk%}">{{r.relation.firstName}} {{r.relation.lastName}}</a></span><br/><div class="relation_type">{{r.type}}{%if r.relation.role%}{%if r.type%} - {%endif%}{{r.relation.role.role}}{%endif%}</div>
+<div class="relation_delete">Delete this relationship</div><br/>
+</div>
+<script type="text/javascript">
+  $(".rel_P{{r.relation.pk}}").click(function(){
+      $(".rel_P{{r.relation.pk}}").slideUp("slow");
+      $.post("{%url 'rolodex_delete_relation'%}",
+          {
+            from_ent:"{{node.pk}}",
+            from_type:"p",
+            to_ent:"{{r.relation.pk}}",
+            to_type:"p",
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+          }
+      );
+  })
+</script>
+{% endspaceless %}
 {%endfor%}
+
 </div>
 </div>
   <div class="change">

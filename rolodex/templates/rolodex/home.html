@@ -37,6 +37,13 @@
             {%endfor%}    
         </optgroup>
         {%endfor%}
+        <optgroup label="N/A">
+            {%for peep in peeps%}
+            {%if peep.orgName == 'N/A'%}
+                <option value="{{peep.id}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
+            {%endif%}
+            {%endfor%}
+        </optgroup>
         </select>
         <div class="buttonDiv">
         <a class="goLink" href="">Go</a>
