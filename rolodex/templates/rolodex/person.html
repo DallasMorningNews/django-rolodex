@@ -8,40 +8,19 @@
 <script src="{% static 'rolodex/js/selectize.min.js' %}"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/selectize.css'%}">
 <link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/entity.css'%}">
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/nodeMap.css'%}">
 <script src="{% static 'js/d3.v3.min.js'%}"></script>
 
 {%endblock%}
 
 {%block content%}
 
-<style>
-.link {
-  fill: none;
-  stroke: #666;
-  stroke-width: 1px;
-  stroke-dasharray:4,4;
-}
-.link.primary{
-  stroke: #0EBFE9;
-  stroke-dasharray:0;
-  stroke-width: 2.5px;
-}
-.node circle {
-  stroke: #fff;
-  stroke-width: 2px;
-}
-.node.primary circle,.lab.primary{
-  fill:#0EBFE9 !important;
-  font-weight: bold;
-}
-text{
-  font: 10px sans-serif;
-  cursor:pointer;
-}
-</style>
 
 <div id="midrail">
 <div id="networkCanvas"></div>
+<div class="fullMap">
+<a href="{%url 'rolodex_person_map' node.pk%}">Full page graph</a>
+</div>
 <h1>{{node.firstName}} {{node.lastName}}</h1>
 <div class="professional">
   {%if node.role%}
@@ -119,6 +98,10 @@ text{
 
 
 
+<div class="change delete">
+<a href="{%url 'rolodex_delete_person' node.pk%}">Delete {{node.firstName}}?</a>
+</div>
+
 
 
 
@@ -143,7 +126,9 @@ function scrolldown(){
 var replaceP = '{% url "rolodex_person" "foobarbaz" %}',
 	replaceO = '{% url "rolodex_org" "foobarbaz" %}',
   nodeID="{{node.firstName}} {{node.lastName}}",
-  nodePRIME = "{{node.primary}}";
+  nodePRIME = "{{node.primary}}"
+  graphWidth = 500,
+  graphHeight = 250;
 </script>
 <script src="{% static 'rolodex/js/nodeNet.js'%}"></script>
 <script type="text/javascript">

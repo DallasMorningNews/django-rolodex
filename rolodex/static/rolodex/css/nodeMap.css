@@ -1,0 +1,21 @@
+.link {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1px;
+}
+.link.primary{
+  stroke: #0EBFE9;
+  stroke-width: 2.5px;
+}
+.node circle {
+  stroke: #fff;
+  stroke-width: 2px;
+}
+.node.primary circle,.lab.primary{
+  fill:#0EBFE9 !important;
+  font-weight: bold;
+}
+text{
+  font: 10px sans-serif;
+  cursor:pointer;
+}

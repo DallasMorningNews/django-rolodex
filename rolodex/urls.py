@@ -16,6 +16,8 @@ urlpatterns = patterns('',
     url(r'^person/(.+)/$',views.search_person,name='rolodex_person'),
     url(r'^add-relationship/org/(\d+)/$',views.new_org_relation,name='rolodex_new_org_relation'),
     url(r'^add-relationship/person/(\d+)/$',views.new_person_relation,name='rolodex_new_person_relation'),
+    url(r'^person-map/(\d+)/$',views.person_map,name='rolodex_person_map'),
+    url(r'^org-map/(\d+)/$',views.org_map,name='rolodex_org_map'),
     url(r'^person-network/(\d+)/$',views.person_network,name='rolodex_person_network'),
     url(r'^org-network/(\d+)/$',views.org_network,name='rolodex_org_network'),
 

@@ -1,18 +1,51 @@
 function chartNetwork(links){
 
+var nodes = {},
+    bilinks = [],
+    drawLinks = [],
+    relations = [];
 
-
-
-var nodes = {};
-
-// Compute the distinct nodes from the links.
+var i = 0;
 links.forEach(function(link) {
-  link.source = nodes[link.source] || (nodes[link.source] = {name:link.source_name,type:link.source_type,id:link.source});
-  link.target = nodes[link.target] || (nodes[link.target] = {name:link.target_name,type:link.target_type,id:link.target});
+  
+  var match = link.source+"_"+link.target,
+      rematch = link.target+"_"+link.source;
+
+  //Check to see if we've already made the match...
+  if( relations.indexOf(match) == -1 & relations.indexOf(rematch) == -1 ){
+
+      relations.push(link.source+"_"+link.target)
+
+      link.source = nodes[link.source] || (nodes[link.source] = {name:link.source_name,type:link.source_type,id:link.source});
+      link.target = nodes[link.target] || (nodes[link.target] = {name:link.target_name,type:link.target_type,id:link.target});
+
+
+      i+=1
+      var iID = i.toString(),
+          fake = {name:"fake"+iID,type:"fake",id:"fake"+iID,};
+      
+      nodes["fake"+i.toString()]=fake;
+
+      drawLinks.push({
+          source:link.source,
+          target:fake
+        },{
+          source:fake,
+          target:link.target
+        });
+
+      bilinks.push([link.source,fake,link.target]);
+  }
+
 });
 
-var width = 500,
-    height = 250;
+//Some scaling for large numbers of nodes...
+linkLength = d3.scale.linear()
+  .domain([1,150])
+  .range([-125,-30]);
+
+var width = graphWidth,
+    height = graphHeight;
 
 var color = d3.scale.ordinal().domain(['org','person']).range(['#5F9F9F','#FF8C69']);
 
@@ -20,10 +53,10 @@ var tickI = 0;
 
 var force = d3.layout.force()
     .nodes(d3.values(nodes))
-    .links(links)
+    .links(drawLinks)
     .size([width, height])
-    .linkDistance(30)
-    .charge(-600)
+    .linkDistance(10)
+    .charge(linkLength(drawLinks.length))
     .on("tick", function(){
       /*Tick limiter*/
       if(tickI%4==0){tick();};
@@ -36,17 +69,18 @@ var svg = d3.select("#networkCanvas").append("svg")
     .attr("width", width)
     .attr("height", height);
 
-
-
 var link = svg.selectAll(".link")
-    .data(force.links())
-  .enter().append("line")
-    .attr("class", function(d){
-      if((d.source.name==nodePRIME && d.target.name==nodeID)||(d.target.name==nodePRIME && d.source.name==nodeID)){
-        return "primary link";
-      }else{
-        return "link";
-      }});
+    .data(bilinks)
+  .enter().append("path")
+    .attr("class",
+      function(d){
+        if((d[0].name==nodePRIME && d[2].name==nodeID)||(d[2].name==nodePRIME && d[0].name==nodeID)){
+          return "primary link";
+        }else{
+          return "link";
+        }
+      });
+
 var node = svg.selectAll(".node")
     .data(force.nodes())
   .enter().append("g")
@@ -56,12 +90,10 @@ var node = svg.selectAll(".node")
 node.append("circle")
     .attr("r", function(d){ return d.type==="org" ? 10:8;})
     .attr("class",function(d) { return d.name==nodeID ?  d.id+" circ primary" : d.id+ " circ"; })
+    .style("visibility",function(d){return d.type=="fake" ? "hidden":"visible" })
     .style("fill", function(d) { return color(d.type); })
-    .on("mouseover",visible)
-    .on("mouseout",invisible)
-    ;
-
-
+    .on("mouseenter",visible)
+    .on("mouseout",invisible);
 
 node.append("text")
 	.attr("class",function(d) { return d.name===nodeID ? d.id + " lab primary":d.id+" lab"; })
@@ -82,16 +114,16 @@ node.append("text")
     	window.location = url;
       }
     })
-    .on("mouseover", mouseover)
+    .on("mouseenter", mouseover)
     .on("mouseout", mouseout);
 
 function visible(){
   if($(this).attr('class').split(' ')[3]!=='primary'){
-  var selector = $(this).attr('class').split(' ')[0];
-  var lab = d3.selectAll("."+selector+".lab");
-  lab.transition().attr("opacity",1)
-  .attr("pointer-events","all");
-}
+    var selector = $(this).attr('class').split(' ')[0];
+    var lab = d3.selectAll("."+selector+".lab");
+    lab.transition().attr("opacity",1)
+    .attr("pointer-events","all");
+  }
 }
 function invisible(){
   if($(this).attr('class').split(' ')[3]!=='primary'){
@@ -102,11 +134,11 @@ function invisible(){
 }
 
 function tick() {
-  link
-      .attr("x1", function(d) { return d.source.x; })
-      .attr("y1", function(d) { return d.source.y; })
-      .attr("x2", function(d) { return d.target.x; })
-      .attr("y2", function(d) { return d.target.y; });
+  link.attr("d", function(d) {
+      return "M" + d[0].x + "," + d[0].y
+          + "S" + d[1].x + "," + d[1].y
+          + " " + d[2].x + "," + d[2].y;
+    });
 
   node
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });

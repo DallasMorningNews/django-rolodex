@@ -153,33 +153,39 @@ def delete_person(request,personNode):
 
 
 @secure
-def search_org(request,pNode):
-	nodes = Org.objects.filter(id=pNode)
-	peeps = Person.objects.filter(id=pNode)
-	peeps = orgRelatePeep(peeps)
-	node = nodes[0]
+def search_org(request,org_id):
+	node = Org.objects.get(id=org_id)
 	node.employees = node.get_employees()
 	node.contacts = node.org_contact.all()
 	node.relations = node.get_relations_with_type()
 	return render_to_response('rolodex/org.html',{'node':node,},context_instance=RequestContext(request))
 
 @secure
-def search_person(request,pNode):
-	nodes = Person.objects.filter(id=pNode)
-	node = nodes[0]
+def org_map(request,org_id):
+	node = Org.objects.get(id=org_id)
+	return render_to_response('rolodex/orgMap.html',{'node':node,},context_instance=RequestContext(request))
+
+@secure
+def search_person(request,p_id):
+	node = Person.objects.get(id=p_id)
 	node.primary = node.org_from_p.filter(relation=EMPLOYMENT)[0].to_ent.orgName
 	node.contacts = node.person_contact.all()
 	node.relations = node.get_relations_with_type()
 	return render_to_response('rolodex/person.html',{'node':node,},context_instance=RequestContext(request))
 
 @secure
-def person_network(request,pNode):
-	network = net_compiler(Person.objects.filter(id=pNode),3)
+def person_map(request,p_id):
+	node = Person.objects.get(id=p_id)
+	return render_to_response('rolodex/personMap.html',{'node':node,},context_instance=RequestContext(request))
+
+@secure
+def person_network(request,p_id):
+	network = net_compiler(Person.objects.filter(id=p_id),3)
 	data = json.dumps(network)
 	return HttpResponse(data, content_type='application/json')
 @secure
-def org_network(request,oNode):
-	network = net_compiler(Org.objects.filter(id=oNode),3)
+def org_network(request,org_id):
+	network = net_compiler(Org.objects.filter(id=org_id),3)
 	data = json.dumps(network)
 	return HttpResponse(data, content_type='application/json')
 

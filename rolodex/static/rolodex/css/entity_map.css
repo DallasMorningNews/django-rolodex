@@ -1,0 +1,19 @@
+div#networkCanvas{
+	width:100%;
+}
+#networkCanvas svg.nodeCanvas {
+width: 100%;
+}
+.change{
+	position: absolute;
+	bottom: 0; 
+	left:50%;
+	margin-left:-50%;
+}
+.waitingGIF{margin-top: 20%;}
+
+@media (max-width: 550px){
+	#networkCanvas {
+		display: inline;
+	}
+}
