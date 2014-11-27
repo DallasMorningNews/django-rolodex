@@ -29,5 +29,5 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
-    install_requires = ['Django>=1.7','djangorestframework>=2.4.4',],
+    install_requires = ['Django>=1.7','djangorestframework>=2.4.4', 'dj-database-url>=0.3.0',],
 )
