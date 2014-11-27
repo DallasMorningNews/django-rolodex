@@ -157,8 +157,7 @@ class Person(models.Model):
 	tags = models.ManyToManyField(Tag,blank=True)
 	def __unicode__(self):
 		return self.lastName+", "+self.firstName
-	class Meta:
-		permissions = (("delete_person", "Can delete people."),)
+
 
 class Org(models.Model):
 	orgName = models.CharField(max_length=200)
@@ -170,8 +169,6 @@ class Org(models.Model):
 	tags = models.ManyToManyField(Tag,blank=True)
 	def __unicode__(self):
 		return self.orgName
-	class Meta:
-		permissions = (("delete_org", "Can delete organizations."),)
 
 ###################
 ## Relationships ##
