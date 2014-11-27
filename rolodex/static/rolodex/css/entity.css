@@ -144,7 +144,8 @@ h5{
 	font-style: normal;
 	border: 1px solid grey;
 	border-radius: 5px;
-	margin: 0px 10px;
+	margin: 0px auto;
+	width: 110px;
 }
 .bioBank .relations .relation_delete:hover{
 

@@ -72,7 +72,7 @@
 <div class="relation_delete">Delete this relationship</div><br/>
 </div>
 <script type="text/javascript">
-  $(".rel_O{{r.relation.pk}}").click(function(){
+  $(".rel_O{{r.relation.pk}} .relation_delete").click(function(){
       $.post("{%url 'rolodex_delete_relation'%}",
           {
             from_ent:"{{node.pk}}",
@@ -103,7 +103,7 @@
 <div class="relation_delete">Delete this relationship</div><br/>
 </div>
 <script type="text/javascript">
-  $(".rel_P{{r.relation.pk}}").click(function(){
+  $(".rel_P{{r.relation.pk}} .relation_delete").click(function(){
       $(".rel_P{{r.relation.pk}}").slideUp("slow");
       $.post("{%url 'rolodex_delete_relation'%}",
           {
