@@ -12,8 +12,8 @@ This is a development release, with more detailed docs, annotated (and probably 
 
 Quick start
 -----------
-1. `pip install django-rolodex`
-2. Add rolodex and the django rest framework to your INSTALLED_APPS setting:
+- `pip install django-rolodex`
+- Add rolodex and the django rest framework to your `INSTALLED_APPS` setting:
 ```python
 INSTALLED_APPS = (
     ...
@@ -21,12 +21,15 @@ INSTALLED_APPS = (
     'rest_framework',
 )
 ```
-3. Include the rolodex and rest framework auth URLconf in your project urls.py:
+- Include the rolodex and rest framework auth URLconf in your project urls.py:
 ```python
-url(r'^rolodex/', include('rolodex.urls')),
-url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+urlpatterns = patterns('',
+    ...
+    url(r'^rolodex/', include('rolodex.urls')),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+)
 ```
-4. If you'd like to restrict views to only logged in users, set Rolodex's security variable in settings.py:
+- If you'd like to restrict views to only logged in users, set Rolodex's security variable in settings.py:
 ```python
 ROLODEX_SECURE = True 
 ```
@@ -46,10 +49,10 @@ REST_FRAMEWORK = {
     ]
 }
 ```
-5. Optionally, create a `'rolodex'` database in your DATABASES settings or use a `ROLODEX_DB` environment variable (à la  `DATABASE_URL`) to route the app to a dedicated database.
-6. Run `python manage.py migrate` (or `python manage.py migrate --database=rolodex` if you set up routing) to create the models and load fixtures.
-7. `python manage.py runserver` and checkout http://localhost:8000/rolodex to create your first people and orgs (see docs). 
-8. Optionally, use the rest framework API at http://localhost:8000/rolodex/api/
+- Optionally, create a `'rolodex'` database in your DATABASES settings or use a `ROLODEX_DB` environment variable (à la  `DATABASE_URL`) to route the app to a dedicated database.
+- Run `python manage.py migrate` (or `python manage.py migrate --database=rolodex` if you set up routing) to create the models and load fixtures.
+- `python manage.py runserver` and checkout [http://localhost:8000/rolodex](http://localhost:8000/rolodex) to create your first people and orgs (see docs). 
+- Optionally, use the rest framework API at [http://localhost:8000/rolodex/api/](http://localhost:8000/rolodex/api/)
 
 
 Adding people & orgs to Rolodex
