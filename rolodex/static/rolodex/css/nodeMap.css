@@ -11,11 +11,28 @@
   stroke: #fff;
   stroke-width: 2px;
 }
-.node.primary circle,.lab.primary{
-  fill:#0EBFE9 !important;
+.node.primary circle.circ.primary, .lab.primary{
+  fill:#0EBFE9 ;
   font-weight: bold;
+}
+.lab{
+  fill:#888888;
+}
+circle.circ.org{
+  fill:#5F9F9F;
+}
+circle.circ.person{
+  fill:#FF8C69;
 }
 text{
   font: 10px sans-serif;
   cursor:pointer;
 }
+
+text.colorKey{
+  font:10px 'Raleway',sans-serif;
+}
+text.colorKey.title{
+  font-size: 12px;
+}
+

@@ -441,6 +441,9 @@ def get_relations_with_type(self):
 		kin=self.p_to_p.all().order_by('pk')
 		return {'orgs':collate_relations(kith),'people':collate_relations(kin)}
 
+
+
+
 ##############
 
 def collate_relations(queryset):
@@ -456,6 +459,31 @@ def collate_relations(queryset):
 	return relation_list
 
 
+import networkx as nx
+def nxAdd(graph,node):
+	people = node.p_relations.all()
+	orgs = node.org_relations.all()
+	ents = list(chain(people,orgs))
+	graph.add_nodes_from(ents)
+	graph.add_edges_from([(node,n) for n in ents])
+	return graph
+
+def relation_list(self):
+	return list( chain( self.p_relations.all(),self.org_relations.all() ) )
+
+def nxGraph(self,hops=2):
+	G = nx.Graph()
+	G = nxAdd(G,self)
+	relations = relation_list(self)
+	for i in range(hops-1):
+		intermediate = []
+		for r in relations:
+			G = nxAdd(G,r)
+			intermediate = list( chain( intermediate,relation_list(r) ) ) 
+		relations = list( chain( relations,intermediate ) )
+	return G
+
+
 ###############
 ## Add funcs ##
 ###############
@@ -468,6 +496,7 @@ Person.get_relations = get_relations
 Person.get_employer = get_employer
 Person.get_relations_with_type = get_relations_with_type
 Person.get_relations_by_type = get_relations_by_type
+Person.nxGraph = nxGraph
 
 Org.add_org2org = add_org2org
 Org.remove_org2org = remove_org2org
@@ -478,4 +507,5 @@ Org.get_employees = get_employees
 Org.get_employees_by_role = get_employees_by_role
 Org.get_relations_with_type = get_relations_with_type
 Org.get_relations_by_type = get_relations_by_type
+Org.nxGraph = nxGraph
 

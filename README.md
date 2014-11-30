@@ -72,23 +72,23 @@ There are different relationship models for each permuation of person/org relati
 
 To help manage the creation of relationships, person and org objects have an extended set of methods.
 
-- `.add_p2p(person_object,**kwargs)` : relationship from person to person
-- `.remove_p2p(person_object,**kwargs)`
-- `.add_p2org(org_object,**kwargs)` : relation from person to org
-- `.remove_p2org(org_object,**kwargs)`
-- `.add_org2org(org_object,**kwargs)` : relation from org to org
-- `.remove_org2org(org_object,**kwargs)`
-- `.add_org2p(person_object,**kwargs)` : relation from org to person
-- `.remove_org2p(person_object,**kwargs)`
+- `add_p2p(person_object,**kwargs)` : relationship from person to person
+- `remove_p2p(person_object,**kwargs)`
+- `add_p2org(org_object,**kwargs)` : relation from person to org
+- `remove_p2org(org_object,**kwargs)`
+- `add_org2org(org_object,**kwargs)` : relation from org to org
+- `remove_org2org(org_object,**kwargs)`
+- `add_org2p(person_object,**kwargs)` : relation from org to person
+- `remove_org2p(person_object,**kwargs)`
 
 There are also shorthand methods for retrieving related objects:
 
-- `.get_relations()` : gets related person & org objects
-- `.get_relations_with_type()` : gets related person & org objects with type of relationship
-- `.get_relations_by_type(type)` : related objects filtered by type name (a string)
-- `.get_employer()` : primary orgs associated with person object
-- `.get_employees()` : gets person objects primarily associated with org
-- `.get_employees_by_role(role)` : role is a string
+- `get_relations()` : gets related person & org objects
+- `get_relations_with_type()` : gets related person & org objects with type of relationship
+- `get_relations_by_type(type)` : related objects filtered by type name (a string)
+- `get_employer()` : primary orgs associated with person object
+- `get_employees()` : gets person objects primarily associated with org
+- `get_employees_by_role(role)` : role is a string
 
 
 <a name="types_and_roles"></a>Types & Roles
@@ -101,3 +101,14 @@ Types and roles are added through django admin:
 - `p2p_type` : relationship between people, e.g., "spouse" or "professional"
 - `org2org_type` : relationships between orgs, e.g., "co-venture" or "subsidiary"
 - `p2org_type` : relationships between people and orgs, where "employment" is a pre-loaded fixture.
+
+Analysis
+---------
+
+Rolodex person and org objects also have methods to return a NetworkX graph of connected objects for more advanced analysis.
+
+`nxGraph(hops=2)` returns a NetworkX graph of all person and org objects within a specified number of hops.
+
+See the [NetworkX documentation](http://networkx.github.io/documentation/latest/reference/index.html) for the methods available on the returned graph.
+
+The "Full Page Graph" for each person or org, also provides a quick and dirty visualization of centrality measures for a graph N hops from the origin node. You can pass the number of hops as a GET parameter, e.g. `?hops=4`, or it will default to 3.

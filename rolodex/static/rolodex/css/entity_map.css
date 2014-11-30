@@ -12,6 +12,30 @@ width: 100%;
 }
 .waitingGIF{margin-top: 20%;}
 
+.statSelect{
+	margin-top: 15px;
+	font-family: 'Raleway',sans-serif;
+	font-size: 14px;
+	float:right;
+}
+.statSelect select{
+	background-color: white;
+	border:1px solid black;
+}
+
+div.modal-dialog{
+  margin-top: 50px;
+}
+
+.btn.info{
+  padding: 0px 4px;
+  line-height: 18px;
+  border-radius: 3px;
+  margin-top: -2px;
+  font-weight: bold;
+  border: 1px solid;
+}
+
 @media (max-width: 550px){
 	#networkCanvas {
 		display: inline;

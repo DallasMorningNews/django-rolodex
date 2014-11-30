@@ -10,6 +10,7 @@ from django.db.models import Q
 from itertools import chain
 import json
 from django.conf import settings
+import networkx as nx
 
 
 EMPLOYMENT = p2org_type.objects.get(relationship_type='employment')
@@ -171,7 +172,8 @@ def search_org(request,org_id):
 @secure
 def org_map(request,org_id):
 	node = Org.objects.get(id=org_id)
-	return render_to_response('rolodex/orgMap.html',{'node':node,},context_instance=RequestContext(request))
+	hops = int(request.GET.get('hops',3))
+	return render_to_response('rolodex/orgMap.html',{'node':node,'hops':hops},context_instance=RequestContext(request))
 
 @secure
 def search_person(request,p_id):
@@ -188,7 +190,8 @@ def search_person(request,p_id):
 @secure
 def person_map(request,p_id):
 	node = Person.objects.get(id=p_id)
-	return render_to_response('rolodex/personMap.html',{'node':node,},context_instance=RequestContext(request))
+	hops = int(request.GET.get('hops',3))
+	return render_to_response('rolodex/personMap.html',{'node':node,'hops':hops},context_instance=RequestContext(request))
 
 @secure
 def person_network(request,p_id):
@@ -199,6 +202,41 @@ def person_network(request,p_id):
 def org_network(request,org_id):
 	network = net_compiler(Org.objects.filter(id=org_id),3)
 	data = json.dumps(network)
+	return HttpResponse(data, content_type='application/json')
+
+
+'''
+Compile some basic network centrality statistics for graph.
+'''
+def adv_compile(node, hops):
+	G = node.nxGraph(hops)
+	degree = nx.degree_centrality(G)
+	betweenness = nx.betweenness_centrality(G)
+	closeness= nx.closeness_centrality(G) 
+	data={}
+	for node in degree:
+		n = getInfo(node)
+		data[n.id] = {'degree':degree[node],
+						'betweenness':betweenness[node],
+						'closeness':closeness[node]}
+	return data
+
+@secure
+def adv_person_network(request,p_id):
+	hops = int(request.GET.get('hops',3))
+	network = net_compiler(Person.objects.filter(id=p_id),hops)
+	peep = Person.objects.get(id=p_id)
+	centrality_data = adv_compile(peep,hops)
+	data = json.dumps({'centrality':centrality_data, 'links':network})
+	return HttpResponse(data, content_type='application/json')
+
+@secure
+def adv_org_network(request,o_id):
+	hops = int(request.GET.get('hops',3))
+	network = net_compiler(Org.objects.filter(id=o_id),hops)
+	org = Org.objects.get(id=o_id)
+	centrality_data = adv_compile(org,hops)
+	data = json.dumps({'centrality':centrality_data, 'links':network})
 	return HttpResponse(data, content_type='application/json')
 
 @secure

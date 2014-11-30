@@ -96,21 +96,21 @@ node.append("circle")
     .on("mouseout",invisible);
 
 node.append("text")
-  .attr("class",function(d) { return d.name===nodeID ? d.id + " lab primary":d.id+" lab"; })
+	.attr("class",function(d) { return d.name===nodeID ? d.id + " lab primary":d.id+" lab"; })
     .attr("x", function(d){ return d.type==="org" ? 12:10;})
     .attr("dy", ".35em")
     .attr("opacity",function(d) { return d.name===nodeID ?1:0;})
     .attr("pointer-events","none")
     .text(function(d) { return d.name; })
     .on("click",function(d){
-      var id = d.id.substring(1);
+    	var id = d.id.substring(1);
       if(d.name===nodeID){}else{
-      if(d.type==='person'){
-        var url = replaceP.replace('foobarbaz',id);
-      }else{
-        var url = replaceO.replace('foobarbaz',id);
-      }
-      window.location = url;
+    	if(d.type==='person'){
+    		var url = replaceP.replace('foobarbaz',id);
+    	}else{
+    		var url = replaceO.replace('foobarbaz',id);
+    	}
+    	window.location = url;
       }
     })
     .on("mouseenter", mouseover)

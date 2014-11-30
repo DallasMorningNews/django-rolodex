@@ -2,13 +2,11 @@
 {%load staticfiles%}
 {%block head%}
 
-<script src="{% static 'rolodex/js/selectize.min.js' %}"></script>
-<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/selectize.css'%}">
 <link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/entity.css'%}">
 <link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/entity_map.css'%}">
 <link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/nodeMap.css'%}">
 <script src="{% static 'rolodex/js/d3.v3.min.js'%}"></script>
-
+<script src="{% static 'rolodex/js/bootbox.min.js'%}"></script>
 {%endblock%}
 
 {%block content%}
@@ -16,7 +14,15 @@
 
 
 
-
+<div class="statSelect">
+  <select>
+    <option value="default">Scale by centrality?</option>
+    <option value="degree">Degree</option>
+    <option value="betweenness">Betweenness</option>
+    <option value="closeness">Closenness</option>
+  </select>
+  <button class="btn info">?</button>
+</div>
 
 <div id="networkCanvas"></div>
 
@@ -32,7 +38,8 @@ var replaceP = '{% url "rolodex_person" "foobarbaz" %}',
   nodeID="{{node.firstName}} {{node.lastName}}",
   nodePRIME = "{{node.primary}}",
   graphWidth = $(window).width(),
-  graphHeight = $(window).height()-60;
+  graphHeight = $(window).height()-100,
+  graphData={};
 </script>
 <script src="{% static 'rolodex/js/nodeNet.js'%}"></script>
 <script type="text/javascript">
@@ -40,12 +47,32 @@ var replaceP = '{% url "rolodex_person" "foobarbaz" %}',
   $.ajax({
     type:"GET",
     dataType:"json",
-    url:"{%url 'rolodex_person_network' node.pk %}",
+    url:"{%url 'rolodex_adv_person_network' node.pk %}?hops={{hops}}",
     success: function(d){
       $('#networkCanvas').html("");
-      chartNetwork(d);
+      chartNetwork(d.links);
+      graphData = d;
     }
   });
+
+
+$(document).ready(function(){
+  $(".statSelect select").change(function(){
+    var centrality = $( ".statSelect select option:selected" ).val();
+    if(centrality == 'default'){
+       nodeDefault();
+    }else{
+      nodeCentrality(centrality);
+    } 
+  })
+
+  $(".btn.info").click(function(){
+    bootbox.alert("<p>In social network theory, centrality measures are one way to assess the \"importance\" of any one person or org in a network. Which measure of importance you use depends on the question you're asking.<p><b>Degree</b> centrality is the simple number of relationships a person or org has to other persons or orgs in the network. Degree centrality assumes whoever has the most connections is the most important. <p><b>Betweenness</b> measures how crucial a conduit any one person or org is to other nodes in the network. A person or org with high betweenness centrality is thought to be important to the transfer of information through the network, assuming people and orgs in the network are trying to use the shortest path possible to distribute or receive information.<p><b>Closenness</b> measures how close to the \"middle\" of the network a person or org is. These people or orgs are not necessarily vital to information transfer or the most well-connected, but they are generally in the middle of things.");
+
+  })
+
+})
+
 </script>
 
 

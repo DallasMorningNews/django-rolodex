@@ -28,7 +28,9 @@ urlpatterns = patterns('',
     url(r'^org-map/(\d+)/$',views.org_map,name='rolodex_org_map'),
     url(r'^person-network/(\d+)/$',views.person_network,name='rolodex_person_network'),
     url(r'^org-network/(\d+)/$',views.org_network,name='rolodex_org_network'),
-
+    url(r'^person-network-advanced/person/(\d+)/$',views.adv_person_network,name='rolodex_adv_person_network'),
+    url(r'^org-network-advanced/org/(\d+)/$',views.adv_org_network,name='rolodex_adv_org_network'),
+    
     #api
     url(r'^api/',include(router.router.urls)),
     url(r'^api/employees/([0-9]+)/$',APIviews.GetEmployees.as_view())
