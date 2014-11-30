@@ -33,6 +33,10 @@ text.colorKey{
   font:10px 'Raleway',sans-serif;
 }
 text.colorKey.title{
-  font-size: 12px;
+  font-size: 10px;
 }
 
+text.centralityData{
+  fill:#666666;
+  font:10px sans-serif;
+}

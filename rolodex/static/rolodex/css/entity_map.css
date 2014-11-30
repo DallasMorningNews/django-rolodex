@@ -17,6 +17,7 @@ width: 100%;
 	font-family: 'Raleway',sans-serif;
 	font-size: 14px;
 	float:right;
+	visibility:hidden;
 }
 .statSelect select{
 	background-color: white;
@@ -25,6 +26,20 @@ width: 100%;
 
 div.modal-dialog{
   margin-top: 50px;
+}
+.sliderContainer{
+	font-size: 10px;
+	font-family: 'Raleway',sans-serif;
+	margin-top: 3px;
+	text-align: center;
+	padding-left: 8px;
+	visibility: hidden;
+}
+.slider{
+	width:100px;
+	font-size: 12px;
+	margin-left: 39px;
+	
 }
 
 .btn.info{
@@ -35,6 +50,29 @@ div.modal-dialog{
   font-weight: bold;
   border: 1px solid;
 }
+
+.ui-widget-header{
+	background:#8AA37B;
+}
+
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus {
+border: 1px solid #333;
+background: white url("images/ui-bg_glass_100_fdf5ce_1x400.png") 50% 50% repeat-x;
+font-weight: bold;
+color: #888
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 @media (max-width: 550px){
 	#networkCanvas {

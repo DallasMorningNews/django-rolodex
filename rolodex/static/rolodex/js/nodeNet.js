@@ -41,7 +41,7 @@ links.forEach(function(link) {
 
 //Some scaling for large numbers of nodes...
 linkLength = d3.scale.linear()
-  .domain([1,150])
+  .domain([1,200])
   .range([-125,-30]);
 
 var width = graphWidth,
@@ -161,7 +161,8 @@ function mouseout() {
 function nodeCentrality(measure){
   var data = graphData.centrality;
   
-  var colors = ['#fcc5c0','#f768a1','#7a0177',];
+  var colors = ['#fcc5c0','#f768a1','#7a0177',],
+      decimal = d3.format("0.2f");
 
   var color = d3.scale.linear()
                 .domain([0,.5,1.0])
@@ -169,7 +170,8 @@ function nodeCentrality(measure){
       c = d3.scale.linear()
                 .domain(d3.extent( d3.values(data), function(d){return d[measure]} ) )
                 .range([0,1]),
-      size = d3.scale.pow().exponent(10)
+      sizeFactor = $(".slider").slider( "value" ),
+      size = d3.scale.pow().exponent(sizeFactor)
                 .domain(d3.extent( d3.values(data), function(d){return d[measure]} ) )
                 .range([6,13]);
 
@@ -195,22 +197,41 @@ function nodeCentrality(measure){
         .attr("stop-opacity", 1);
       svg.append("rect")
       .attr("class","colorKey")
-      .attr("width",97)
+      .attr("width",99)
       .attr("height",12)
       .attr("fill","url(#gradient)")
-      .attr("x",graphWidth-160)
-      .attr("y",10 );
+      .attr("x",graphWidth-164)
+      .attr("y",15 );
       svg.append("text")
         .attr("class","colorKey")
-        .attr("x",graphWidth-180)
-        .attr("y",20)
-        .text("Min");
-      svg.append("text")
-        .attr("class","colorKey")
-        .attr("x",graphWidth-60)
-        .attr("y",20)
+        .attr("x",graphWidth-87)
+        .attr("y",25)
+        .style("fill","white")
+        .style("font-weight","bold")
         .text("Max");
-
+      svg.append("text")
+        .attr("class","colorKey title")
+        .attr("x",graphWidth-165)
+        .attr("y",12)
+        .text("Centrality");
+      svg.append("text")
+        .attr("class","centralityData degree")
+        .attr("x",graphWidth-65)
+        .attr("y",38)
+        .attr("text-anchor","end")
+        .text("");
+      svg.append("text")
+        .attr("class","centralityData betweenness")
+        .attr("x",graphWidth-65)
+        .attr("y",48)
+        .attr("text-anchor","end")
+        .text("");
+      svg.append("text")
+        .attr("class","centralityData closeness")
+        .attr("x",graphWidth-65)
+        .attr("y",58)
+        .attr("text-anchor","end")
+        .text("");
   }else{
     d3.selectAll(".colorKey")
     .style("opacity",1);
@@ -218,17 +239,39 @@ function nodeCentrality(measure){
 
 
   d3.selectAll('circle.circ')
+    .on("mouseover",function(d){
+      d3.select(".centralityData.degree").text(     "Degree: "+decimal(data[d.id].degree))
+      d3.select(".centralityData.betweenness").text("Betweenness: "+decimal(data[d.id].betweenness))
+      d3.select(".centralityData.closeness").text(  "Closeness: "+decimal(data[d.id].closeness))
+    })
+    .on("mouseleave",function(){
+      d3.selectAll(".centralityData").text("")
+    })
     .transition().duration(1500)
     .style("fill",function(d){ return d.id.substring(0,4) == 'fake' ? '' : color(c(data[d.id][measure]))  })
-    .attr("r",function(d){return d.id.substring(0,4) == 'fake' ? '' : size(data[d.id][measure])  });
+    .attr("r",function(d){return d.id.substring(0,4) == 'fake' ? '' : size(data[d.id][measure])  })
+    ;
 
 }
 
 function nodeDefault(){
   d3.selectAll('circle.circ')
+    .on("mouseover","")
+    .on("mouseleave","")
     .transition().duration(1500)
     .style("fill","")
     .attr("r", function(d){ return d.type==="org" ? 10:8;});
   d3.selectAll(".colorKey")
     .style("opacity",0);
+}
+
+function changeSize(factor,measure){
+    var data = graphData.centrality;
+    var size = d3.scale.pow().exponent(factor)
+                .domain(d3.extent( d3.values(data), function(d){return d[measure]} ) )
+                .range([6,13]);
+  
+    d3.selectAll('circle.circ')
+      .transition().duration(1000)
+      .attr("r",function(d){return d.id.substring(0,4) == 'fake' ? '' : size(data[d.id][measure])  });
 }

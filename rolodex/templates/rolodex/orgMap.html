@@ -22,6 +22,9 @@
     <option value="closeness">Closenness</option>
   </select>
   <button class="btn info">?</button>
+  <div class="sliderContainer">Size scale variance
+    <div class="slider"></div>
+  </div>
 </div>
 
 <div id="networkCanvas"></div>
@@ -53,23 +56,39 @@ var replaceP = '{% url "rolodex_person" "foobarbaz" %}',
     success: function(d){
       $('#networkCanvas').html("");
       chartNetwork(d);
+      $(".statSelect").css("visibility","visible");
       graphData = d;
     }
   });
 
 
 $(document).ready(function(){
+
+  $( ".slider" ).slider({ 
+    range: "min",
+    value:5,
+    min: 1,
+    max: 15,
+    change: function( event, ui ) {
+      //pass scale factor and measure value
+      changeSize(ui.value,$( ".statSelect select option:selected" ).val())
+    }
+  });
+
+
   $(".statSelect select").change(function(){
     var centrality = $( ".statSelect select option:selected" ).val();
     if(centrality == 'default'){
+      $(".sliderContainer").css("visibility","hidden");
        nodeDefault();
     }else{
+      $(".sliderContainer").css("visibility","visible");
       nodeCentrality(centrality);
     } 
   })
 
   $(".btn.info").click(function(){
-    bootbox.alert("<p>In social network theory, centrality measures are one way to assess the \"importance\" of any one person or org in a network. Which measure of importance you use depends on the question you're asking.<p><b>Degree</b> centrality is the simple number of relationships a person or org has to other persons or orgs in the network. Degree centrality assumes whoever has the most connections is the most important. <p><b>Betweenness</b> measures how crucial a conduit any one person or org is to other nodes in the network. A person or org with high betweenness centrality is thought to be important to the transfer of information through the network, assuming people and orgs in the network are trying to use the shortest path possible to distribute or receive information.<p><b>Closenness</b> measures how close to the \"middle\" of the network a person or org is. These people or orgs are not necessarily vital to information transfer or the most well-connected, but they are generally in the middle of things.");
+    bootbox.alert("<p>In social network theory, centrality measures are one way to assess the \"importance\" of any one person or org in a network. Which measure of importance you use depends on the question you're asking.<p><b>Degree</b> centrality is the simple number of relationships a person or org has to others in the network. Degree centrality assumes whoever has the most connections is the most important. <p><b>Betweenness</b> measures how crucial a conduit any one person or org is to others in the network. A person or org with high betweenness centrality is thought to be important to the transfer of information through the network, assuming people and orgs try to use the shortest path possible to distribute or receive information.<p><b>Closenness</b> measures how close to the \"middle\" of the network a person or org is. These people or orgs are not necessarily vital to information transfer or the most well-connected, but they are generally near the central points of information exchange and influence in the network.");
 
   })
 
