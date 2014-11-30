@@ -4,7 +4,7 @@ Rolodex
 
 Rolodex is a directory of people and the organizations they belong to. It's also a space where you can model relationships.
 
-At _The News_ we use it as a drop-in backend for projects that require us to manage relationships between people and organizations. We also maintain our contacts with it with a dedicated app.
+At _The News_ we use it as a drop-in backend for projects that require us to manage relationships between people and organizations. We also maintain our contacts with it on a dedicated app.
 
 The stand-alone app provides a clean, intuitive interface for our reporters to enter and search basic information about people and orgs and the relationships between them, while the API and django plug-in lets us cut out quick graphs of related entities.
 
@@ -50,7 +50,7 @@ People and orgs can easily be added through Rolodex.
 
 Rolodex forces users to choose the primary organization a person belongs to before they can be created. This relationship is set as type `'employment'`, which is pre-loaded as a [p2org](#types_and_roles) relationship type fixture.
 
-Developers can also use the RESTful API framework to create people, orgs and their relationships and contact details. Browse the API to see what parameters can be passed when creating objects.
+Developers can also use the RESTful API to create people, orgs and their relationships and contact details. Browse the API to see what parameters can be passed when creating objects.
 
 The API uses Django rest framework's hyperlinked serializers, so use URLs for foreign keys.
 
@@ -66,7 +66,7 @@ These can be added in the admin for individual users or groups:
 
 Relationships
 -------------
-Relationships in Rolodex are symmetrical (i.e., facebook not twitter), so when you create a relationship from one person or org to another person or org, the relationship is reciprocally created. 
+Relationships in Rolodex are undirected (facebook not twitter), so when you create a relationship from one person or org to another person or org, the relationship is reciprocally created the other way. 
 
 There are different relationship models for each permuation of person/org relationship, e.g. person-to-person,person-to-org, etc.
 
@@ -105,7 +105,7 @@ Types and roles are added through django admin:
 Analysis
 ---------
 
-Rolodex person and org objects also have methods to return a NetworkX graph of connected objects for more advanced analysis.
+Rolodex person and org objects also have methods to return a [NetworkX](http://networkx.github.io/) graph of connected objects for more advanced analysis.
 
 `nxGraph(hops=2)` returns a NetworkX graph of all person and org objects within a specified number of hops.
 
