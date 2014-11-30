@@ -26,11 +26,19 @@ INSTALLED_APPS = (
 url(r'^rolodex/', include('rolodex.urls')),
 url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ```
-4. If you'd like to restrict views to only logged in users, set rolodex's security variable in settings.py:
+4. If you'd like to restrict views to only logged in users, set Rolodex's security variable in settings.py:
 ```python
 ROLODEX_SECURE = True 
 ```
-It's also recommended you set django rest framework's auth to django model permissions in settings.py. You may also add anonymous read only like this:
+Also add django's auth views to your project's urls.py:
+```python
+urlpatterns = patterns('',
+    ...
+    url(r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name':'admin/login.html'}),
+    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout'),
+)
+```
+It's also a good idea to set django rest framework's auth to django model permissions in settings.py. You may also add anonymous read only like this:
 ```python
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
