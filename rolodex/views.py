@@ -146,8 +146,12 @@ def edit_person(request, personNode):
 			if formset.is_valid():
 				formset.save()
 				return redirect('rolodex_person',personNode)
-		
-	primary = peep.get_employer()[0]
+	
+	employer = peep.org_from_p.filter(relation=EMPLOYMENT)
+	if len(employer)>0:
+		primary = employer[0].to_ent
+	else:
+		primary = "N/A"	
 	orgs = Org.objects.all()
 	tags = Tag.objects.all()
 	return render_to_response('rolodex/new_person.html',{'form':form,'formset':formset,'personNode':peep,'orgs':orgs,'tags':tags,'primary':primary,'edit':True},context_instance=RequestContext(request))
