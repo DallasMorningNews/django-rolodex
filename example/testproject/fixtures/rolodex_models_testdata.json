@@ -1,0 +1,105 @@
+[
+{
+    "fields": {
+        "role": "boss",
+        "description": null
+    },
+    "model": "rolodex.role",
+    "pk": "boss"
+},
+{
+    "fields": {
+        "role": "front desk",
+        "description": null
+    },
+    "model": "rolodex.org_contact_role",
+    "pk": "front-desk"
+},
+{
+    "fields": {
+        "relationship_type": "employment"
+    },
+    "model": "rolodex.p2org_type",
+    "pk": ""
+},
+{
+    "fields": {
+        "notes": "",
+        "person": null,
+        "contact": "http://www.ajaxy.com",
+        "role": null,
+        "org": 2,
+        "type": "link"
+    },
+    "model": "rolodex.contact",
+    "pk": 1
+},
+{
+    "fields": {
+        "firstName": "John",
+        "tags": [],
+        "lastName": "Doe",
+        "role": "boss",
+        "gender": null,
+        "department": null,
+        "position": null
+    },
+    "model": "rolodex.person",
+    "pk": 1
+},
+{
+    "fields": {
+        "firstName": "Jane",
+        "tags": [],
+        "lastName": "Doe",
+        "role": null,
+        "gender": null,
+        "department": null,
+        "position": null
+    },
+    "model": "rolodex.person",
+    "pk": 2
+},
+{
+    "fields": {
+        "orgName": "ACME, Corp.",
+        "openRecordsLaw": null,
+        "tags": []
+    },
+    "model": "rolodex.org",
+    "pk": 1
+},
+{
+    "fields": {
+        "orgName": "AJAX, Corp.",
+        "openRecordsLaw": null,
+        "tags": []
+    },
+    "model": "rolodex.org",
+    "pk": 2
+},
+{
+    "fields": {
+        "description": null,
+        "from_ent": 1,
+        "from_date": null,
+        "to_ent": 1,
+        "relation": "",
+        "to_date": null
+    },
+    "model": "rolodex.p2org",
+    "pk": 1
+},
+{
+    "fields": {
+        "description": null,
+        "from_ent": 1,
+        "from_date": null,
+        "to_ent": 1,
+        "relation": "",
+        "to_date": null
+    },
+    "model": "rolodex.org2p",
+    "pk": 1
+}
+]

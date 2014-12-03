@@ -6,12 +6,21 @@ from django.utils.text import slugify
 from django.utils.translation import ugettext as _
 from django.core.validators import URLValidator,validate_email
 
+
+class GetOrNoneManager(models.Manager):
+    def get_or_none(self, **kwargs):
+        try:
+            return self.get(**kwargs)
+        except self.model.DoesNotExist:
+            return None
+
+
 ###################
 ## Choice Models ##
 ###################
 ## These are all registered in admin.
 
-class openRecordsLaw(models.Model):
+class OpenRecordsLaw(models.Model):
 	'''
 	Which open records law applies to the org.
 	'''
@@ -22,9 +31,9 @@ class openRecordsLaw(models.Model):
 		return self.name
 	def save(self, *args, **kwargs):
 		self.id = slugify(unicode(self.name))
-		super(openRecordsLaw, self).save(*args, **kwargs)
+		super(OpenRecordsLaw, self).save(*args, **kwargs)
 
-class role(models.Model):
+class PersonRole(models.Model):
 	'''
 	Define some roles, preferably ones useful for filtering on, e.g. "Media Contact", "FOIA Officer".
 	'''
@@ -35,9 +44,9 @@ class role(models.Model):
 		return self.role
 	def save(self, *args, **kwargs):
 		self.id = slugify(unicode(self.role))
-		super(role, self).save(*args, **kwargs)
+		super(PersonRole, self).save(*args, **kwargs)
 
-class org_contact_role(models.Model):
+class OrgContactRole(models.Model):
 	'''
 	Define roles for org contacts, e.g., FOIA email, etc.
 	'''
@@ -48,18 +57,9 @@ class org_contact_role(models.Model):
 		return self.role
 	def save(self, *args, **kwargs):
 		self.id = slugify(unicode(self.role))
-		super(org_contact_role, self).save(*args, **kwargs)
+		super(OrgContactRole, self).save(*args, **kwargs)
 
-class GetOrNoneManager(models.Manager):
-    """Adds get_or_none method to objects
-    """
-    def get_or_none(self, **kwargs):
-        try:
-            return self.get(**kwargs)
-        except self.model.DoesNotExist:
-            return None
-
-class p2p_type(models.Model):
+class P2P_Type(models.Model):
 	id = models.CharField(max_length=250,primary_key=True,editable=False)
 	relationship_type = models.CharField(max_length=250)
 	objects = GetOrNoneManager()
@@ -67,9 +67,9 @@ class p2p_type(models.Model):
 		return self.relationship_type
 	def save(self, *args, **kwargs):
 		self.id = slugify(unicode(self.relationship_type))
-		super(p2p_type, self).save(*args, **kwargs)
+		super(P2P_Type, self).save(*args, **kwargs)
 
-class org2org_type(models.Model):
+class Org2Org_Type(models.Model):
 	id = models.CharField(max_length=250,primary_key=True,editable=False)
 	relationship_type = models.CharField(max_length=250)
 	objects = GetOrNoneManager()
@@ -77,9 +77,9 @@ class org2org_type(models.Model):
 		return self.relationship_type
 	def save(self, *args, **kwargs):
 		self.id = slugify(unicode(self.relationship_type))
-		super(org2org_type, self).save(*args, **kwargs)
+		super(Org2Org_Type, self).save(*args, **kwargs)
 
-class p2org_type(models.Model):
+class P2Org_Type(models.Model):
 	id = models.CharField(max_length=250,primary_key=True,editable=False)
 	relationship_type = models.CharField(max_length=250)
 	objects = GetOrNoneManager()
@@ -87,8 +87,10 @@ class p2org_type(models.Model):
 		return self.relationship_type
 	def save(self, *args, **kwargs):
 		self.id = slugify(unicode(self.relationship_type))
-		super(p2org_type, self).save(*args, **kwargs)
-
+		super(P2Org_Type, self).save(*args, **kwargs)
+'''
+2.0 feature??? 
+'''
 class Tag(models.Model):
 	id = models.CharField(max_length=250,primary_key=True,editable=False)
 	tag_name = models.CharField(max_length=250)
@@ -103,7 +105,7 @@ class Tag(models.Model):
 ## Contact Forms ##
 ###################
 contact_types = (('email','email'),('phone','phone'),('link','link'),('address','address'))
-class contact(models.Model):
+class Contact(models.Model):
 	'''
 	A contact record for persons or orgs.
 	'''
@@ -112,7 +114,7 @@ class contact(models.Model):
 	
 	type = models.CharField(max_length=100,choices=contact_types)
 	contact = models.CharField(max_length=250,blank=True,null=True)
-	role = models.ForeignKey('org_contact_role',blank=True,null=True)
+	role = models.ForeignKey('OrgContactRole',blank=True,null=True)
 	notes = models.TextField(blank=True,null=True)
 	
 	def clean(self):
@@ -146,7 +148,7 @@ gender_types=((1,'Female'),(2,'Male'),(3,'Other'))
 class Person(models.Model):
 	lastName = models.CharField(max_length=100)
 	firstName = models.CharField(max_length=100)
-	role = models.ForeignKey('role',blank=True,null=True,related_name='person_role')
+	role = models.ForeignKey('PersonRole',blank=True,null=True,related_name='person_role')
 	position = models.CharField(max_length=250,blank=True,null=True)
 	department = models.CharField(max_length=250,blank=True,null=True)
 	gender = models.IntegerField(blank=True,null=True,choices=gender_types)
@@ -154,6 +156,9 @@ class Person(models.Model):
 	p_relations = models.ManyToManyField('self',through='P2P',symmetrical=False,related_name='+',blank=True)
 	org_relations = models.ManyToManyField('Org',through='P2Org',related_name='people',blank=True)
 
+	notes = models.TextField(blank=True, null=True)
+
+	#2.0 feature
 	tags = models.ManyToManyField(Tag,blank=True)
 	def __unicode__(self):
 		return self.lastName+", "+self.firstName
@@ -161,11 +166,14 @@ class Person(models.Model):
 
 class Org(models.Model):
 	orgName = models.CharField(max_length=200)
-	openRecordsLaw = models.ForeignKey('openRecordsLaw',blank=True,null=True)
+	openRecordsLaw = models.ForeignKey('OpenRecordsLaw',blank=True,null=True)
 	#Relationships
 	org_relations = models.ManyToManyField('self',through='Org2Org',symmetrical=False,related_name='+',blank=True)
 	p_relations = models.ManyToManyField('Person',through="Org2P",related_name='orgs',blank=True)
 	
+	notes = models.TextField(blank=True, null=True)
+
+	#2.0 feature
 	tags = models.ManyToManyField(Tag,blank=True)
 	def __unicode__(self):
 		return self.orgName
@@ -177,7 +185,7 @@ class Org(models.Model):
 class P2P(models.Model):
 	from_ent = models.ForeignKey(Person, related_name='p_from_p')
 	to_ent   = models.ForeignKey(Person,related_name='p_to_p')
-	relation = models.ForeignKey('p2p_type',blank=True, null=True,related_name='p2p_relation')
+	relation = models.ForeignKey('P2P_Type',blank=True, null=True,related_name='p2p_relation')
 	from_date = models.DateField(blank=True, null=True)
 	to_date = models.DateField(blank=True, null=True)
 	description = models.TextField(blank=True, null=True)
@@ -216,20 +224,37 @@ class P2P(models.Model):
 			relation.delete();
 
 
+'''
+We make Org2Org relationships unique in that they can have heirarchy. 
+'''
+def heirarchy_test(self):
+		if self.heirarchy == 'none':
+			return 'none'
+		else:
+			if self.heirarchy == 'child':
+				return 'parent'
+			else:
+				return 'child'
+heirarchy_types = (('parent','parent'),('child','child'),('none','none'))
+
 class Org2Org(models.Model):
 	from_ent = models.ForeignKey(Org,related_name='org_from_org')
 	to_ent   = models.ForeignKey(Org,related_name='org_to_org')
-	relation = models.ForeignKey('org2org_type',blank=True, null=True,related_name='org2org_relation')
+	relation = models.ForeignKey('Org2Org_Type',blank=True, null=True,related_name='org2org_relation')
 	from_date = models.DateField(blank=True, null=True)
 	to_date = models.DateField(blank=True, null=True)
 	description = models.TextField(blank=True, null=True)
+	heirarchy = models.CharField(choices=heirarchy_types, default='none', max_length=10)
 	objects = GetOrNoneManager()
+	
+	def __unicode__(self):
+		return self.from_ent.orgName +" ... "+self.to_ent.orgName
+	
 	def clean(self):
 		if Org2Org.objects.get_or_none(from_ent=self.from_ent,to_ent=self.to_ent):
 			raise ValidationError(_('That relationship already exists.'),code='already_exists')
 		super(Org2Org, self).clean()
-	def __unicode__(self):
-		return self.from_ent.orgName +" ... "+self.to_ent.orgName
+	
 	def save(self, *args, **kwargs):
 		super(Org2Org, self).save(*args, **kwargs)
 		#Enforce Symmetry
@@ -239,33 +264,39 @@ class Org2Org(models.Model):
 			relation=self.relation,
 			from_date=self.from_date,
 			to_date=self.to_date,
-			description=self.description)
+			description=self.description,
+			heirarchy = heirarchy_test(self) )
+	
 	def delete(self,*args,**kwargs):
 		super(Org2Org, self).delete(*args, **kwargs)
+		#Enforce Symmetry
 		relation = Org2Org.objects.get_or_none(
 			from_ent=self.to_ent,
 			to_ent=self.from_ent,
 			relation=self.relation,
 			from_date=self.from_date,
 			to_date=self.to_date,
-			description=self.description)
+			description=self.description )
 		if relation:
 			relation.delete()
 
 class P2Org(models.Model):
 	from_ent = models.ForeignKey(Person,related_name='org_from_p')
 	to_ent   = models.ForeignKey(Org,related_name='p_to_org')
-	relation = models.ForeignKey('p2org_type',blank=True, null=True,related_name='p2org_relation')
+	relation = models.ForeignKey('P2Org_Type',blank=True, null=True,related_name='p2org_relation')
 	from_date = models.DateField(blank=True,null=True)
 	to_date = models.DateField(blank=True,null=True)
 	description = models.TextField(blank=True,null=True)
 	objects = GetOrNoneManager()
+
+	def __unicode__(self):
+		return self.from_ent.lastName +" ... "+self.to_ent.orgName
+
 	def clean(self):
 		if P2Org.objects.get_or_none(from_ent=self.from_ent,to_ent=self.to_ent):
 			raise ValidationError(_('That relationship already exists.'),code='already_exists')
 		super(P2Org, self).clean()
-	def __unicode__(self):
-		return self.from_ent.lastName +" ... "+self.to_ent.orgName
+	
 	def save(self, *args, **kwargs):
 		super(P2Org, self).save(*args, **kwargs)
 		#Enforce Symmetry
@@ -276,8 +307,10 @@ class P2Org(models.Model):
 			from_date=self.from_date,
 			to_date=self.to_date,
 			description=self.description)
+	
 	def delete(self,*args,**kwargs):
 		super(P2Org, self).delete(*args, **kwargs)
+		#Enforce Symmetry
 		relation = Org2P.objects.get_or_none(
 			from_ent=self.to_ent,
 			to_ent=self.from_ent,
@@ -291,17 +324,20 @@ class P2Org(models.Model):
 class Org2P(models.Model):
 	from_ent = models.ForeignKey(Org, related_name='p_from_org')
 	to_ent   = models.ForeignKey(Person,related_name='org_to_p')
-	relation = models.ForeignKey('p2org_type',blank=True, null=True,related_name='org2p_relation')
+	relation = models.ForeignKey('P2Org_Type',blank=True, null=True,related_name='org2p_relation')
 	from_date = models.DateField(blank=True,null=True)
 	to_date = models.DateField(blank=True,null=True)
 	description = models.TextField(blank=True,null=True)
 	objects = GetOrNoneManager()
+
+	def __unicode__(self):
+		return self.from_ent.orgName +" ... "+self.to_ent.lastName
+
 	def clean(self):
 		if Org2P.objects.get_or_none(from_ent=self.from_ent,to_ent=self.to_ent):
 			raise ValidationError(_('That relationship already exists.'),code='already_exists')
 		super(Org2P, self).clean()
-	def __unicode__(self):
-		return self.from_ent.orgName +" ... "+self.to_ent.lastName
+
 	def save(self, *args, **kwargs):
 		super(Org2P, self).save(*args, **kwargs)
 		#Enforce Symmetry
@@ -312,8 +348,10 @@ class Org2P(models.Model):
 			from_date=self.from_date,
 			to_date=self.to_date,
 			description=self.description)
+
 	def delete(self,*args,**kwargs):
 		super(Org2P, self).delete(*args, **kwargs)
+		#Enforce Symmetry
 		relation = P2Org.objects.get_or_none(
 			from_ent=self.to_ent,
 			to_ent=self.from_ent,
@@ -325,7 +363,7 @@ class Org2P(models.Model):
 			relation.delete()
 
 ##################
-## Helper Funcs ##
+## Setter Funcs ##
 ##################
 
 def add_p2p(self, person,symm=True,**kwargs):
@@ -333,68 +371,51 @@ def add_p2p(self, person,symm=True,**kwargs):
         from_ent=self,
         to_ent=person,
         **kwargs)
-    if symm:
-        person.add_p2p(self, symm=False, **kwargs)
     return relationship
 def remove_p2p(self, person, symm=True,**kwargs):
     P2P.objects.filter(
         from_ent=self, 
         to_ent=person,
         **kwargs).delete()
-    if symm:
-        person.remove_p2p(self, symm=False,**kwargs)
 def add_org2org(self,org,symm=True,**kwargs):
 	relationship = Org2Org.objects.get_or_create(
 		from_ent=self,
 		to_ent=org,
 		**kwargs)
-	if symm:
-		org.add_org2org(self,symm=False,**kwargs)
 	return relationship
 def remove_org2org(self,org,symm=True,**kwargs):
 	Org2Org.objects.filter(
 		from_ent=self,
 		to_ent=org,
 		**kwargs).delete()
-	if symm:
-		org.remove_org2org(self,symm=False,**kwargs)
-
 def add_p2org(self,org,symm=True,**kwargs):
 	relationship = P2Org.objects.get_or_create(
 		from_ent=self,
 		to_ent=org,
-		**kwargs
-		)
-	if symm:
-		org.add_org2p(self,symm=False,**kwargs)
+		**kwargs)
 	return relationship
 def remove_p2org(self,org,symm=True,**kwargs):
 	P2Org.objects.filter(
 		from_ent=self,
 		to_ent=org,
 		**kwargs).delete()
-	if symm:
-		org.remove_org2p(self,symm=False,**kwargs)
 def add_org2p(self,person,symm=True,**kwargs):
 	relationship = Org2P.objects.get_or_create(
 		from_ent=self,
 		to_ent=person,
-		**kwargs
-		)
-	if symm:
-		person.add_p2org(self,symm=False,**kwargs)
+		**kwargs)
 	return relationship
 def remove_org2p(self,person,symm=True,**kwargs):
 	Org2P.objects.filter(
 		from_ent=self,
 		to_ent=person,
 		**kwargs).delete()
-	if symm:
-		person.remove_p2org(self,symm=False,**kwargs)
 
-#############
-## Getters ##
-#############
+
+##################
+## Getter Funcs ##
+##################
+
 def get_relations(self):
 	people=self.p_relations.all()
 	orgs = self.org_relations.all()
@@ -444,7 +465,9 @@ def get_relations_with_type(self):
 
 
 
-##############
+###################
+## Network Funcs ##
+###################
 
 def collate_relations(queryset):
 	'''
@@ -460,7 +483,7 @@ def collate_relations(queryset):
 
 
 import networkx as nx
-def nxAdd(graph,node):
+def nx_add(graph,node):
 	people = node.p_relations.all()
 	orgs = node.org_relations.all()
 	ents = list(chain(people,orgs))
@@ -471,14 +494,14 @@ def nxAdd(graph,node):
 def relation_list(self):
 	return list( chain( self.p_relations.all(),self.org_relations.all() ) )
 
-def nxGraph(self,hops=2):
+def nx_graph(self,hops=2):
 	G = nx.Graph()
-	G = nxAdd(G,self)
+	G = nx_add(G,self)
 	relations = relation_list(self)
 	for i in range(hops-1):
 		intermediate = []
 		for r in relations:
-			G = nxAdd(G,r)
+			G = nx_add(G,r)
 			intermediate = list( chain( intermediate,relation_list(r) ) ) 
 		relations = list( chain( relations,intermediate ) )
 	return G
@@ -496,7 +519,7 @@ Person.get_relations = get_relations
 Person.get_employer = get_employer
 Person.get_relations_with_type = get_relations_with_type
 Person.get_relations_by_type = get_relations_by_type
-Person.nxGraph = nxGraph
+Person.nx_graph = nx_graph
 
 Org.add_org2org = add_org2org
 Org.remove_org2org = remove_org2org
@@ -507,5 +530,4 @@ Org.get_employees = get_employees
 Org.get_employees_by_role = get_employees_by_role
 Org.get_relations_with_type = get_relations_with_type
 Org.get_relations_by_type = get_relations_by_type
-Org.nxGraph = nxGraph
-
+Org.nx_graph = nx_graph

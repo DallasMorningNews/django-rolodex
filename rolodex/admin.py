@@ -1,21 +1,21 @@
 from django.contrib import admin
-from rolodex.models import openRecordsLaw,role,p2p_type,org2org_type,p2org_type,Tag,contact,Person,Org,org_contact_role
+from rolodex.models import OpenRecordsLaw,PersonRole,P2P_Type,Org2Org_Type,P2Org_Type,Tag,Contact,Person,Org,OrgContactRole
 
 
 
 class ContactInline(admin.StackedInline):
-	model = contact
+	model = Contact
 	extra = 0
 
 class POAdmin(admin.ModelAdmin):
 	inlines = [ContactInline,]
 
-admin.site.register(openRecordsLaw)
-admin.site.register(role)
-admin.site.register(org_contact_role)
-admin.site.register(p2p_type)
-admin.site.register(org2org_type)
-admin.site.register(p2org_type)
+admin.site.register(OpenRecordsLaw)
+admin.site.register(PersonRole)
+admin.site.register(OrgContactRole)
+admin.site.register(P2P_Type)
+admin.site.register(Org2Org_Type)
+admin.site.register(P2Org_Type)
 admin.site.register(Tag)
 
 admin.site.register(Person,POAdmin)

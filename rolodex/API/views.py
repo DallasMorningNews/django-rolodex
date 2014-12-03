@@ -1,29 +1,29 @@
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rolodex.API import serializers
-from rolodex.models import Person,Org,contact,role,org_contact_role,P2P,Org2Org,P2Org,Org2P,p2p_type,org2org_type,p2org_type
+from rolodex.models import Person,Org,Contact,PersonRole,OrgContactRole,P2P,Org2Org,P2Org,Org2P,P2P_Type,Org2Org_Type,P2Org_Type
 from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
 class RoleViewSet(viewsets.ModelViewSet):
-	queryset = role.objects.all()
+	queryset = PersonRole.objects.all()
 	serializer_class = serializers.RoleSerializer
 
 class ContactRoleViewSet(viewsets.ModelViewSet):
-	queryset = org_contact_role.objects.all()
+	queryset = OrgContactRole.objects.all()
 	serializer_class = serializers.ContactRoleSerializer
 
 
 class P2P_TypeViewSet(viewsets.ModelViewSet):
-	queryset = p2p_type.objects.all()
+	queryset = P2P_Type.objects.all()
 	serializer_class = serializers.P2P_TypeSerializer
 class Org2Org_TypeViewSet(viewsets.ModelViewSet):
-	queryset = org2org_type.objects.all()
+	queryset = Org2Org_Type.objects.all()
 	serializer_class = serializers.Org2Org_TypeSerializer
 class P2Org_TypeViewSet(viewsets.ModelViewSet):
-	queryset = p2org_type.objects.all()
+	queryset = P2Org_Type.objects.all()
 	serializer_class = serializers.P2Org_TypeSerializer
 
 
@@ -36,7 +36,7 @@ class OrgViewSet(viewsets.ModelViewSet):
 	serializer_class = serializers.OrgSerializer
 
 class ContactViewSet(viewsets.ModelViewSet):
-	queryset = contact.objects.all().order_by('id')
+	queryset = Contact.objects.all().order_by('id')
 	serializer_class = serializers.ContactSerializer
 
 class P2PViewSet(viewsets.ModelViewSet):

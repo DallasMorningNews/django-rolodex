@@ -1,32 +1,32 @@
 from rest_framework import serializers
 
-from rolodex.models import Person,Org,contact,role,org_contact_role,P2P,Org2Org,P2Org,Org2P,p2p_type,org2org_type,p2org_type
+from rolodex.models import Person,Org,Contact,PersonRole,OrgContactRole,P2P,Org2Org,P2Org,Org2P,P2P_Type,Org2Org_Type,P2Org_Type
 from django.contrib.auth.models import User
 
 
 
 class RoleSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
-		model = role
+		model = PersonRole
 		fields = ('role','description')
 
 class ContactRoleSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
-		model = org_contact_role
+		model = OrgContactRole
 		fields = ('role','description')
 
 
 class P2P_TypeSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
-		model = p2p_type 
+		model = P2P_Type 
 		fields = ('relationship_type',)
 class Org2Org_TypeSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
-		model = org2org_type 
+		model = Org2Org_Type 
 		fields = ('relationship_type',)
 class P2Org_TypeSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
-		model = p2org_type 
+		model = P2Org_Type 
 		fields = ('relationship_type',)
 
 
@@ -49,7 +49,7 @@ class ContactSerializer(serializers.HyperlinkedModelSerializer):
 	person_contact = serializers.HyperlinkedRelatedField( read_only=False,view_name='person')
 	org_contact = serializers.HyperlinkedRelatedField( read_only=False,view_name='org')
 	class Meta:
-		model = contact
+		model = Contact
 		fields = ('id','person','org','type','contact','role','notes')
 
 class P2PSerializer(serializers.HyperlinkedModelSerializer):

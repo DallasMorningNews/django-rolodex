@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import redirect, render, render_to_response, HttpResponseRedirect,get_object_or_404
 from django.template import RequestContext
 from django.http import HttpResponse
-from rolodex.models import Tag, Org, Person, P2P,Org2Org,P2Org,Org2P,p2org_type,p2p_type,org2org_type
+from rolodex.models import Tag,Org,Person,P2P,Org2Org,P2Org,Org2P,P2Org_Type,P2P_Type,Org2Org_Type
 from rolodex.forms import OrgForm,OrgFormSet,PersonForm,PersonFormSet,P2PForm,Org2OrgForm,P2OrgForm,Org2PForm
 from datetime import datetime as dt
 from operator import attrgetter
@@ -13,7 +13,7 @@ from django.conf import settings
 import networkx as nx
 
 
-EMPLOYMENT = p2org_type.objects.get(relationship_type='employment')
+EMPLOYMENT = P2Org_Type.objects.get(relationship_type='employment')
 
 
 def secure(view):
@@ -22,7 +22,7 @@ def secure(view):
 	else:
 		return view
 
-def orgRelatePeep(peeps):
+def org_relate_peep(peeps):
 	for peep in peeps:
 		employers = peep.org_relations.filter(p_to_org__relation=EMPLOYMENT)
 		if len(employers) > 0:
@@ -39,7 +39,7 @@ def orgRelatePeep(peeps):
 def home(request): 
 	orgs = Org.objects.all()
 	peeps = Person.objects.all()
-	peeps = orgRelatePeep(peeps)
+	peeps = org_relate_peep(peeps)
 	return render_to_response('rolodex/home.html',{'orgs':orgs,'peeps':peeps},context_instance=RequestContext(request))
 
 @secure
@@ -213,13 +213,13 @@ def org_network(request,org_id):
 Compile some basic network centrality statistics for graph.
 '''
 def adv_compile(node, hops):
-	G = node.nxGraph(hops)
+	G = node.nx_graph(hops)
 	degree = nx.degree_centrality(G)
 	betweenness = nx.betweenness_centrality(G)
 	closeness= nx.closeness_centrality(G) 
 	data={}
 	for node in degree:
-		n = getInfo(node)
+		n = get_info(node)
 		data[n.id] = {'degree':degree[node],
 						'betweenness':betweenness[node],
 						'closeness':closeness[node]}
@@ -257,10 +257,9 @@ def new_person_relation(request,Node):
 				in order to force the symetrical relationship created (so the 
 				get_relations method works).
 				'''
-				#Create relationship via method rather than form to force symmetry
 				fromEnt = Person.objects.get(pk=request.POST['from_ent'])
 				toEnt   = Person.objects.get(pk=request.POST['to_ent'])
-				relation= p2p_type.objects.get_or_none(relationship_type=request.POST['relation'])
+				relation= P2P_Type.objects.get_or_none(relationship_type=request.POST['relation'])
 				fromEnt.add_p2p(toEnt,**{'relation':relation})
 				saved=True
 		else:	
@@ -268,14 +267,14 @@ def new_person_relation(request,Node):
 			if p2orgForm.is_valid():
 				fromEnt = Person.objects.get(pk=request.POST['from_ent'])
 				toEnt   = Org.objects.get(pk=request.POST['to_ent'])
-				relation= p2org_type.objects.get_or_none(relationship_type=request.POST['relation'])
+				relation= P2Org_Type.objects.get_or_none(relationship_type=request.POST['relation'])
 				fromEnt.add_p2org(toEnt,**{'relation':relation})
 				saved=True
 
 	
 	orgs = Org.objects.all()
 	peeps = Person.objects.filter(~Q(pk=Node))
-	peeps = orgRelatePeep(peeps)
+	peeps = org_relate_peep(peeps)
 	peepNode = Person.objects.get(pk=Node)
 	return render_to_response('rolodex/new_relation.html',{'peepNode':peepNode,'pForm':p2pForm,'orgForm':p2orgForm,'saved':saved,'peeps':peeps,'orgs':orgs},context_instance=RequestContext(request))
 
@@ -316,22 +315,23 @@ def new_org_relation(request,Node):
 			if org2pForm.is_valid():
 				fromEnt = Org.objects.get(pk=request.POST['from_ent'])
 				toEnt   = Person.objects.get(pk=request.POST['to_ent'])
-				relation= p2org_type.objects.get_or_none(relationship_type=request.POST['relation'])
+				relation= P2Org_Type.objects.get_or_none(relationship_type=request.POST['relation'],)
 				fromEnt.add_org2p(toEnt,**{'relation':relation})
 				saved=True
 		else:	
 			org2orgForm = Org2OrgForm(request.POST)
 			if org2orgForm.is_valid():
 				fromEnt = Org.objects.get(pk=request.POST['from_ent'])
-				toEnt   = Org.objects.get_or_none(pk=request.POST['to_ent'])
-				relation= org2org_type.objects.get_or_none(relationship_type=request.POST['relation'])
-				fromEnt.add_org2org(toEnt,**{'relation':relation})
+				toEnt   = Org.objects.get(pk=request.POST['to_ent'])
+				heirarchy = request.POST['heirarchy']
+				relation= Org2Org_Type.objects.get_or_none(relationship_type=request.POST['relation'])
+				fromEnt.add_org2org(toEnt,**{'relation':relation,'heirarchy':heirarchy})
 				saved=True
 
 	
 	orgs = Org.objects.filter(~Q(pk=Node))
 	peeps = Person.objects.all()
-	peeps = orgRelatePeep(peeps)
+	peeps = org_relate_peep(peeps)
 	orgNode = Org.objects.get(pk=Node)
 	return render_to_response('rolodex/new_relation.html',{'orgNode':orgNode ,'pForm':org2pForm,'orgForm':org2orgForm,'saved':saved,'peeps':peeps,'orgs':orgs},context_instance=RequestContext(request))
 
@@ -339,7 +339,7 @@ def new_org_relation(request,Node):
 ###################
 ## Network Funcs ##
 ###################
-def getInfo(n):
+def get_info(n):
 	class output:
 		pass
 	node = output()
@@ -352,13 +352,13 @@ def getInfo(n):
 		node.type = "org"
 		node.id="o"+str(n.id)
 	return node
-def getRelations(nodes):
+def get_relations(nodes):
 	relations,node_list=[],[]
 	for node in nodes: 
-		snode=getInfo(node)
+		snode=get_info(node)
 		relations = node.get_relations()
 		for r in list(chain(relations['orgs'],relations['people'])):
-			tnode=getInfo(r)
+			tnode=get_info(r)
 			node_list.append({ 
 				"source":snode.id,
 				"source_name":str(snode.name), 
@@ -373,7 +373,7 @@ def getRelations(nodes):
 def net_compiler(nodes,hops=2):
 	node_list=[]
 	for i in range(hops):
-		result = getRelations(nodes)
+		result = get_relations(nodes)
 		nodes=result['relations']
 		node_list+=result['node_list']
 	#de-dup

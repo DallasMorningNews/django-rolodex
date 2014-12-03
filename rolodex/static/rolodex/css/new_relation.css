@@ -28,7 +28,10 @@ h4{
 	max-width:250px;
 	min-width: 210px;
 }
-.relationform .type{
+.relationform .heirarchy select{
+	width:180px;
+}
+.relationform .type, .relationform .heirarchy{
 	display:block;
 	margin:0 auto;
 	max-width:370px;
@@ -42,11 +45,10 @@ h4{
 }
 
 .instruction{
-	text-align: center;
-	font-size: 13px;
+	font-size: 11px;
 	line-height: 12px;
 	font-family: arial,sans-serif;
-	margin:0 7px;
+	margin:15px 7px 10px;
 	padding:5px;
 	border-radius:4px;
 	background-color: lightgrey;
@@ -76,6 +78,7 @@ h4{
 	font-weight: bold;
 	text-align: left;
 }
+
 
 
 @media (max-width: 400px) {

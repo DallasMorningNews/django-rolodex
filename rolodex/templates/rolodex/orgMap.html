@@ -55,9 +55,10 @@ var replaceP = '{% url "rolodex_person" "foobarbaz" %}',
     url:"{%url 'rolodex_adv_org_network' node.pk %}?hops={{hops}}",
     success: function(d){
       $('#networkCanvas').html("");
-      chartNetwork(d);
-      $(".statSelect").css("visibility","visible");
       graphData = d;
+      chartNetwork(d.links);
+      $(".statSelect").css("visibility","visible");
+      
     }
   });
 

@@ -47,6 +47,13 @@ h5{
 	font-size: 16px;
 	color:#8C1717;
 }
+.entity_notes{
+	font:12px 'Raleway',sans-serif;
+	width:250px;
+	text-align: left;
+	display:block;
+	margin:40px auto 25px;
+}
 
 .bioBank{
 	margin:0 auto;

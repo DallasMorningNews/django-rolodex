@@ -49,7 +49,7 @@ REST_FRAMEWORK = {
     ]
 }
 ```
-- Optionally, create a `'rolodex'` database in your DATABASES settings or use a `ROLODEX_DB` environment variable (à la  `DATABASE_URL`) to route the app to a dedicated database.
+- Optionally, create a `'rolodex'` database in your DATABASES settings or use a `ROLODEX_DB` environment variable (à la  `DATABASE_URL`) to route the app to a dedicated database. __REMEMBER:__ Django does not support [cross-database relationships](https://docs.djangoproject.com/en/dev/topics/db/multi-db/#cross-database-relations), so forget foreign keys. Instead, we often just use the built in API.
 - Run `python manage.py migrate` (or `python manage.py migrate --database=rolodex` if you set up routing) to create the models and load fixtures.
 - `python manage.py runserver` and checkout [http://localhost:8000/rolodex](http://localhost:8000/rolodex) to create your first people and orgs (see docs). 
 - Optionally, use the rest framework API at [http://localhost:8000/rolodex/api/](http://localhost:8000/rolodex/api/)

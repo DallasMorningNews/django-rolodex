@@ -196,6 +196,16 @@ input.add{
 	text-align: left;
 }
 
+.addform .entity_notes textarea{
+	width:280px;
+	max-width:280px;
+	max-height:150px; 
+	height:50px;
+	margin:0 auto;
+	display:block;
+}
+
+
 @media (max-width: 400px) {
 	h1{
 		font-size: 48px;

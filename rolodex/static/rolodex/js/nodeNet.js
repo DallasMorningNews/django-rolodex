@@ -1,5 +1,8 @@
 function chartNetwork(links){
 
+console.log("FIRE!");
+console.log(links);
+
 var nodes = {},
     bilinks = [],
     drawLinks = [],

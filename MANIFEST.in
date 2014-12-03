@@ -5,4 +5,5 @@ recursive-include rolodex/templates *
 recursive-include rolodex/templatetags *
 recursive-include rolodex/migrations *
 recursive-include rolodex/API *
+recursive-include rolodex/fixtures *
 recursive-include docs *
