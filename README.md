@@ -92,6 +92,12 @@ To help manage the creation of relationships, person and org objects have an ext
 - `add_org2p(person_object,**kwargs)` : relation from org to person
 - `remove_org2p(person_object,**kwargs)`
 
+Org2Org relationships are allowed hierarchy. Pass the `hierarchy` parameter `parent` or `child` when creating the relationship, referencing the current object, and the related node's symmetrical relationship will receive the inverse property. 
+
+For example, if org1 is parent to org2, `org1.add_org2org(org2,**{hierarchy:'parent'})` will create the relationship with the correct hierarchy. 
+
+__Note__: If you modify an existing Org2Org relationship's hierarchy, a duplicate will be created. Instead delete the current relationship and re-create it with the correct hierarchy.
+
 There are also shorthand methods for retrieving related objects:
 
 - `get_relations()` : gets related person & org objects
@@ -100,6 +106,8 @@ There are also shorthand methods for retrieving related objects:
 - `get_employer()` : primary orgs associated with person object
 - `get_employees()` : gets person objects primarily associated with org
 - `get_employees_by_role(role)` : role is a string
+- `get_children()` : get children in Org2Org relationships
+- `get_parents()` : get parents in Org2Org relationships
 
 
 <a name="types_and_roles"></a>Types & Roles
@@ -107,18 +115,18 @@ There are also shorthand methods for retrieving related objects:
 You can classify people, org contacts and relationships in Rolodex, so it's easy to create custom filters for how you want to organize your networks. Usually, the more generic, the more useful the type or role, but that is up to you and your project's needs. Remember, that all relationships are created symmetrically.
 
 Types and roles are added through django admin:
-- `role` : specific to person objects, e.g., "chief information officer"
-- `org contact role` : of an org contact, e.g., "information desk" or "mailing address"
-- `p2p_type` : relationship between people, e.g., "spouse" or "professional"
-- `org2org_type` : relationships between orgs, e.g., "co-venture" or "subsidiary"
-- `p2org_type` : relationships between people and orgs, where "employment" is a pre-loaded fixture.
+- `Role` : specific to person objects, e.g., "chief information officer"
+- `OrgContactRole` : of an org contact, e.g., "information desk" or "mailing address"
+- `P2P_Type` : relationship between people, e.g., "spouse" or "professional"
+- `Org2Org_Type` : relationships between orgs, e.g., "co-venture" or "subsidiary"
+- `P2Org_Type` : relationships between people and orgs, where "employment" is a pre-loaded fixture.
 
 Analysis
 ---------
 
 Rolodex person and org objects also have methods to return a [NetworkX](http://networkx.github.io/) graph of connected objects for more advanced analysis.
 
-`nxGraph(hops=2)` returns a NetworkX graph of all person and org objects within a specified number of hops.
+`nx_graph(hops=2)` returns a NetworkX graph of all person and org objects within a specified number of hops.
 
 See the [NetworkX documentation](http://networkx.github.io/documentation/latest/reference/index.html) for the methods available on the returned graph.
 
