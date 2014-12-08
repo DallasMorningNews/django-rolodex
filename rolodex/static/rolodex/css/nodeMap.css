@@ -1,7 +1,7 @@
 .link {
   fill: none;
   stroke: #666;
-  stroke-width: 1px;
+  stroke-width:1px;
 }
 .link.primary{
   stroke: #0EBFE9;

@@ -1,9 +1,12 @@
 //This code is a bit wiffy. Could probably use a healthy refactor and definitely needs better comments...
 
+
+
 function chartNetwork(links){
 
 
 var nodes = {},
+    nodeCount = {},
     bilinks = [],
     drawLinks = [],
     relations = [],
@@ -31,8 +34,14 @@ links.forEach(function(link) {
 
       relations.push(link.source+"_"+link.target)
 
+      nodeCount[link.source] = 1;
+      nodeCount[link.target] = 1;
+
       link.source = nodes[link.source] || (nodes[link.source] = {name:link.source_name,type:link.source_type,id:link.source,});
       link.target = nodes[link.target] || (nodes[link.target] = {name:link.target_name,type:link.target_type,id:link.target,});
+
+      
+
 
       i+=1
       var iID = i.toString(),
@@ -59,10 +68,31 @@ links.forEach(function(link) {
 });
 
 
+
 //Some scaling for large numbers of nodes...
-linkLength = d3.scale.linear()
-  .domain([1,200])
-  .range([-125,-30]);
+var nodeCount = Object.keys(nodeCount).length;
+
+linkLength = d3.scale.log().base(10)
+  .clamp(true)
+  .domain([1,250])
+  .range([-150,-10]);
+
+if(nodeCount > 150){
+  window.defaultRadius = 4,
+  window.scaleRadius = 3,
+  window.stroke = .1;
+}else if(nodeCount > 75){
+  window.defaultRadius = 6,
+  window.scaleRadius = 5,
+  window.stroke = .5;
+}else{
+  window.defaultRadius = 8,
+  window.scaleRadius = 6,
+  window.stroke = 1;
+}
+
+
+
 
 var width = graphWidth,
     height = graphHeight;
@@ -76,7 +106,7 @@ var force = d3.layout.force()
     .links(drawLinks)
     .size([width, height])
     .linkDistance(10)
-    .charge(linkLength(drawLinks.length))
+    .charge(linkLength(nodeCount))
     .on("tick", function(){
       /*Tick limiter*/
       if(tickI%4==0){tick();};
@@ -136,7 +166,8 @@ var link = svg.selectAll(".link")
       })
     .attr("marker-end", function(d){
       return $.inArray(d[0].id + d[2].id, parent_hierarchies) > -1 ? "url(#arrowEnd)" : "";
-    });
+    })
+    .style("stroke-width",window.stroke);
 
 var node = svg.selectAll(".node")
     .data(force.nodes())
@@ -145,7 +176,7 @@ var node = svg.selectAll(".node")
     .call(force.drag);
 
 node.append("circle")
-    .attr("r", 8)
+    .attr("r", defaultRadius)
     .attr("class",function(d) { return d.name==nodeID ?  d.id+" circ primary "+d.type : d.id+ " circ "+d.type; })
     .style("visibility",function(d){return d.type=="fake" ? "hidden":"visible" })
     /*.style("fill", function(d) { return color(d.type); })*/
@@ -271,7 +302,7 @@ function nodeCentrality(measure){
       sizeFactor = $(".slider").slider( "value" ),
       size = d3.scale.pow().exponent(sizeFactor)
                 .domain(d3.extent( d3.values(data), function(d){return d[measure]} ) )
-                .range([6,13]);
+                .range([window.scaleRadius,13]);
 
   d3.selectAll(".lab").style("fill","#666");
 
@@ -357,12 +388,13 @@ function nodeCentrality(measure){
 }
 
 function nodeDefault(){
+
   d3.selectAll('circle.circ')
     .on("mouseover","")
     .on("mouseleave","")
     .transition().duration(1500)
     .style("fill","")
-    .attr("r", 8);
+    .attr("r", window.defaultRadius);
   d3.selectAll(".colorKey")
     .style("opacity",0);
   d3.selectAll(".key")
@@ -370,10 +402,11 @@ function nodeDefault(){
 }
 
 function changeSize(factor,measure){
+
     var data = graphData.centrality;
     var size = d3.scale.pow().exponent(factor)
                 .domain(d3.extent( d3.values(data), function(d){return d[measure]} ) )
-                .range([6,13]);
+                .range([window.scaleRadius,13]);
   
     d3.selectAll('circle.circ')
       .transition().duration(1000)

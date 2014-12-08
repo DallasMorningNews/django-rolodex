@@ -123,3 +123,5 @@ Rolodex person and org objects also have methods to return a [NetworkX](http://n
 See the [NetworkX documentation](http://networkx.github.io/documentation/latest/reference/index.html) for the methods available on the returned graph.
 
 The "Full Page Graph" for each person or org, also provides a quick and dirty visualization of centrality measures for a graph N hops from the origin node. You can pass the number of hops as a GET parameter, e.g. `?hops=4`, or it will default to 3.
+
+![Rolodex](screenshot.png)
