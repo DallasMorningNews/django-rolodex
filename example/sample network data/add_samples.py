@@ -1,3 +1,11 @@
+'''
+This script can be run from within the django shell to add an example network into the database.
+
+The data is a subset of the facebook graph from Stanford's Network Analysis Project (SNAP). 
+
+http://snap.stanford.edu/data/egonets-Facebook.html
+'''
+
 from rolodex.models import Person
 
 edge_docs = ['0.edges',]#'107.edges','348.edges','414.edges','686.edges']

@@ -66,15 +66,6 @@ Developers can also use the RESTful API to create people, orgs and their relatio
 The API uses Django rest framework's hyperlinked serializers, so use URLs for foreign keys.
 
 
-Deleting people & orgs
-----------------------
-Users must have explicit permission to delete people and organizations.
-
-These can be added in the admin for individual users or groups:
-- `rolodex | org | Can delete org`
-- `rolodex | person | Can delete person`
-
-
 Relationships
 -------------
 Relationships in Rolodex are undirected (facebook not twitter), so when you create a relationship from one person or org to another person or org, the relationship is reciprocally created the other way. 
@@ -92,12 +83,32 @@ To help manage the creation of relationships, person and org objects have an ext
 - `add_org2p(person_object,**kwargs)` : relation from org to person
 - `remove_org2p(person_object,**kwargs)`
 
-Org2Org relationships are allowed hierarchy. Pass the `hierarchy` parameter `parent` or `child` when creating the relationship, referencing the current object, and the related node's symmetrical relationship will receive the inverse property. 
 
-For example, if org1 is parent to org2, `org1.add_org2org(org2,**{hierarchy:'parent'})` will create the relationship with the correct hierarchy. 
+Hierarchy
+----------
+Org2Org relationships are allowed hierarchy. Pass a `hierarchy` parameter `"parent"` or `"child"` when creating the relationship (referencing the current object), and the related node's symmetrical relationship will receive the inverse property. 
 
-__Note__: If you modify an existing Org2Org relationship's hierarchy, a duplicate will be created. Instead delete the current relationship and re-create it with the correct hierarchy.
+For example, if org1 is parent to org2, `org1.add_org2org(org2,**{hierarchy:"parent"})` will create the relationship with the correct hierarchy. 
 
+Hierarchy is not available for other types of relationships. Generally, we think of hierarchy as implying a general sense of ownership, which obviously doesn't apply to the other relationship types. 
+
+__Note__: If you modify an existing Org2Org relationship's hierarchy (for that matter, any relationship porperty), a duplicate will be created. Instead delete the current relationship and re-create it with the correct hierarchy or other properties.
+
+
+<a name="types_and_roles"></a>Types & Roles
+-------------
+You can classify people, org contacts and relationships in Rolodex, so it's easy to create custom filters for how you want to organize your networks. Usually, the more generic, the more useful the type or role, but that is up to you and your project's needs. Remember, that all relationships are created symmetrically.
+
+Types and roles are added through django admin:
+- `PersonRole` : specific to person objects, e.g., "chief information officer"
+- `OrgContactRole` : of an org contact, e.g., "information desk" or "mailing address"
+- `P2P_Type` : relationship between people, e.g., "spouse" or "professional"
+- `Org2Org_Type` : relationships between orgs, e.g., "co-venture" or "subsidiary"
+- `P2Org_Type` : relationships between people and orgs, where "employment" is a pre-loaded fixture.
+
+
+Shorthand
+----------
 There are also shorthand methods for retrieving related objects:
 
 - `get_relations()` : gets related person & org objects
@@ -110,19 +121,8 @@ There are also shorthand methods for retrieving related objects:
 - `get_parents()` : get parents in Org2Org relationships
 
 
-<a name="types_and_roles"></a>Types & Roles
--------------
-You can classify people, org contacts and relationships in Rolodex, so it's easy to create custom filters for how you want to organize your networks. Usually, the more generic, the more useful the type or role, but that is up to you and your project's needs. Remember, that all relationships are created symmetrically.
-
-Types and roles are added through django admin:
-- `Role` : specific to person objects, e.g., "chief information officer"
-- `OrgContactRole` : of an org contact, e.g., "information desk" or "mailing address"
-- `P2P_Type` : relationship between people, e.g., "spouse" or "professional"
-- `Org2Org_Type` : relationships between orgs, e.g., "co-venture" or "subsidiary"
-- `P2Org_Type` : relationships between people and orgs, where "employment" is a pre-loaded fixture.
-
-Analysis
----------
+Graph Analysis
+--------------
 
 Rolodex person and org objects also have methods to return a [NetworkX](http://networkx.github.io/) graph of connected objects for more advanced analysis.
 
