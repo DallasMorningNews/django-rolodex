@@ -18,10 +18,10 @@
 .lab{
   fill:#888888;
 }
-circle.circ.org{
+circle.org{
   fill:#5F9F9F;
 }
-circle.circ.person{
+circle.person{
   fill:#FF8C69;
 }
 text{
@@ -39,4 +39,12 @@ text.colorKey.title{
 text.centralityData{
   fill:#666666;
   font:10px sans-serif;
+}
+
+text.keyText{
+  font:9px 'Raleway',sans-serif;
+  color:black;
+}
+text.keyText.title{
+
 }

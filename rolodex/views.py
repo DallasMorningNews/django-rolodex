@@ -12,28 +12,21 @@ import json
 from django.conf import settings
 import networkx as nx
 
-
+'''
+Employment is the only required fixture.
+'''
 EMPLOYMENT = P2Org_Type.objects.get(relationship_type='employment')
 
 
 def secure(view):
+	'''
+	Simple decorator that checks SETTINGS.
+	'''
 	if settings.ROLODEX_SECURE:
 		return login_required(view)
 	else:
 		return view
 
-def org_relate_peep(peeps):
-	for peep in peeps:
-		employers = peep.org_relations.filter(p_to_org__relation=EMPLOYMENT)
-		if len(employers) > 0:
-			peep.orgName=employers[0].orgName
-		else:
-			'''
-			If person has no primary org relationship, or if it has been deleted, we list
-			them with N/A for the purposes of the search boxes on home and relation page.
-			'''
-			peep.orgName="N/A"
-	return peeps
 
 @secure
 def home(request): 
@@ -41,6 +34,11 @@ def home(request):
 	peeps = Person.objects.all()
 	peeps = org_relate_peep(peeps)
 	return render_to_response('rolodex/home.html',{'orgs':orgs,'peeps':peeps},context_instance=RequestContext(request))
+
+
+############################################################################
+#### ORG Views ####
+###################
 
 @secure
 def new_org(request): 
@@ -92,7 +90,69 @@ def delete_org(request,orgNode):
 		return redirect('rolodex_home')
 	return render_to_response('rolodex/delete.html',{'org':org},context_instance=RequestContext(request))
 
+@secure
+def search_org(request,org_id):
+	node = Org.objects.get(id=org_id)
+	node.employees = node.get_employees()
+	node.contacts = node.org_contact.all()
+	node.relations = node.get_relations_with_type()
+	return render_to_response('rolodex/org.html',{'node':node,},context_instance=RequestContext(request))
 
+@secure
+def org_map(request,org_id):
+	node = Org.objects.get(id=org_id)
+	hops = int(request.GET.get('hops',3))
+	return render_to_response('rolodex/orgMap.html',{'node':node,'hops':hops},context_instance=RequestContext(request))
+
+@secure
+def org_network(request,org_id):
+	network = net_compiler(Org.objects.filter(id=org_id),3)
+	data = json.dumps(network)
+	return HttpResponse(data, content_type='application/json')
+
+@secure
+def adv_org_network(request,o_id):
+	hops = int(request.GET.get('hops',3))
+	network = net_compiler(Org.objects.filter(id=o_id),hops)
+	org = Org.objects.get(id=o_id)
+	centrality_data = adv_compile(org,hops)
+	data = json.dumps({'centrality':centrality_data, 'links':network})
+	return HttpResponse(data, content_type='application/json')
+
+@secure
+def new_org_relation(request,Node):
+	saved=False
+	org2orgForm = Org2OrgForm()
+	org2pForm = Org2PForm()
+	if request.method == "POST":
+		if request.POST['formType']=='2P':
+			org2pForm = Org2PForm(request.POST)
+			if org2pForm.is_valid():
+				fromEnt = Org.objects.get(pk=request.POST['from_ent'])
+				toEnt   = Person.objects.get(pk=request.POST['to_ent'])
+				relation= P2Org_Type.objects.get_or_none(relationship_type=request.POST['relation'],)
+				fromEnt.add_org2p(toEnt,**{'relation':relation})
+				saved=True
+		else:	
+			org2orgForm = Org2OrgForm(request.POST)
+			if org2orgForm.is_valid():
+				fromEnt = Org.objects.get(pk=request.POST['from_ent'])
+				toEnt   = Org.objects.get(pk=request.POST['to_ent'])
+				hierarchy = request.POST['hierarchy']
+				relation= Org2Org_Type.objects.get_or_none(relationship_type=request.POST['relation'])
+				fromEnt.add_org2org(toEnt,**{'relation':relation,'hierarchy':hierarchy})
+				saved=True
+
+	orgs = Org.objects.filter(~Q(pk=Node))
+	peeps = Person.objects.all()
+	peeps = org_relate_peep(peeps)
+	orgNode = Org.objects.get(pk=Node)
+	return render_to_response('rolodex/new_relation.html',{'orgNode':orgNode ,'pForm':org2pForm,'orgForm':org2orgForm,'saved':saved,'peeps':peeps,'orgs':orgs},context_instance=RequestContext(request))
+
+
+############################################################################
+#### PERSON Views ####
+######################
 
 @secure
 def new_person(request, orgNode): 
@@ -164,21 +224,6 @@ def delete_person(request,personNode):
 		return redirect('rolodex_home')
 	return render_to_response('rolodex/delete.html',{'peep':peep},context_instance=RequestContext(request))
 
-
-@secure
-def search_org(request,org_id):
-	node = Org.objects.get(id=org_id)
-	node.employees = node.get_employees()
-	node.contacts = node.org_contact.all()
-	node.relations = node.get_relations_with_type()
-	return render_to_response('rolodex/org.html',{'node':node,},context_instance=RequestContext(request))
-
-@secure
-def org_map(request,org_id):
-	node = Org.objects.get(id=org_id)
-	hops = int(request.GET.get('hops',3))
-	return render_to_response('rolodex/orgMap.html',{'node':node,'hops':hops},context_instance=RequestContext(request))
-
 @secure
 def search_person(request,p_id):
 	node = Person.objects.get(id=p_id)
@@ -202,28 +247,6 @@ def person_network(request,p_id):
 	network = net_compiler(Person.objects.filter(id=p_id),3)
 	data = json.dumps(network)
 	return HttpResponse(data, content_type='application/json')
-@secure
-def org_network(request,org_id):
-	network = net_compiler(Org.objects.filter(id=org_id),3)
-	data = json.dumps(network)
-	return HttpResponse(data, content_type='application/json')
-
-
-'''
-Compile some basic network centrality statistics for graph.
-'''
-def adv_compile(node, hops):
-	G = node.nx_graph(hops)
-	degree = nx.degree_centrality(G)
-	betweenness = nx.betweenness_centrality(G)
-	closeness= nx.closeness_centrality(G) 
-	data={}
-	for node in degree:
-		n = get_info(node)
-		data[n.id] = {'degree':degree[node],
-						'betweenness':betweenness[node],
-						'closeness':closeness[node]}
-	return data
 
 @secure
 def adv_person_network(request,p_id):
@@ -231,15 +254,6 @@ def adv_person_network(request,p_id):
 	network = net_compiler(Person.objects.filter(id=p_id),hops)
 	peep = Person.objects.get(id=p_id)
 	centrality_data = adv_compile(peep,hops)
-	data = json.dumps({'centrality':centrality_data, 'links':network})
-	return HttpResponse(data, content_type='application/json')
-
-@secure
-def adv_org_network(request,o_id):
-	hops = int(request.GET.get('hops',3))
-	network = net_compiler(Org.objects.filter(id=o_id),hops)
-	org = Org.objects.get(id=o_id)
-	centrality_data = adv_compile(org,hops)
 	data = json.dumps({'centrality':centrality_data, 'links':network})
 	return HttpResponse(data, content_type='application/json')
 
@@ -271,12 +285,13 @@ def new_person_relation(request,Node):
 				fromEnt.add_p2org(toEnt,**{'relation':relation})
 				saved=True
 
-	
 	orgs = Org.objects.all()
 	peeps = Person.objects.filter(~Q(pk=Node))
 	peeps = org_relate_peep(peeps)
 	peepNode = Person.objects.get(pk=Node)
 	return render_to_response('rolodex/new_relation.html',{'peepNode':peepNode,'pForm':p2pForm,'orgForm':p2orgForm,'saved':saved,'peeps':peeps,'orgs':orgs},context_instance=RequestContext(request))
+
+
 
 @secure
 def delete_relationship(request):
@@ -304,41 +319,37 @@ def delete_relationship(request):
 				from_ent.remove_org2org(to_ent)
 	return HttpResponse("Done.")
 
-@secure
-def new_org_relation(request,Node):
-	saved=False
-	org2orgForm = Org2OrgForm()
-	org2pForm = Org2PForm()
-	if request.method == "POST":
-		if request.POST['formType']=='2P':
-			org2pForm = Org2PForm(request.POST)
-			if org2pForm.is_valid():
-				fromEnt = Org.objects.get(pk=request.POST['from_ent'])
-				toEnt   = Person.objects.get(pk=request.POST['to_ent'])
-				relation= P2Org_Type.objects.get_or_none(relationship_type=request.POST['relation'],)
-				fromEnt.add_org2p(toEnt,**{'relation':relation})
-				saved=True
-		else:	
-			org2orgForm = Org2OrgForm(request.POST)
-			if org2orgForm.is_valid():
-				fromEnt = Org.objects.get(pk=request.POST['from_ent'])
-				toEnt   = Org.objects.get(pk=request.POST['to_ent'])
-				heirarchy = request.POST['heirarchy']
-				relation= Org2Org_Type.objects.get_or_none(relationship_type=request.POST['relation'])
-				fromEnt.add_org2org(toEnt,**{'relation':relation,'heirarchy':heirarchy})
-				saved=True
-
-	
-	orgs = Org.objects.filter(~Q(pk=Node))
-	peeps = Person.objects.all()
-	peeps = org_relate_peep(peeps)
-	orgNode = Org.objects.get(pk=Node)
-	return render_to_response('rolodex/new_relation.html',{'orgNode':orgNode ,'pForm':org2pForm,'orgForm':org2orgForm,'saved':saved,'peeps':peeps,'orgs':orgs},context_instance=RequestContext(request))
 
 
-###################
-## Network Funcs ##
-###################
+#################################################################
+##### GRAPH HELPER FUNCTIONS ######
+###################################
+
+def org_relate_peep(peeps):
+	'''
+	Helper to serialize data for search boxes.
+	'''
+	for peep in peeps:
+		employers = peep.org_relations.filter(p_to_org__relation=EMPLOYMENT)
+		if len(employers) > 0:
+			peep.orgName=employers[0].orgName
+		else:
+			'''
+			If person has no primary org relationship, or if it has been deleted, we list
+			them with N/A for the purposes of the search boxes on home and relation page.
+			'''
+			peep.orgName="N/A"
+	return peeps
+
+def hierarchy(snode,tnode):
+	if snode.type == 'org' and tnode.type == 'org':
+		snode.hierarchy = Org2Org.objects.get(from_ent=snode.pk,to_ent=tnode.pk).hierarchy
+		tnode.hierarchy = Org2Org.objects.get(from_ent=tnode.pk,to_ent=snode.pk).hierarchy
+	else:
+		snode.hierarchy = 'none'
+		tnode.hierarchy = 'none'
+	return (snode, tnode)
+
 def get_info(n):
 	class output:
 		pass
@@ -351,7 +362,9 @@ def get_info(n):
 		node.name = n.orgName
 		node.type = "org"
 		node.id="o"+str(n.id)
+	node.pk = n.pk
 	return node
+
 def get_relations(nodes):
 	relations,node_list=[],[]
 	for node in nodes: 
@@ -359,17 +372,21 @@ def get_relations(nodes):
 		relations = node.get_relations()
 		for r in list(chain(relations['orgs'],relations['people'])):
 			tnode=get_info(r)
+			snode, tnode = hierarchy(snode,tnode)
 			node_list.append({ 
 				"source":snode.id,
 				"source_name":str(snode.name), 
 				"source_type":str(snode.type),
+				"source_hierarchy":str(snode.hierarchy),
 				"target":tnode.id,
 				"target_name":str(tnode.name),
-				"target_type":str(tnode.type)
+				"target_type":str(tnode.type),
+				"target_hierarchy":str(tnode.hierarchy),
 				})
 		relations = list(chain(relations['orgs'],relations['people']))
 	relations=list(set(relations))
 	return {'node_list':node_list,'relations':relations}
+
 def net_compiler(nodes,hops=2):
 	node_list=[]
 	for i in range(hops):
@@ -379,3 +396,19 @@ def net_compiler(nodes,hops=2):
 	#de-dup
 	node_list=[dict(t) for t in set([tuple(d.items()) for d in node_list])]
 	return node_list
+
+def adv_compile(node, hops):
+	'''
+	Compile some basic network centrality statistics for graph.
+	'''
+	G = node.nx_graph(hops)
+	degree = nx.degree_centrality(G)
+	betweenness = nx.betweenness_centrality(G)
+	closeness= nx.closeness_centrality(G) 
+	data={}
+	for node in degree:
+		n = get_info(node)
+		data[n.id] = {'degree':degree[node],
+						'betweenness':betweenness[node],
+						'closeness':closeness[node]}
+	return data

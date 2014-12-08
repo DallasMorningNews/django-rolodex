@@ -42,8 +42,8 @@ var replaceP = '{% url "rolodex_person" "foobarbaz" %}',
 	replaceO = '{% url "rolodex_org" "foobarbaz" %}',
 	nodeID="{{node.orgName}}",
 	nodePRIME = "{{node.primary}}"
-  graphWidth = $(window).width(),
-  graphHeight = $(window).height()-60,
+  graphWidth = $(window).width()-50,
+  graphHeight = $(window).height()-120,
   graphData={};
 </script>
 <script src="{% static 'rolodex/js/nodeNet.js'%}"></script>

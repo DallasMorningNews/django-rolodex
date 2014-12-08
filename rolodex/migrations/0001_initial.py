@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 ('from_date', models.DateField(null=True, blank=True)),
                 ('to_date', models.DateField(null=True, blank=True)),
                 ('description', models.TextField(null=True, blank=True)),
-                ('heirarchy', models.CharField(default=b'none', max_length=10, choices=[(b'parent', b'parent'), (b'child', b'child'), (b'none', b'none')])),
+                ('hierarchy', models.CharField(default=b'none', max_length=10, choices=[(b'parent', b'parent'), (b'child', b'child'), (b'none', b'none')])),
                 ('from_ent', models.ForeignKey(related_name='org_from_org', to='rolodex.Org')),
             ],
             options={

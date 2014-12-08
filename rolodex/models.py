@@ -18,7 +18,10 @@ class GetOrNoneManager(models.Manager):
 ###################
 ## Choice Models ##
 ###################
-## These are all registered in admin.
+
+'''
+Choice models are registered in the admin are designed to be set by user prior to entering entities into Rolodex.
+'''
 
 class OpenRecordsLaw(models.Model):
 	'''
@@ -27,8 +30,10 @@ class OpenRecordsLaw(models.Model):
 	id = models.CharField(max_length=250,primary_key=True,editable=False)
 	name = models.CharField(max_length=250)
 	link = models.URLField(blank=True,null=True)
+
 	def __unicode__(self):
 		return self.name
+
 	def save(self, *args, **kwargs):
 		self.id = slugify(unicode(self.name))
 		super(OpenRecordsLaw, self).save(*args, **kwargs)
@@ -40,8 +45,10 @@ class PersonRole(models.Model):
 	id = models.CharField(max_length=250,primary_key=True,editable=False)
 	role = models.CharField(max_length=250)
 	description = models.TextField(blank=True,null=True)
+
 	def __unicode__(self):
 		return self.role
+
 	def save(self, *args, **kwargs):
 		self.id = slugify(unicode(self.role))
 		super(PersonRole, self).save(*args, **kwargs)
@@ -53,18 +60,26 @@ class OrgContactRole(models.Model):
 	id = models.CharField(max_length=250,primary_key=True,editable=False)
 	role = models.CharField(max_length=250)
 	description = models.TextField(blank=True,null=True)
+
 	def __unicode__(self):
 		return self.role
+
 	def save(self, *args, **kwargs):
 		self.id = slugify(unicode(self.role))
 		super(OrgContactRole, self).save(*args, **kwargs)
+
+'''
+Relationship types
+'''
 
 class P2P_Type(models.Model):
 	id = models.CharField(max_length=250,primary_key=True,editable=False)
 	relationship_type = models.CharField(max_length=250)
 	objects = GetOrNoneManager()
+
 	def __unicode__(self):
 		return self.relationship_type
+
 	def save(self, *args, **kwargs):
 		self.id = slugify(unicode(self.relationship_type))
 		super(P2P_Type, self).save(*args, **kwargs)
@@ -73,8 +88,10 @@ class Org2Org_Type(models.Model):
 	id = models.CharField(max_length=250,primary_key=True,editable=False)
 	relationship_type = models.CharField(max_length=250)
 	objects = GetOrNoneManager()
+
 	def __unicode__(self):
 		return self.relationship_type
+
 	def save(self, *args, **kwargs):
 		self.id = slugify(unicode(self.relationship_type))
 		super(Org2Org_Type, self).save(*args, **kwargs)
@@ -83,8 +100,10 @@ class P2Org_Type(models.Model):
 	id = models.CharField(max_length=250,primary_key=True,editable=False)
 	relationship_type = models.CharField(max_length=250)
 	objects = GetOrNoneManager()
+
 	def __unicode__(self):
 		return self.relationship_type
+
 	def save(self, *args, **kwargs):
 		self.id = slugify(unicode(self.relationship_type))
 		super(P2Org_Type, self).save(*args, **kwargs)
@@ -95,8 +114,10 @@ class Tag(models.Model):
 	id = models.CharField(max_length=250,primary_key=True,editable=False)
 	tag_name = models.CharField(max_length=250)
 	objects = GetOrNoneManager()
+
 	def __unicode__(self):
 		return tag_name
+
 	def save(self, *args, **kwargs):
 		self.id = slugify(unicode(self.tag_name))
 		super(Tag, self).save(*args, **kwargs)
@@ -128,7 +149,7 @@ class Contact(models.Model):
 			url=URLValidator()
 			url(self.contact)
 		elif self.type=='phone':
-			#Add a validator?
+			#Add a validator here?
 			pass
 		else:
 			pass
@@ -160,6 +181,7 @@ class Person(models.Model):
 
 	#2.0 feature
 	tags = models.ManyToManyField(Tag,blank=True)
+
 	def __unicode__(self):
 		return self.lastName+", "+self.firstName
 
@@ -175,6 +197,7 @@ class Org(models.Model):
 
 	#2.0 feature
 	tags = models.ManyToManyField(Tag,blank=True)
+
 	def __unicode__(self):
 		return self.orgName
 
@@ -199,7 +222,6 @@ class P2P(models.Model):
 		return self.from_ent.lastName +" ... "+self.to_ent.lastName
 	'''
 	Override save and delete methods to maintain relationship symmetry. 
-	Same is enforced in the add_ and remove_(relationship) model methods. 
 	'''
 	def save(self, *args, **kwargs):
 		super(P2P, self).save(*args, **kwargs)
@@ -211,6 +233,7 @@ class P2P(models.Model):
 			from_date=self.from_date,
 			to_date=self.to_date,
 			description=self.description)
+
 	def delete(self,*args,**kwargs):
 		super(P2P, self).delete(*args, **kwargs)
 		relation = P2P.objects.get_or_none(
@@ -225,17 +248,23 @@ class P2P(models.Model):
 
 
 '''
-We make Org2Org relationships unique in that they can have heirarchy. 
+We make Org2Org relationships unique in that they can have hierarchy. 
+Could technically apply to other relationship types, but philosophically
+we mean this to convey some principle of ownership. As such doesn't 
+really apply to Org2P and definitely not to P2P.
 '''
-def heirarchy_test(self):
-		if self.heirarchy == 'none':
-			return 'none'
+def hierarchy_test(self):
+	'''
+	Simple 3-way test.
+	'''
+	if self.hierarchy == 'none':
+		return 'none'
+	else:
+		if self.hierarchy == 'child':
+			return 'parent'
 		else:
-			if self.heirarchy == 'child':
-				return 'parent'
-			else:
-				return 'child'
-heirarchy_types = (('parent','parent'),('child','child'),('none','none'))
+			return 'child'
+hierarchy_types = (('parent','parent'),('child','child'),('none','none'))
 
 class Org2Org(models.Model):
 	from_ent = models.ForeignKey(Org,related_name='org_from_org')
@@ -244,7 +273,7 @@ class Org2Org(models.Model):
 	from_date = models.DateField(blank=True, null=True)
 	to_date = models.DateField(blank=True, null=True)
 	description = models.TextField(blank=True, null=True)
-	heirarchy = models.CharField(choices=heirarchy_types, default='none', max_length=10)
+	hierarchy = models.CharField(choices=hierarchy_types, default='none', max_length=10)
 	objects = GetOrNoneManager()
 	
 	def __unicode__(self):
@@ -257,15 +286,18 @@ class Org2Org(models.Model):
 	
 	def save(self, *args, **kwargs):
 		super(Org2Org, self).save(*args, **kwargs)
-		#Enforce Symmetry
-		Org2Org.objects.get_or_create(
+		'''
+		Enforce Symmetry.
+		An issue: If you change a feature of a relationship, e.g., hierarchy, you'll end up creating a new relationship, and the stale one will persist.
+		'''
+		relation, got = Org2Org.objects.get_or_create(
 			from_ent=self.to_ent,
 			to_ent=self.from_ent,
 			relation=self.relation,
 			from_date=self.from_date,
 			to_date=self.to_date,
 			description=self.description,
-			heirarchy = heirarchy_test(self) )
+			hierarchy=hierarchy_test(self))
 	
 	def delete(self,*args,**kwargs):
 		super(Org2Org, self).delete(*args, **kwargs)
@@ -279,6 +311,7 @@ class Org2Org(models.Model):
 			description=self.description )
 		if relation:
 			relation.delete()
+
 
 class P2Org(models.Model):
 	from_ent = models.ForeignKey(Person,related_name='org_from_p')
@@ -433,7 +466,7 @@ def get_employees(self):
 
 def get_employees_by_role(self,role):
 	'''
-	Preferable to pass a string? Could also refactor for role object.
+	Thinking preferable to pass a string? Could also refactor for role object.
 	'''
 	relates=self.p_to_org.filter(relation__relationship_type='employment',from_ent__role__role=role)
 	employees=[r.from_ent for r in relates]
@@ -462,7 +495,16 @@ def get_relations_with_type(self):
 		kin=self.p_to_p.all().order_by('pk')
 		return {'orgs':collate_relations(kith),'people':collate_relations(kin)}
 
+'''
+hierarchy getters for orgs
+'''
+def get_children(self):
+	orgs = self.org_to_org.filter(hierarchy='child')
+	return [org.from_ent for org in orgs]
 
+def get_parents(self):
+	orgs = self.org_to_org.filter(hierarchy='parent')
+	return [org.from_ent for org in orgs]
 
 
 ###################
@@ -480,7 +522,6 @@ def collate_relations(queryset):
 		else:
 			relation_list.append({'type':'','relation':q.from_ent})
 	return relation_list
-
 
 import networkx as nx
 def nx_add(graph,node):
@@ -530,4 +571,6 @@ Org.get_employees = get_employees
 Org.get_employees_by_role = get_employees_by_role
 Org.get_relations_with_type = get_relations_with_type
 Org.get_relations_by_type = get_relations_by_type
+Org.get_parents = get_parents
+Org.get_children = get_children
 Org.nx_graph = nx_graph

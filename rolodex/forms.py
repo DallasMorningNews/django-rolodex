@@ -42,4 +42,4 @@ class Org2PForm(ModelForm):
 class Org2OrgForm(ModelForm):
 	class Meta:
 		model = Org2Org
-		fields = ['from_ent','to_ent','relation','from_date','to_date','heirarchy','description']
+		fields = ['from_ent','to_ent','relation','from_date','to_date','hierarchy','description']

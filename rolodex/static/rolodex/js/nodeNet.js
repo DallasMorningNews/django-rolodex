@@ -1,12 +1,13 @@
+//This code is a bit wiffy. Could probably use a healthy refactor and definitely needs better comments...
+
 function chartNetwork(links){
 
-console.log("FIRE!");
-console.log(links);
 
 var nodes = {},
     bilinks = [],
     drawLinks = [],
-    relations = [];
+    relations = [],
+    parent_hierarchies = [];
 
 var i = 0;
 links.forEach(function(link) {
@@ -14,14 +15,24 @@ links.forEach(function(link) {
   var match = link.source+"_"+link.target,
       rematch = link.target+"_"+link.source;
 
+
+  //Flip them so we avoid the marker-start property which doesn't track well with the curved path.
+  if(link.source_hierarchy=='parent'){
+    parent_hierarchies.push(link.source+link.target);
+  }else if(link.source_hierarchy=='child'){
+    parent_hierarchies.push(link.target+link.source);
+  }
+
+  
+
   //Check to see if we've already made the match...
   if( relations.indexOf(match) == -1 & relations.indexOf(rematch) == -1 ){
 
+
       relations.push(link.source+"_"+link.target)
 
-      link.source = nodes[link.source] || (nodes[link.source] = {name:link.source_name,type:link.source_type,id:link.source});
-      link.target = nodes[link.target] || (nodes[link.target] = {name:link.target_name,type:link.target_type,id:link.target});
-
+      link.source = nodes[link.source] || (nodes[link.source] = {name:link.source_name,type:link.source_type,id:link.source,});
+      link.target = nodes[link.target] || (nodes[link.target] = {name:link.target_name,type:link.target_type,id:link.target,});
 
       i+=1
       var iID = i.toString(),
@@ -37,10 +48,16 @@ links.forEach(function(link) {
           target:link.target
         });
 
-      bilinks.push([link.source,fake,link.target]);
+      //Flip them
+      if(link.source_hierarchy!=='child'){
+        bilinks.push([link.source,fake,link.target]);
+      }else{
+        bilinks.push([link.target,fake,link.source]);
+      }
   }
 
 });
+
 
 //Some scaling for large numbers of nodes...
 linkLength = d3.scale.linear()
@@ -72,6 +89,40 @@ var svg = d3.select("#networkCanvas").append("svg")
     .attr("width", width)
     .attr("height", height);
 
+svg.append("defs").append("svg:marker")
+  .attr("id","arrowEnd")
+  .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 22)
+    .attr("refY", 0)
+    .attr("markerWidth", 8)
+    .attr("markerHeight", 8)
+    .attr("orient", "auto")
+    .attr("fill","#666")
+  .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5");
+svg.append("defs").append("svg:marker")
+  .attr("id","arrowStart")
+  .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 22)
+    .attr("refY", 0)
+    .attr("markerWidth", 8)
+    .attr("markerHeight", 8)
+    .attr("orient", "auto")
+    .attr("fill","#666")
+  .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5");
+svg.append("defs").append("svg:marker")
+  .attr("id","arrowKey")
+  .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 0)
+    .attr("refY", 0)
+    .attr("markerWidth", 8)
+    .attr("markerHeight", 8)
+    .attr("orient", "auto")
+    .attr("fill","#666")
+  .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5");
+
 var link = svg.selectAll(".link")
     .data(bilinks)
   .enter().append("path")
@@ -82,7 +133,10 @@ var link = svg.selectAll(".link")
         }else{
           return "link";
         }
-      });
+      })
+    .attr("marker-end", function(d){
+      return $.inArray(d[0].id + d[2].id, parent_hierarchies) > -1 ? "url(#arrowEnd)" : "";
+    });
 
 var node = svg.selectAll(".node")
     .data(force.nodes())
@@ -91,7 +145,7 @@ var node = svg.selectAll(".node")
     .call(force.drag);
 
 node.append("circle")
-    .attr("r", function(d){ return d.type==="org" ? 10:8;})
+    .attr("r", 8)
     .attr("class",function(d) { return d.name==nodeID ?  d.id+" circ primary "+d.type : d.id+ " circ "+d.type; })
     .style("visibility",function(d){return d.type=="fake" ? "hidden":"visible" })
     /*.style("fill", function(d) { return color(d.type); })*/
@@ -118,6 +172,47 @@ node.append("text")
     })
     .on("mouseenter", mouseover)
     .on("mouseout", mouseout);
+
+
+//Key
+svg.append("circle")
+  .attr("r",4)
+  .attr("cx",width-60)
+  .attr("cy",height-40)
+  .attr("class","key org");
+svg.append("text")
+  .attr("class","key keyText")
+  .attr("x",width-53)
+  .attr("y",height-37)
+  .text("Organization");
+svg.append("circle")
+  .attr("r",4)
+  .attr("cx",width-60)
+  .attr("cy",height-30)
+  .attr("class","key person");
+svg.append("text")
+  .attr("class","key keyText")
+  .attr("x",width-53)
+  .attr("y",height-27)
+  .text("Person");
+svg.append("text")
+  .attr("class","key keyText title")
+  .attr("x",width-55)
+  .attr("y",height-16)
+  .text("Hierarchy");
+svg.append("line")
+  .attr("x1",width-60)
+  .attr("x2",width-45)
+  .attr("y1",height-10)
+  .attr("y2",height-10)
+  .attr("class","key link")
+  .attr("marker-end", "url(#arrowKey)");
+svg.append("text")
+  .attr("class","key keyText")
+  .attr("x",width-35)
+  .attr("y",height-7)
+  .text("child");
+
 
 function visible(){
   if($(this).attr('class').split(' ')[3]!=='primary'){
@@ -203,43 +298,48 @@ function nodeCentrality(measure){
       .attr("width",99)
       .attr("height",12)
       .attr("fill","url(#gradient)")
-      .attr("x",graphWidth-164)
+      .attr("x",graphWidth-114)
       .attr("y",15 );
       svg.append("text")
         .attr("class","colorKey")
-        .attr("x",graphWidth-87)
+        .attr("x",graphWidth-37)
         .attr("y",25)
         .style("fill","white")
         .style("font-weight","bold")
         .text("Max");
       svg.append("text")
         .attr("class","colorKey title")
-        .attr("x",graphWidth-165)
+        .attr("x",graphWidth-115)
         .attr("y",12)
         .text("Centrality");
       svg.append("text")
         .attr("class","centralityData degree")
-        .attr("x",graphWidth-65)
+        .attr("x",graphWidth-15)
         .attr("y",38)
         .attr("text-anchor","end")
         .text("");
       svg.append("text")
         .attr("class","centralityData betweenness")
-        .attr("x",graphWidth-65)
+        .attr("x",graphWidth-15)
         .attr("y",48)
         .attr("text-anchor","end")
         .text("");
       svg.append("text")
         .attr("class","centralityData closeness")
-        .attr("x",graphWidth-65)
+        .attr("x",graphWidth-15)
         .attr("y",58)
         .attr("text-anchor","end")
         .text("");
+      
   }else{
     d3.selectAll(".colorKey")
     .style("opacity",1);
+    
   }
 
+
+  d3.selectAll(".key")
+    .style("opacity",0);
 
   d3.selectAll('circle.circ')
     .on("mouseover",function(d){
@@ -251,9 +351,8 @@ function nodeCentrality(measure){
       d3.selectAll(".centralityData").text("")
     })
     .transition().duration(1500)
-    .style("fill",function(d){ return d.id.substring(0,4) == 'fake' ? '' : color(c(data[d.id][measure]))  })
-    .attr("r",function(d){return d.id.substring(0,4) == 'fake' ? '' : size(data[d.id][measure])  })
-    ;
+    .style("fill",function(d){return d.id.substring(0,4) == 'fake' ? '' : color(c(data[d.id][measure]))  })
+    .attr("r",function(d){return d.id.substring(0,4) == 'fake' ? '' : size(data[d.id][measure])  });
 
 }
 
@@ -263,9 +362,11 @@ function nodeDefault(){
     .on("mouseleave","")
     .transition().duration(1500)
     .style("fill","")
-    .attr("r", function(d){ return d.type==="org" ? 10:8;});
+    .attr("r", 8);
   d3.selectAll(".colorKey")
     .style("opacity",0);
+  d3.selectAll(".key")
+    .style("opacity",1);
 }
 
 function changeSize(factor,measure){
