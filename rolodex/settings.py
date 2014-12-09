@@ -10,7 +10,8 @@ if not settings.DATABASES.has_key('rolodex'):
 	if os.environ.has_key('ROLODEX_DB'):
 	    settings.DATABASES['rolodex'] = dj_database_url.parse(os.environ.get('ROLODEX_DB'))
 	    settings.DATABASE_ROUTERS.append('rolodex.routers.RolodexRouter')
-
+else:
+	settings.DATABASE_ROUTERS.append('rolodex.routers.RolodexRouter')
 #######################################################
 
 if not hasattr(settings, 'ROLODEX_SECURE'):

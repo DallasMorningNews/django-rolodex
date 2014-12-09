@@ -1,5 +1,5 @@
 '''
-This script can be run within the django shell to add an example network into the database.
+This script can be run from within the django shell to add an example network into the database.
 
 The data is a subset of the facebook graph from Stanford's Network Analysis Project (SNAP). 
 

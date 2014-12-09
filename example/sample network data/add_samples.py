@@ -18,7 +18,6 @@ for doc in edge_docs:
 	print doc
         for line in file:
             ents=line.split()
-            print type(ents[0])
             ent1, get = Person.objects.get_or_create(firstName='node',lastName=ents[0])
             ent2, get = Person.objects.get_or_create(firstName='node',lastName=ents[1])
             if 'n'+ents[0]+'-n'+ents[1] not in relationships:

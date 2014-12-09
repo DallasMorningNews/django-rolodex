@@ -20,7 +20,7 @@ class GetOrNoneManager(models.Manager):
 ###################
 
 '''
-Choice models are registered in the admin are designed to be set by user prior to entering entities into Rolodex.
+Choice models are registered in the admin and are designed to be set by user prior to entering entities into Rolodex.
 '''
 
 class OpenRecordsLaw(models.Model):

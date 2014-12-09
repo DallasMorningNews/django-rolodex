@@ -173,10 +173,6 @@ class RolodexViewsTestCase(WebTest):
 		response = form.submit()
 		self.assertEqual(response.context['saved'],True)
 
-		# response = self.app.post(reverse('rolodex_delete_relation'),{'from_type':'p','to_type':'o','from_ent':'2','to_ent':'1'})
-		# self.assertEqual(resonse.status_code,403)
-
-
 		print " >> Passed relationship create page"
 
 	def test_delete(self):
@@ -186,15 +182,7 @@ class RolodexViewsTestCase(WebTest):
 		self.assertEqual(response.status_code , 302)
 		print " >> Passed delete page"
 
-'''
-VIEWS TO WRITE TESTS FOR:
-person_map
-org_map
-person_network
-org_network
 
-delete_relationship
-'''
 
 '''
 Fixtures...
