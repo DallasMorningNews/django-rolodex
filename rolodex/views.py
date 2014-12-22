@@ -321,12 +321,14 @@ def org_relate_peep(peeps):
 		employers = peep.org_relations.filter(p_to_org__relation=EMPLOYMENT)
 		if len(employers) > 0:
 			peep.orgName=employers[0].orgName
+			peep.orgID = employers[0].id
 		else:
 			'''
 			If person has no primary org relationship, or if it has been deleted, we list
 			them with N/A for the purposes of the search boxes on home and relation page.
 			'''
 			peep.orgName="N/A"
+			peep.orgID = "N/A"
 	return peeps
 
 def hierarchy(snode,tnode):

@@ -135,11 +135,12 @@
   </div>
 </div>
 
-
+{%if node.notes%}
 <div class="entity_notes">
 <h4>Notes</h4>
 {{node.notes|linebreaks}}
 </div>
+{%endif%}
 
 <div class="change delete">
 <a href="{%url 'rolodex_delete_person' node.pk%}">Delete {{node.firstName}}?</a>

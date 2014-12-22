@@ -106,7 +106,7 @@
     {%for org in orgs%}
     <optgroup label="{{org.orgName}}">
         {%for peep in peeps%}
-        {%if peep.orgName == org.orgName%}
+        {%if peep.orgID == org.pk%}
             <option value="{{peep.id}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
         {%endif%}
         {%endfor%}    
