@@ -16,7 +16,8 @@ import pdb
 '''
 Employment is the only required fixture.
 '''
-EMPLOYMENT = P2Org_Type.objects.get(relationship_type='employment')
+#using first right now to get around a testing bug where there seems to be a conflict on get between fixtures
+EMPLOYMENT = P2Org_Type.objects.filter(relationship_type='employment').first()
 
 
 def secure(view):
