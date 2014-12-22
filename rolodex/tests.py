@@ -14,10 +14,10 @@ class RolodexModelsTestCase(TestCase):
 	fixtures = ['rolodex_models_testdata.json']
 	
 	def setUp(self):
-		self.o1 = Org.objects.get(pk=1)
-		self.p1 = Person.objects.get(pk=1)
-		self.o2 = Org.objects.get(pk=2)
-		self.p2 = Person.objects.get(pk=2)
+		self.o1 = Org.objects.get(pk="acme-corp")
+		self.p1 = Person.objects.get(pk="john-doe")
+		self.o2 = Org.objects.get(pk="ajax-corp")
+		self.p2 = Person.objects.get(pk="jane-doe")
 
 	def test_getter_methods(self):
 		self.assertEqual(list(self.p1.get_relations()['orgs']),[self.o1])
@@ -70,10 +70,10 @@ class RolodexViewsTestCase(WebTest):
 	fixtures = ['rolodex_views_testdata.json']
 	
 	def setUp(self):
-		self.o1 = Org.objects.get(pk=1)
-		self.p1 = Person.objects.get(pk=1)
-		self.o2 = Org.objects.get(pk=2)
-		self.p2 = Person.objects.get(pk=2)
+		self.o1 = Org.objects.get(pk="acme-corp")
+		self.p1 = Person.objects.get(pk="john-doe")
+		self.o2 = Org.objects.get(pk="ajax-corp")
+		self.p2 = Person.objects.get(pk="jane-doe")
 
 	def test_home(self):	
 		response = client.get(reverse('rolodex_home'))
@@ -96,6 +96,7 @@ class RolodexViewsTestCase(WebTest):
 		form['firstName'] = 'Roger'
 		form['person_contact-0-contact'] = 'nobugsbunny'
 		form['person_contact-0-type'] = 'email'
+		print form['lastName'].value
 		response = form.submit()
 		self.assertContains(response, 'Enter a valid email address.')
 		form = response.form
@@ -120,12 +121,12 @@ class RolodexViewsTestCase(WebTest):
 		'''
 		Edit Contact
 		'''
-		form = self.app.get(reverse('rolodex_edit_person',args=[3])).form
+		form = self.app.get(reverse('rolodex_edit_person',args=['roger-rabbit'])).form
 		form['person_contact-0-contact'] = 'theRealRoger@gmail.com'
 		response= form.submit().follow()
 		self.assertContains(response, 'theRealRoger@gmail.com')
 		#Delete the contact
-		form = self.app.get(reverse('rolodex_edit_person',args=[3])).form
+		form = self.app.get(reverse('rolodex_edit_person',args=['roger-rabbit'])).form
 		form['person_contact-0-DELETE'] = True
 		response = form.submit().follow()
 		self.assertNotContains(response, 'nobugs@gmail.com' , status_code=200)
@@ -137,8 +138,8 @@ class RolodexViewsTestCase(WebTest):
 
 		Org2Org
 		'''
-		form = self.app.get(reverse('rolodex_new_org_relation',args=[1])).forms[0]
-		form['to_ent'] = '2'
+		form = self.app.get(reverse('rolodex_new_org_relation',args=[self.o1.pk])).forms[0]
+		form['to_ent'] = self.o2.pk
 		form['hierarchy'] = 'parent'
 		response = form.submit()
 		self.assertEqual(response.status_code,200)
@@ -146,30 +147,30 @@ class RolodexViewsTestCase(WebTest):
 		'''
 		Check no duplicate relationships
 		'''
-		form = self.app.get(reverse('rolodex_new_org_relation',args=[1])).forms[0]
-		form['to_ent'] = '2'
+		form = self.app.get(reverse('rolodex_new_org_relation',args=[self.o1.pk])).forms[0]
+		form['to_ent'] = self.o2.pk
 		response = form.submit()
 		self.assertContains(response, 'That relationship already exists.')
 
 		'''
 		Org2P
 		'''
-		form = self.app.get(reverse('rolodex_new_org_relation',args=[2])).forms[1]
-		form['to_ent'] = '2'
+		form = self.app.get(reverse('rolodex_new_org_relation',args=[self.o2.pk])).forms[1]
+		form['to_ent'] = self.p2.pk
 		response = form.submit()
 		self.assertEqual(response.context['saved'],True)
 		'''
 		P2P
 		'''
-		form = self.app.get(reverse('rolodex_new_person_relation',args=[2])).forms[1]
-		form['to_ent'] = '1'
+		form = self.app.get(reverse('rolodex_new_person_relation',args=[self.p2.pk])).forms[1]
+		form['to_ent'] = self.p1.pk
 		response = form.submit()
 		self.assertEqual(response.context['saved'],True)
 		'''
 		P2Org
 		'''
-		form = self.app.get(reverse('rolodex_new_person_relation',args=[2])).forms[0]
-		form['to_ent'] = '1'
+		form = self.app.get(reverse('rolodex_new_person_relation',args=[self.p2.pk])).forms[0]
+		form['to_ent'] = self.o1.pk
 		response = form.submit()
 		self.assertEqual(response.context['saved'],True)
 
@@ -187,11 +188,15 @@ class RolodexViewsTestCase(WebTest):
 '''
 Fixtures...
 '''
-# RELATION, get = p2org_type.objects.get_or_create(relationship_type='employment')
-# ROLE = role.objects.create(role="boss")
-# CONTACT_ROLE = org_contact_role.objects.create(role="front desk")
+# from rolodex.models import *
+# RELATION, get = P2Org_Type.objects.get_or_create(relationship_type='employment')
+# ROLE = PersonRole.objects.create(role="boss")
+# CONTACT_ROLE = OrgContactRole.objects.create(role="front desk")
 # o1 = Org.objects.create(orgName="ACME, Corp.")
 # p1 = Person.objects.create(firstName='John', lastName='Doe', role=ROLE)
 # p1.add_p2org(o1,**{'relation':RELATION})
 # Org.objects.create(orgName="AJAX, Corp.")
 # Person.objects.create(firstName='Jane', lastName='Doe')
+
+#python manage.py dumpdata rolodex --format=json --indent=4 > testproject/fixtures/rolodex_models_testdata.json
+#python manage.py dumpdata rolodex --format=json --indent=4 > testproject/fixtures/rolodex_views_testdata.json

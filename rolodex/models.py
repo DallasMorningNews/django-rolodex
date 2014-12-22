@@ -7,6 +7,8 @@ from django.utils.translation import ugettext as _
 from django.core.validators import URLValidator,validate_email
 
 
+from rolodex.slug import unique_slugify
+
 class GetOrNoneManager(models.Manager):
     def get_or_none(self, **kwargs):
         try:
@@ -27,7 +29,7 @@ class OpenRecordsLaw(models.Model):
 	'''
 	Which open records law applies to the org.
 	'''
-	id = models.CharField(max_length=250,primary_key=True,editable=False)
+	id = models.SlugField(primary_key=True,editable=False)
 	name = models.CharField(max_length=250)
 	link = models.URLField(blank=True,null=True)
 
@@ -35,14 +37,14 @@ class OpenRecordsLaw(models.Model):
 		return self.name
 
 	def save(self, *args, **kwargs):
-		self.id = slugify(unicode(self.name))
+		unique_slugify(self,self.name)
 		super(OpenRecordsLaw, self).save(*args, **kwargs)
 
 class PersonRole(models.Model):
 	'''
 	Define some roles, preferably ones useful for filtering on, e.g. "Media Contact", "FOIA Officer".
 	'''
-	id = models.CharField(max_length=250,primary_key=True,editable=False)
+	id = models.SlugField(primary_key=True,editable=False)
 	role = models.CharField(max_length=250)
 	description = models.TextField(blank=True,null=True)
 
@@ -50,14 +52,15 @@ class PersonRole(models.Model):
 		return self.role
 
 	def save(self, *args, **kwargs):
-		self.id = slugify(unicode(self.role))
+		unique_slugify(self,self.role)
+		print self.id
 		super(PersonRole, self).save(*args, **kwargs)
 
 class OrgContactRole(models.Model):
 	'''
 	Define roles for org contacts, e.g., FOIA email, etc.
 	'''
-	id = models.CharField(max_length=250,primary_key=True,editable=False)
+	id = models.SlugField(primary_key=True,editable=False)
 	role = models.CharField(max_length=250)
 	description = models.TextField(blank=True,null=True)
 
@@ -65,7 +68,7 @@ class OrgContactRole(models.Model):
 		return self.role
 
 	def save(self, *args, **kwargs):
-		self.id = slugify(unicode(self.role))
+		unique_slugify(self,self.role)
 		super(OrgContactRole, self).save(*args, **kwargs)
 
 '''
@@ -73,7 +76,7 @@ Relationship types
 '''
 
 class P2P_Type(models.Model):
-	id = models.CharField(max_length=250,primary_key=True,editable=False)
+	id = models.SlugField(primary_key=True,editable=False)
 	relationship_type = models.CharField(max_length=250)
 	objects = GetOrNoneManager()
 
@@ -81,11 +84,11 @@ class P2P_Type(models.Model):
 		return self.relationship_type
 
 	def save(self, *args, **kwargs):
-		self.id = slugify(unicode(self.relationship_type))
+		unique_slugify(self,self.relationship_type)
 		super(P2P_Type, self).save(*args, **kwargs)
 
 class Org2Org_Type(models.Model):
-	id = models.CharField(max_length=250,primary_key=True,editable=False)
+	id = models.SlugField(primary_key=True,editable=False)
 	relationship_type = models.CharField(max_length=250)
 	objects = GetOrNoneManager()
 
@@ -93,11 +96,11 @@ class Org2Org_Type(models.Model):
 		return self.relationship_type
 
 	def save(self, *args, **kwargs):
-		self.id = slugify(unicode(self.relationship_type))
+		unique_slugify(self,self.relationship_type)
 		super(Org2Org_Type, self).save(*args, **kwargs)
 
 class P2Org_Type(models.Model):
-	id = models.CharField(max_length=250,primary_key=True,editable=False)
+	id = models.SlugField(primary_key=True,editable=False)
 	relationship_type = models.CharField(max_length=250)
 	objects = GetOrNoneManager()
 
@@ -105,13 +108,13 @@ class P2Org_Type(models.Model):
 		return self.relationship_type
 
 	def save(self, *args, **kwargs):
-		self.id = slugify(unicode(self.relationship_type))
+		unique_slugify(self,self.relationship_type)
 		super(P2Org_Type, self).save(*args, **kwargs)
 '''
 2.0 feature??? 
 '''
 class Tag(models.Model):
-	id = models.CharField(max_length=250,primary_key=True,editable=False)
+	id = models.SlugField(primary_key=True,editable=False)
 	tag_name = models.CharField(max_length=250)
 	objects = GetOrNoneManager()
 
@@ -119,7 +122,7 @@ class Tag(models.Model):
 		return tag_name
 
 	def save(self, *args, **kwargs):
-		self.id = slugify(unicode(self.tag_name))
+		unique_slugify(self,self.tag_name)
 		super(Tag, self).save(*args, **kwargs)
 
 ###################
@@ -167,6 +170,7 @@ class Contact(models.Model):
 gender_types=((1,'Female'),(2,'Male'),(3,'Other'))
 
 class Person(models.Model):
+	id = models.SlugField(primary_key=True,editable=False)
 	lastName = models.CharField(max_length=100)
 	firstName = models.CharField(max_length=100)
 	role = models.ForeignKey('PersonRole',blank=True,null=True,related_name='person_role')
@@ -185,8 +189,12 @@ class Person(models.Model):
 	def __unicode__(self):
 		return self.lastName+", "+self.firstName
 
+	def save(self, *args, **kwargs):
+		unique_slugify(self,self.firstName +"-"+ self.lastName)
+		super(Person, self).save(*args, **kwargs)
 
 class Org(models.Model):
+	id = models.SlugField(primary_key=True,editable=False)
 	orgName = models.CharField(max_length=200)
 	openRecordsLaw = models.ForeignKey('OpenRecordsLaw',blank=True,null=True)
 	#Relationships
@@ -200,6 +208,10 @@ class Org(models.Model):
 
 	def __unicode__(self):
 		return self.orgName
+
+	def save(self, *args, **kwargs):
+		unique_slugify(self,self.orgName)
+		super(Org, self).save(*args, **kwargs)
 
 ###################
 ## Relationships ##

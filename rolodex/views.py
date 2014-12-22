@@ -11,6 +11,7 @@ from itertools import chain
 import json
 from django.conf import settings
 import networkx as nx
+import pdb
 
 '''
 Employment is the only required fixture.
@@ -47,22 +48,15 @@ def new_org(request):
 	if request.method == "POST":
 		form = OrgForm(request.POST)
 		if form.is_valid():
-			org = form.save(commit=False)
-			'''
-			Because form requires pk, we fake it,
-			check all other validation and then reset 
-			the instance for the formset. It's a hack...
-			'''
-			org.pk = 1 
+			org = form.save()
 			formset = OrgFormSet(request.POST,instance=org)
 			if formset.is_valid():
-				org.pk=None
-				org = form.save(commit=True)
-				formset = OrgFormSet(request.POST,instance=org)
-				formset.is_valid()
 				formset.save()
 				return redirect('rolodex_org',org.pk)
-
+			else:
+				org.delete()
+				form = OrgForm(request.POST)
+				
 	return render_to_response('rolodex/new_org.html',{'form':form,'formset':formset,},context_instance=RequestContext(request))
 
 @secure
@@ -78,7 +72,7 @@ def edit_org(request,orgNode):
 			formset = OrgFormSet(request.POST,instance=org)
 			if formset.is_valid():
 				formset.save()
-				return redirect('rolodex_org',orgNode)
+				return redirect('rolodex_org',org.pk)
 
 	return render_to_response('rolodex/new_org.html',{'form':form,'formset':formset,'orgNode':orgNODE,'edit':True},context_instance=RequestContext(request))
 
@@ -162,19 +156,9 @@ def new_person(request, orgNode):
 	if request.method == "POST":
 		form = PersonForm(request.POST) 
 		if form.is_valid():
-			person = form.save(commit=False)
-			'''
-			Because form requires pk, we fake it,
-			check all other validation and then reset 
-			the instance for the formset. It's a hack...
-			'''
-			person.pk=1
+			person = form.save()
 			formset = PersonFormSet(request.POST,instance=person)
 			if formset.is_valid():
-				person.pk=None
-				person = form.save(commit=True)
-				formset = PersonFormSet(request.POST,instance=person)
-				formset.is_valid()
 				formset.save()
 
 				#Add employment relationship
@@ -185,6 +169,9 @@ def new_person(request, orgNode):
 				form=PersonForm()
 				formset=PersonFormSet(instance=Person())
 				success = True
+			else:
+				person.delete()
+				form = PersonForm(request.POST)
 
 	primary = Org.objects.get(id=orgNode)
 	orgs = Org.objects.all()
@@ -205,7 +192,7 @@ def edit_person(request, personNode):
 			formset = PersonFormSet(request.POST, instance=person)
 			if formset.is_valid():
 				formset.save()
-				return redirect('rolodex_person',personNode)
+				return redirect('rolodex_person',person.pk)
 	
 	employer = peep.org_from_p.filter(relation=EMPLOYMENT)
 	if len(employer)>0:

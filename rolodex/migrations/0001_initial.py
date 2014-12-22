@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='OpenRecordsLaw',
             fields=[
-                ('id', models.CharField(max_length=250, serialize=False, editable=False, primary_key=True)),
+                ('id', models.SlugField(serialize=False, editable=False, primary_key=True)),
                 ('name', models.CharField(max_length=250)),
                 ('link', models.URLField(null=True, blank=True)),
             ],
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Org',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.SlugField(serialize=False, editable=False, primary_key=True)),
                 ('orgName', models.CharField(max_length=200)),
                 ('notes', models.TextField(null=True, blank=True)),
                 ('openRecordsLaw', models.ForeignKey(blank=True, to='rolodex.OpenRecordsLaw', null=True)),
@@ -62,7 +62,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Org2Org_Type',
             fields=[
-                ('id', models.CharField(max_length=250, serialize=False, editable=False, primary_key=True)),
+                ('id', models.SlugField(serialize=False, editable=False, primary_key=True)),
                 ('relationship_type', models.CharField(max_length=250)),
             ],
             options={
@@ -85,7 +85,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='OrgContactRole',
             fields=[
-                ('id', models.CharField(max_length=250, serialize=False, editable=False, primary_key=True)),
+                ('id', models.SlugField(serialize=False, editable=False, primary_key=True)),
                 ('role', models.CharField(max_length=250)),
                 ('description', models.TextField(null=True, blank=True)),
             ],
@@ -108,7 +108,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='P2Org_Type',
             fields=[
-                ('id', models.CharField(max_length=250, serialize=False, editable=False, primary_key=True)),
+                ('id', models.SlugField(serialize=False, editable=False, primary_key=True)),
                 ('relationship_type', models.CharField(max_length=250)),
             ],
             options={
@@ -130,7 +130,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='P2P_Type',
             fields=[
-                ('id', models.CharField(max_length=250, serialize=False, editable=False, primary_key=True)),
+                ('id', models.SlugField(serialize=False, editable=False, primary_key=True)),
                 ('relationship_type', models.CharField(max_length=250)),
             ],
             options={
@@ -140,7 +140,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Person',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.SlugField(serialize=False, editable=False, primary_key=True)),
                 ('lastName', models.CharField(max_length=100)),
                 ('firstName', models.CharField(max_length=100)),
                 ('position', models.CharField(max_length=250, null=True, blank=True)),
@@ -157,7 +157,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PersonRole',
             fields=[
-                ('id', models.CharField(max_length=250, serialize=False, editable=False, primary_key=True)),
+                ('id', models.SlugField(serialize=False, editable=False, primary_key=True)),
                 ('role', models.CharField(max_length=250)),
                 ('description', models.TextField(null=True, blank=True)),
             ],
@@ -168,7 +168,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Tag',
             fields=[
-                ('id', models.CharField(max_length=250, serialize=False, editable=False, primary_key=True)),
+                ('id', models.SlugField(serialize=False, editable=False, primary_key=True)),
                 ('tag_name', models.CharField(max_length=250)),
             ],
             options={
