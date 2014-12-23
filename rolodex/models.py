@@ -53,7 +53,6 @@ class PersonRole(models.Model):
 
 	def save(self, *args, **kwargs):
 		unique_slugify(self,self.role)
-		print self.id
 		super(PersonRole, self).save(*args, **kwargs)
 
 class OrgContactRole(models.Model):
