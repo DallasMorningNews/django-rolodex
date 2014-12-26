@@ -14,10 +14,14 @@
 
 
 <div id="midrail">
+
+{% if node.relations|length > 2 %}
 <div id="networkCanvas"></div>
 <div class="fullMap">
 <a href="{%url 'rolodex_person_map' node.pk%}">Full page graph</a>
 </div>
+{%endif%}
+
 <h1>{{node.firstName}} {{node.lastName}}</h1>
 <div class="professional">
   {%if node.role%}
