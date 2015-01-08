@@ -4,8 +4,10 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 
 from django.conf import settings
+from __future__ import print_function
 
 def initial_data(apps, schema_editor):
+	print("Rolodex Fixtures")
 	if settings.DATABASES.has_key('rolodex'):
 		if not schema_editor.connection.alias == 'rolodex':
         	return
