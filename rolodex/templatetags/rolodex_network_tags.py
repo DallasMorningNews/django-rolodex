@@ -9,7 +9,7 @@ def network_length_check(nodeset,length):
 	Checks if the 'nodeset' network contains more than 'length' nodes.
 	'''
 	net = len(nodeset['people'])+len(nodeset['orgs'])
-	if net > int(len):
+	if net > int(length):
 		return True 
 	else:
 		return False
