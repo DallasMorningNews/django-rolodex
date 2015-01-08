@@ -1,6 +1,5 @@
 {%extends "rolodex/base.html" %}
 {%load staticfiles%}
-{%load rolodex_network_tags%}
 {%block head%}
 
 <script src="{% static 'rolodex/js/selectize.min.js' %}"></script>
@@ -16,7 +15,7 @@
 
 <div id="midrail">
 
-{% if node.relations|network_length_check:2 %}
+{% if node.net_length > 2 %}
 <div id="networkCanvas"></div>
 <div class="fullMap">
 <a href="{%url 'rolodex_person_map' node.pk%}">Full page graph</a>

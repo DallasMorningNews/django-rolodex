@@ -91,6 +91,7 @@ def search_org(request,org_id):
 	node.employees = node.get_employees()
 	node.contacts = node.org_contact.all()
 	node.relations = node.get_relations_with_type()
+	node.net_length = len(net_compiler(Org.objects.filter(id=org_id),3))
 	return render_to_response('rolodex/org.html',{'node':node,},context_instance=RequestContext(request))
 
 @secure
@@ -222,6 +223,7 @@ def search_person(request,p_id):
 		node.primary = "N/A"
 	node.contacts = node.person_contact.all()
 	node.relations = node.get_relations_with_type()
+	node.net_length = len(net_compiler(Person.objects.filter(id=p_id),3))
 	return render_to_response('rolodex/person.html',{'node':node,},context_instance=RequestContext(request))
 
 @secure
