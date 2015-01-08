@@ -33,7 +33,7 @@ class P2Org_TypeSerializer(serializers.HyperlinkedModelSerializer):
 class PersonSerializer(serializers.HyperlinkedModelSerializer):
 	people = serializers.HyperlinkedRelatedField(many=True, read_only=True,view_name='person-relations')
 	orgs = serializers.HyperlinkedRelatedField(many=True, read_only=True,view_name='org-relations')
-	person_role = serializers.HyperlinkedRelatedField(many=True, read_only=False,view_name='roles')
+	person_role = serializers.HyperlinkedRelatedField(many=True, read_only=True,view_name='roles')
 	class Meta:
 		model = Person
 		fields = ('id','firstName', 'lastName',  'position','department','gender','p_relations','org_relations','role','person_contact')
