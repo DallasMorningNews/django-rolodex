@@ -8,10 +8,10 @@ from django.conf import settings
 def initial_data(apps, schema_editor):
 	if settings.DATABASES.has_key('rolodex'):
 		if not schema_editor.connection.alias == 'rolodex':
-        	return
-    else:
-    	if not schema_editor.connection.alias == 'default':
-        	return
+			return
+	else:
+		if not schema_editor.connection.alias == 'default':
+			return
 	P2Org_Type = apps.get_model('rolodex','P2Org_Type')
 	P2Org_Type.objects.get_or_create(id='employment',relationship_type='employment')
 
@@ -23,10 +23,10 @@ def initial_data(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('rolodex', '0001_initial'),
-    ]
+	dependencies = [
+		('rolodex', '0001_initial'),
+	]
 
-    operations = [
-    	migrations.RunPython(initial_data),
-    ]
+	operations = [
+		migrations.RunPython(initial_data),
+	]
