@@ -153,4 +153,4 @@ The "Full Page Graph" for each person or org, also provides a quick and dirty vi
 
 ![Rolodex](screenshot.png)
 
-**Note:** All styling on Rolodex was done by our data team, not our extremely talented staff of designers. 
+**Note:** All styling on Rolodex was done by our data team, _**not**_ our extremely talented designers. Pull requests welcome.

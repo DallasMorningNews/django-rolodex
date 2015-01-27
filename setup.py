@@ -18,6 +18,7 @@ setup(
     author='Jon McClure',
     author_email='jon.r.mcclure@gmail.com',
     classifiers=[
+        'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',
