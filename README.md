@@ -90,7 +90,7 @@ For example, if org1 is parent to org2, `org1.add_org2org(org2,**{hierarchy:"par
 
 Hierarchy is not available for other types of relationships. Generally, we think of hierarchy as implying ownership, which obviously doesn't apply to the other relationship types. 
 
-__Note__: If you modify an existing Org2Org relationship's hierarchy (for that matter, any relationship porperty), a duplicate will be created. Instead delete the current relationship and re-create it with the correct hierarchy or other properties.
+__Note__: If you modify an existing Org2Org relationship's hierarchy (for that matter, any relationship property), a duplicate will be created. Instead delete the current relationship and re-create it with the correct hierarchy or other properties.
 
 
 <a name="types_and_roles"></a>Types & Roles
