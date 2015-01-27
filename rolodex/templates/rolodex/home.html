@@ -31,8 +31,8 @@
         {%for org in orgs%}
         <optgroup label="{{org.orgName}}">
             {%for peep in peeps%}
-            {%if peep.orgID == org.id%}
-                <option value="{{peep.id}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
+            {%if peep.orgID == org.pk%}
+                <option value="{{peep.pk}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
             {%endif%}
             {%endfor%}    
         </optgroup>
@@ -40,7 +40,7 @@
         <optgroup label="N/A">
             {%for peep in peeps%}
             {%if peep.orgName == 'N/A'%}
-                <option value="{{peep.id}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
+                <option value="{{peep.pk}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
             {%endif%}
             {%endfor%}
         </optgroup>
@@ -55,7 +55,7 @@
         <select id="orgSelect">
              <option value=""></option>
         {%for org in orgs%}
-            <option value="{{org.id}}">{{org.orgName}}</option>
+            <option value="{{org.pk}}">{{org.orgName}}</option>
         {%endfor%}
         </select>
         <div class="buttonDiv">
@@ -70,7 +70,7 @@
         <select id="orgSelect2">
              <option value=""></option>
         {%for org in orgs%}
-            <option value="{{org.id}}">{{org.orgName}}</option>
+            <option value="{{org.pk}}">{{org.orgName}}</option>
         {%endfor%}
         </select>
         <div class="buttonDiv">
@@ -92,11 +92,11 @@
 <script>
 var NewOrgDict = {},SearchOrgDict={},PeepDict={};
 {%for org in orgs%}
-NewOrgDict['{{org.id}}']="{% url 'rolodex_new_person' org.id%}";
-SearchOrgDict['{{org.id}}']="{% url 'rolodex_org' org.id%}";
+NewOrgDict['{{org.pk}}']="{% url 'rolodex_new_person' org.slug%}";
+SearchOrgDict['{{org.pk}}']="{% url 'rolodex_org' org.slug%}";
 {%endfor%}
 {%for peep in peeps%}
-PeepDict['{{peep.id}}']="{%url 'rolodex_person' peep.id%}";
+PeepDict['{{peep.pk}}']="{%url 'rolodex_person' peep.slug%}";
 {%endfor%}
 
 

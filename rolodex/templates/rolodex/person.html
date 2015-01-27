@@ -18,7 +18,7 @@
 {% if node.net_length > 2 %}
 <div id="networkCanvas"></div>
 <div class="fullMap">
-<a href="{%url 'rolodex_person_map' node.pk%}">Full page graph</a>
+<a href="{%url 'rolodex_person_map' node.slug%}">Full page graph</a>
 </div>
 {%endif%}
 
@@ -38,7 +38,7 @@
 
 
 <div class="change">
-<a href="{%url 'rolodex_edit_person' node.pk%}">Edit Info</a>
+<a href="{%url 'rolodex_edit_person' node.slug%}">Edit Info</a>
 </div>
 
 
@@ -71,7 +71,7 @@
 
 {%endfor%}
   <div class="change">
-    <a href="{%url 'rolodex_edit_person' node.pk%}">Edit Contacts</a>
+    <a href="{%url 'rolodex_edit_person' node.slug%}">Edit Contacts</a>
   </div>
 </div>
 
@@ -85,7 +85,7 @@
 {%for r in node.relations.orgs%}
 {% spaceless %}
 <div class="rel_O{{r.relation.pk}}">
-<span><a href="{%url 'rolodex_org' r.relation.pk%}">{{r.relation.orgName}}</a></span><br/><div class="relation_type">{{r.type}}</div>
+<span><a href="{%url 'rolodex_org' r.relation.slug%}">{{r.relation.orgName}}</a></span><br/><div class="relation_type">{{r.type}}</div>
 <div class="relation_delete">Delete this relationship</div><br/>
 </div>
 <script type="text/javascript">
@@ -114,7 +114,7 @@
 {%for r in node.relations.people%}
 {% spaceless %}
 <div class="rel_P{{r.relation.pk}}">
-<span><a href="{%url 'rolodex_person' r.relation.pk%}">{{r.relation.firstName}} {{r.relation.lastName}}</a></span><br/><div class="relation_type">{{r.type}}{%if r.relation.role%}{%if r.type%} - {%endif%}{{r.relation.role.role}}{%endif%}</div>
+<span><a href="{%url 'rolodex_person' r.relation.slug%}">{{r.relation.firstName}} {{r.relation.lastName}}</a></span><br/><div class="relation_type">{{r.type}}{%if r.relation.role%}{%if r.type%} - {%endif%}{{r.relation.role.role}}{%endif%}</div>
 <div class="relation_delete">Delete this relationship</div><br/>
 </div>
 <script type="text/javascript">
@@ -137,7 +137,7 @@
 </div>
 </div>
   <div class="change">
-    <a href="{%url 'rolodex_new_person_relation' node.pk%}">Add Relationship</a>
+    <a href="{%url 'rolodex_new_person_relation' node.slug%}">Add Relationship</a>
   </div>
 </div>
 
@@ -149,7 +149,7 @@
 {%endif%}
 
 <div class="change delete">
-<a href="{%url 'rolodex_delete_person' node.pk%}">Delete {{node.firstName}}?</a>
+<a href="{%url 'rolodex_delete_person' node.slug%}">Delete {{node.firstName}}?</a>
 </div>
 
 
@@ -186,7 +186,7 @@ var replaceP = '{% url "rolodex_person" "foobarbaz" %}',
   $.ajax({
     type:"GET",
     dataType:"json",
-    url:"{%url 'rolodex_person_network' node.pk %}",
+    url:"{%url 'rolodex_person_network' node.slug %}",
     success: function(d){
       $('#networkCanvas').html("");
       chartNetwork(d);

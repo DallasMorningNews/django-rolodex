@@ -53,7 +53,7 @@ def new_org(request):
 			formset = OrgFormSet(request.POST,instance=org)
 			if formset.is_valid():
 				formset.save()
-				return redirect('rolodex_org',org.pk)
+				return redirect('rolodex_org',org.slug)
 			else:
 				org.delete()
 				form = OrgForm(request.POST)
@@ -61,8 +61,8 @@ def new_org(request):
 	return render_to_response('rolodex/new_org.html',{'form':form,'formset':formset,},context_instance=RequestContext(request))
 
 @secure
-def edit_org(request,orgNode):
-	orgNODE = Org.objects.get(pk=orgNode)
+def edit_org(request,org_slug):
+	orgNODE = Org.objects.get(slug=org_slug)
 	form=OrgForm(instance=orgNODE)
 	formset=OrgFormSet(instance=orgNODE)
 	formset.extra=0
@@ -73,50 +73,50 @@ def edit_org(request,orgNode):
 			formset = OrgFormSet(request.POST,instance=org)
 			if formset.is_valid():
 				formset.save()
-				return redirect('rolodex_org',org.pk)
+				return redirect('rolodex_org',org.slug)
 
 	return render_to_response('rolodex/new_org.html',{'form':form,'formset':formset,'orgNode':orgNODE,'edit':True},context_instance=RequestContext(request))
 
 @permission_required('rolodex.delete_org')
-def delete_org(request,orgNode):
-	org = Org.objects.get(pk=orgNode)
+def delete_org(request,org_slug):
+	org = Org.objects.get(slug=org_slug)
 	if request.method=="POST":
 		org.delete()
 		return redirect('rolodex_home')
 	return render_to_response('rolodex/delete.html',{'org':org},context_instance=RequestContext(request))
 
 @secure
-def search_org(request,org_id):
-	node = Org.objects.get(id=org_id)
+def search_org(request,org_slug):
+	node = Org.objects.get(slug=org_slug)
 	node.employees = node.get_employees()
 	node.contacts = node.org_contact.all()
 	node.relations = node.get_relations_with_type()
-	node.net_length = len(net_compiler(Org.objects.filter(id=org_id),3))
+	node.net_length = len(net_compiler(Org.objects.filter(slug=org_slug),3))
 	return render_to_response('rolodex/org.html',{'node':node,},context_instance=RequestContext(request))
 
 @secure
-def org_map(request,org_id):
-	node = Org.objects.get(id=org_id)
+def org_map(request,org_slug):
+	node = Org.objects.get(slug=org_slug)
 	hops = int(request.GET.get('hops',3))
 	return render_to_response('rolodex/orgMap.html',{'node':node,'hops':hops},context_instance=RequestContext(request))
 
 @secure
-def org_network(request,org_id):
-	network = net_compiler(Org.objects.filter(id=org_id),3)
+def org_network(request,org_slug):
+	network = net_compiler(Org.objects.filter(slug=org_slug),3)
 	data = json.dumps(network)
 	return HttpResponse(data, content_type='application/json')
 
 @secure
-def adv_org_network(request,o_id):
+def adv_org_network(request,org_slug):
 	hops = int(request.GET.get('hops',3))
-	network = net_compiler(Org.objects.filter(id=o_id),hops)
-	org = Org.objects.get(id=o_id)
+	network = net_compiler(Org.objects.filter(slug=org_slug),hops)
+	org = Org.objects.get(slug=org_slug)
 	centrality_data = adv_compile(org,hops)
 	data = json.dumps({'centrality':centrality_data, 'links':network})
 	return HttpResponse(data, content_type='application/json')
 
 @secure
-def new_org_relation(request,Node):
+def new_org_relation(request,org_slug):
 	saved=False
 	org2orgForm = Org2OrgForm()
 	org2pForm = Org2PForm()
@@ -139,10 +139,10 @@ def new_org_relation(request,Node):
 				fromEnt.add_org2org(toEnt,**{'relation':relation,'hierarchy':hierarchy})
 				saved=True
 
-	orgs = Org.objects.filter(~Q(pk=Node))
+	orgs = Org.objects.filter(~Q(slug=org_slug))
 	peeps = Person.objects.all()
 	peeps = org_relate_peep(peeps)
-	orgNode = Org.objects.get(pk=Node)
+	orgNode = Org.objects.get(slug=org_slug)
 	return render_to_response('rolodex/new_relation.html',{'orgNode':orgNode ,'pForm':org2pForm,'orgForm':org2orgForm,'saved':saved,'peeps':peeps,'orgs':orgs},context_instance=RequestContext(request))
 
 
@@ -151,7 +151,7 @@ def new_org_relation(request,Node):
 ######################
 
 @secure
-def new_person(request, orgNode): 
+def new_person(request, org_slug): 
 	form=PersonForm()
 	formset=PersonFormSet(instance=Person())
 	success = False
@@ -164,7 +164,7 @@ def new_person(request, orgNode):
 				formset.save()
 
 				#Add employment relationship
-				orgNODE = Org.objects.get(id=orgNode)
+				orgNODE = Org.objects.get(slug=org_slug)
 				person.add_p2org(orgNODE,**{'relation':EMPLOYMENT})
 				person.save()
 			
@@ -175,14 +175,14 @@ def new_person(request, orgNode):
 				person.delete()
 				form = PersonForm(request.POST)
 
-	primary = Org.objects.get(id=orgNode)
+	primary = Org.objects.get(slug=org_slug)
 	orgs = Org.objects.all()
 	tags = Tag.objects.all()
-	return render_to_response('rolodex/new_person.html',{'form':form,'formset':formset,'orgNode':orgNode,'orgs':orgs,'tags':tags,'primary':primary,'success':success},context_instance=RequestContext(request))
+	return render_to_response('rolodex/new_person.html',{'form':form,'formset':formset,'orgNode':org_slug,'orgs':orgs,'tags':tags,'primary':primary,'success':success},context_instance=RequestContext(request))
 
 @secure
-def edit_person(request, personNode):
-	peep = Person.objects.get(pk=personNode)
+def edit_person(request, person_slug):
+	peep = Person.objects.get(slug=person_slug)
 	form=PersonForm(instance=peep)
 	formset=PersonFormSet(instance=peep)
 	formset.extra=0
@@ -194,7 +194,7 @@ def edit_person(request, personNode):
 			formset = PersonFormSet(request.POST, instance=person)
 			if formset.is_valid():
 				formset.save()
-				return redirect('rolodex_person',person.pk)
+				return redirect('rolodex_person',person.slug)
 	
 	employer = peep.org_from_p.filter(relation=EMPLOYMENT)
 	if len(employer)>0:
@@ -206,16 +206,16 @@ def edit_person(request, personNode):
 	return render_to_response('rolodex/new_person.html',{'form':form,'formset':formset,'personNode':peep,'orgs':orgs,'tags':tags,'primary':primary,'edit':True},context_instance=RequestContext(request))
 
 @permission_required('rolodex.delete_person')
-def delete_person(request,personNode):
-	peep = Person.objects.get(pk=personNode)
+def delete_person(request,person_slug):
+	peep = Person.objects.get(slug=person_slug)
 	if request.method=="POST":
 		peep.delete()
 		return redirect('rolodex_home')
 	return render_to_response('rolodex/delete.html',{'peep':peep},context_instance=RequestContext(request))
 
 @secure
-def search_person(request,p_id):
-	node = Person.objects.get(id=p_id)
+def search_person(request,person_slug):
+	node = Person.objects.get(slug=person_slug)
 	employer = node.org_from_p.filter(relation=EMPLOYMENT)
 	if len(employer)>0:
 		node.primary = employer[0].to_ent.orgName
@@ -223,32 +223,32 @@ def search_person(request,p_id):
 		node.primary = "N/A"
 	node.contacts = node.person_contact.all()
 	node.relations = node.get_relations_with_type()
-	node.net_length = len(net_compiler(Person.objects.filter(id=p_id),3))
+	node.net_length = len(net_compiler(Person.objects.filter(slug=person_slug),3))
 	return render_to_response('rolodex/person.html',{'node':node,},context_instance=RequestContext(request))
 
 @secure
-def person_map(request,p_id):
-	node = Person.objects.get(id=p_id)
+def person_map(request,person_slug):
+	node = Person.objects.get(slug=person_slug)
 	hops = int(request.GET.get('hops',3))
 	return render_to_response('rolodex/personMap.html',{'node':node,'hops':hops},context_instance=RequestContext(request))
 
 @secure
-def person_network(request,p_id):
-	network = net_compiler(Person.objects.filter(id=p_id),3)
+def person_network(request,person_slug):
+	network = net_compiler(Person.objects.filter(slug=person_slug),3)
 	data = json.dumps(network)
 	return HttpResponse(data, content_type='application/json')
 
 @secure
-def adv_person_network(request,p_id):
+def adv_person_network(request,person_slug):
 	hops = int(request.GET.get('hops',3))
-	network = net_compiler(Person.objects.filter(id=p_id),hops)
-	peep = Person.objects.get(id=p_id)
+	network = net_compiler(Person.objects.filter(slug=person_slug),hops)
+	peep = Person.objects.get(slug=person_slug)
 	centrality_data = adv_compile(peep,hops)
 	data = json.dumps({'centrality':centrality_data, 'links':network})
 	return HttpResponse(data, content_type='application/json')
 
 @secure
-def new_person_relation(request,Node):
+def new_person_relation(request,person_slug):
 	saved=False
 	p2orgForm = P2OrgForm()
 	p2pForm = P2PForm()
@@ -276,9 +276,9 @@ def new_person_relation(request,Node):
 				saved=True
 
 	orgs = Org.objects.all()
-	peeps = Person.objects.filter(~Q(pk=Node))
+	peeps = Person.objects.filter(~Q(slug=person_slug))
 	peeps = org_relate_peep(peeps)
-	peepNode = Person.objects.get(pk=Node)
+	peepNode = Person.objects.get(slug=person_slug)
 	return render_to_response('rolodex/new_relation.html',{'peepNode':peepNode,'pForm':p2pForm,'orgForm':p2orgForm,'saved':saved,'peeps':peeps,'orgs':orgs},context_instance=RequestContext(request))
 
 
@@ -291,21 +291,21 @@ def delete_relationship(request):
 	if request.POST:
 		if request.POST['from_type']=='p':
 			if request.POST['to_type'] == 'p':
-				from_ent = Person.objects.get(id=request.POST['from_ent'])
-				to_ent = Person.objects.get(id=request.POST['to_ent'])
+				from_ent = Person.objects.get(pk=request.POST['from_ent'])
+				to_ent = Person.objects.get(pk=request.POST['to_ent'])
 				from_ent.remove_p2p(to_ent)
 			else:
-				from_ent = Person.objects.get(id=request.POST['from_ent'])
-				to_ent = Org.objects.get(id=request.POST['to_ent'])
+				from_ent = Person.objects.get(pk=request.POST['from_ent'])
+				to_ent = Org.objects.get(pk=request.POST['to_ent'])
 				from_ent.remove_p2org(to_ent)
 		else:
 			if request.POST['to_type'] == 'p':
-				from_ent = Org.objects.get(id=request.POST['from_ent'])
-				to_ent = Person.objects.get(id=request.POST['to_ent'])
+				from_ent = Org.objects.get(pk=request.POST['from_ent'])
+				to_ent = Person.objects.get(pk=request.POST['to_ent'])
 				from_ent.remove_org2p(to_ent)
 			else:
-				from_ent = Org.objects.get(id=request.POST['from_ent'])
-				to_ent = Org.objects.get(id=request.POST['to_ent'])
+				from_ent = Org.objects.get(pk=request.POST['from_ent'])
+				to_ent = Org.objects.get(pk=request.POST['to_ent'])
 				from_ent.remove_org2org(to_ent)
 	return HttpResponse("Done.")
 
@@ -323,7 +323,7 @@ def org_relate_peep(peeps):
 		employers = peep.org_relations.filter(p_to_org__relation=EMPLOYMENT)
 		if len(employers) > 0:
 			peep.orgName=employers[0].orgName
-			peep.orgID = employers[0].id
+			peep.orgID = employers[0].pk
 		else:
 			'''
 			If person has no primary org relationship, or if it has been deleted, we list
@@ -349,11 +349,11 @@ def get_info(n):
 	if n.__class__.__name__ == 'Person':
 		node.name = n.firstName +" "+n.lastName
 		node.type = "person"
-		node.id="p"+str(n.id)
+		node.id="p"+str(n.slug)
 	else:
 		node.name = n.orgName
 		node.type = "org"
-		node.id="o"+str(n.id)
+		node.id="o"+str(n.slug)
 	node.pk = n.pk
 	return node
 

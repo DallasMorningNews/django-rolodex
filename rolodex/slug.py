@@ -3,7 +3,7 @@ import re
 from django.template.defaultfilters import slugify
 
 
-def unique_slugify(instance, value, slug_field_name='id', queryset=None,
+def unique_slugify(instance, value, slug_field_name='slug', queryset=None,
                    slug_separator='-'):
     """
     Calculates and stores a unique slug of ``value`` for an instance.

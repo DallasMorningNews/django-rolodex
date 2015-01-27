@@ -29,7 +29,7 @@ class OpenRecordsLaw(models.Model):
 	'''
 	Which open records law applies to the org.
 	'''
-	id = models.SlugField(primary_key=True,editable=False)
+	slug = models.SlugField(unique=True,editable=False)
 	name = models.CharField(max_length=250)
 	link = models.URLField(blank=True,null=True)
 
@@ -44,7 +44,7 @@ class PersonRole(models.Model):
 	'''
 	Define some roles, preferably ones useful for filtering on, e.g. "Media Contact", "FOIA Officer".
 	'''
-	id = models.SlugField(primary_key=True,editable=False)
+	slug = models.SlugField(unique=True,editable=False)
 	role = models.CharField(max_length=250)
 	description = models.TextField(blank=True,null=True)
 
@@ -59,7 +59,7 @@ class OrgContactRole(models.Model):
 	'''
 	Define roles for org contacts, e.g., FOIA email, etc.
 	'''
-	id = models.SlugField(primary_key=True,editable=False)
+	slug = models.SlugField(unique=True,editable=False)
 	role = models.CharField(max_length=250)
 	description = models.TextField(blank=True,null=True)
 
@@ -75,7 +75,7 @@ Relationship types
 '''
 
 class P2P_Type(models.Model):
-	id = models.SlugField(primary_key=True,editable=False)
+	slug = models.SlugField(unique=True,editable=False)
 	relationship_type = models.CharField(max_length=250)
 	objects = GetOrNoneManager()
 
@@ -87,7 +87,7 @@ class P2P_Type(models.Model):
 		super(P2P_Type, self).save(*args, **kwargs)
 
 class Org2Org_Type(models.Model):
-	id = models.SlugField(primary_key=True,editable=False)
+	slug = models.SlugField(unique=True,editable=False)
 	relationship_type = models.CharField(max_length=250)
 	objects = GetOrNoneManager()
 
@@ -99,7 +99,7 @@ class Org2Org_Type(models.Model):
 		super(Org2Org_Type, self).save(*args, **kwargs)
 
 class P2Org_Type(models.Model):
-	id = models.SlugField(primary_key=True,editable=False)
+	slug = models.SlugField(unique=True,editable=False)
 	relationship_type = models.CharField(max_length=250)
 	objects = GetOrNoneManager()
 
@@ -113,7 +113,7 @@ class P2Org_Type(models.Model):
 2.0 feature??? 
 '''
 class Tag(models.Model):
-	id = models.SlugField(primary_key=True,editable=False)
+	slug = models.SlugField(unique=True,editable=False)
 	tag_name = models.CharField(max_length=250)
 	objects = GetOrNoneManager()
 
@@ -169,7 +169,7 @@ class Contact(models.Model):
 gender_types=((1,'Female'),(2,'Male'),(3,'Other'))
 
 class Person(models.Model):
-	id = models.SlugField(primary_key=True,editable=False)
+	slug = models.SlugField(unique=True,editable=False)
 	lastName = models.CharField(max_length=100)
 	firstName = models.CharField(max_length=100)
 	role = models.ForeignKey('PersonRole',blank=True,null=True,related_name='person_role')
@@ -193,7 +193,7 @@ class Person(models.Model):
 		super(Person, self).save(*args, **kwargs)
 
 class Org(models.Model):
-	id = models.SlugField(primary_key=True,editable=False)
+	slug = models.SlugField(unique=True,editable=False)
 	orgName = models.CharField(max_length=200)
 	openRecordsLaw = models.ForeignKey('OpenRecordsLaw',blank=True,null=True)
 	#Relationships
@@ -498,12 +498,12 @@ def get_relations_by_type(self,type):
 
 def get_relations_with_type(self):
 	if self._meta.model_name == 'org':
-		kith=self.p_to_org.all().order_by('pk')
-		kin=self.org_to_org.all().order_by('pk')
+		kith=self.p_to_org.all().order_by('id')
+		kin=self.org_to_org.all().order_by('id')
 		return {'people':collate_relations(kith),'orgs':collate_relations(kin)}
 	else: # =='person'
-		kith=self.org_to_p.all().order_by('pk')
-		kin=self.p_to_p.all().order_by('pk')
+		kith=self.org_to_p.all().order_by('id')
+		kin=self.p_to_p.all().order_by('id')
 		return {'orgs':collate_relations(kith),'people':collate_relations(kin)}
 
 '''

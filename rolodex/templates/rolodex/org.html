@@ -18,14 +18,14 @@
 {% if node.net_length > 2 %}
 <div id="networkCanvas"></div>
 <div class="fullMap">
-<a href="{%url 'rolodex_org_map' node.pk%}">Full page graph</a>
+<a href="{%url 'rolodex_org_map' node.slug%}">Full page graph</a>
 </div>
 {%endif%}
 
 <h1>{{node.orgName}}</h1>
 
 <div class="change">
-<a href="{%url 'rolodex_edit_org' node.pk%}">Edit Info</a>
+<a href="{%url 'rolodex_edit_org' node.slug%}">Edit Info</a>
 </div>
 
 
@@ -57,7 +57,7 @@
 
 {%endfor%}
   <div class="change">
-    <a href="{%url 'rolodex_edit_org' node.pk%}">Edit Contacts</a>
+    <a href="{%url 'rolodex_edit_org' node.slug%}">Edit Contacts</a>
   </div>
 </div>
 
@@ -72,7 +72,7 @@
 {%for r in node.relations.orgs%}
 {% spaceless %}
 <div class="rel_O{{r.relation.pk}}">
-<span><a href="{%url 'rolodex_org' r.relation.pk%}">{{r.relation.orgName}}</a></span><br/><div class="relation_type">{{r.type}}</div>
+<span><a href="{%url 'rolodex_org' r.relation.slug%}">{{r.relation.orgName}}</a></span><br/><div class="relation_type">{{r.type}}</div>
 <div class="relation_delete">Delete this relationship</div><br/>
 </div>
 <script type="text/javascript">
@@ -103,7 +103,7 @@
 {%for r in node.relations.people%}
 {% spaceless %}
 <div class="rel_P{{r.relation.pk}}">
-<span><a href="{%url 'rolodex_person' r.relation.pk%}">{{r.relation.firstName}} {{r.relation.lastName}}</a></span><br/><div class="relation_type">{{r.type}}{%if r.relation.role%}{%if r.type%} - {%endif%}{{r.relation.role.role}}{%endif%}</div>
+<span><a href="{%url 'rolodex_person' r.relation.slug%}">{{r.relation.firstName}} {{r.relation.lastName}}</a></span><br/><div class="relation_type">{{r.type}}{%if r.relation.role%}{%if r.type%} - {%endif%}{{r.relation.role.role}}{%endif%}</div>
 <div class="relation_delete">Delete this relationship</div><br/>
 </div>
 <script type="text/javascript">
@@ -127,7 +127,7 @@
 </div>
 </div>
   <div class="change">
-    <a href="{%url 'rolodex_new_org_relation' node.pk%}">Add Relationship</a>
+    <a href="{%url 'rolodex_new_org_relation' node.slug%}">Add Relationship</a>
   </div>
 </div>
 
@@ -144,6 +144,7 @@
         <a class="goLink" href="">Go</a>
         </div>
         </div>
+        <div><a href="{%url 'rolodex_new_person' node.slug %}">Add an employee</a></div>
 </div>
 
 {%if node.notes%}
@@ -154,7 +155,7 @@
 {%endif%}
 
 <div class="change delete">
-<a href="{%url 'rolodex_delete_org' node.pk%}">Delete {{node.orgName}}?</a>
+<a href="{%url 'rolodex_delete_org' node.slug%}">Delete {{node.orgName}}?</a>
 </div>
 
 
@@ -176,7 +177,7 @@ function scrolldown(){
 
 var PeepDict={};
 {%for peep in node.employees%}
-PeepDict['{{peep.id}}']="{%url 'rolodex_person' peep.id%}";
+PeepDict['{{peep.id}}']="{%url 'rolodex_person' peep.slug%}";
 {%endfor%}
 
 var $peepSelect = $('#peepSelect').selectize({
@@ -211,7 +212,7 @@ var replaceP = '{% url "rolodex_person" "foobarbaz" %}',
   $.ajax({
     type:"GET",
     dataType:"json",
-    url:"{%url 'rolodex_org_network' node.pk %}",
+    url:"{%url 'rolodex_org_network' node.slug %}",
     success: function(d){
       $('#networkCanvas').html("");
       chartNetwork(d);

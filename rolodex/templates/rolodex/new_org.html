@@ -18,7 +18,7 @@
 <div class="formDiv">
 <h2>Identity</h2>
 {% if edit %}
-<form action="/rolodex/edit-org/{{orgNode.id}}/" method="Post">
+<form action="/rolodex/edit-org/{{orgNode.slug}}/" method="Post">
 {% else %}
 <form action="/rolodex/add-org/" method="Post">
 {% endif %}

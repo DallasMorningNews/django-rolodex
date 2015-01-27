@@ -60,10 +60,10 @@
 <div class="clickable" id="2Org_select">Organization</div>
 <div id="2Org_formDiv" class="relationform">
 {%if orgNode%}
-<form action="/rolodex/add-relationship/org/{{orgNode.pk}}/" method="Post">
+<form action="/rolodex/add-relationship/org/{{orgNode.slug}}/" method="Post">
 <input type="hidden" value="{{orgNode.pk}}" name="from_ent">
 {%else%}
-<form action="/rolodex/add-relationship/person/{{peepNode.pk}}/" method="Post">
+<form action="/rolodex/add-relationship/person/{{peepNode.slug}}/" method="Post">
 <input type="hidden" value="{{peepNode.pk}}" name="from_ent">
 {%endif%}
 
@@ -75,7 +75,7 @@
     <select id="orgNode" name="to_ent">
          <option value=""></option>
     {%for org in orgs%}
-        <option value="{{org.id}}">{{org.orgName}}</option>
+        <option value="{{org.pk}}">{{org.orgName}}</option>
     {%endfor%}
     </select>
 </div>
@@ -92,10 +92,10 @@
 <div class="clickable" id="2P_select">Person</div>
 <div id="2P_formDiv" class="relationform">
 {%if orgNode%}
-<form action="/rolodex/add-relationship/org/{{orgNode.pk}}/" method="Post">
+<form action="/rolodex/add-relationship/org/{{orgNode.slug}}/" method="Post">
 <input type="hidden" value="{{orgNode.pk}}" name="from_ent">
 {%else%}
-<form action="/rolodex/add-relationship/person/{{peepNode.pk}}/" method="Post">
+<form action="/rolodex/add-relationship/person/{{peepNode.slug}}/" method="Post">
 <input type="hidden" value="{{peepNode.pk}}" name="from_ent">
 {%endif%}
 {% csrf_token %}
@@ -107,7 +107,7 @@
     <optgroup label="{{org.orgName}}">
         {%for peep in peeps%}
         {%if peep.orgID == org.pk%}
-            <option value="{{peep.id}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
+            <option value="{{peep.pk}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
         {%endif%}
         {%endfor%}    
     </optgroup>
@@ -115,7 +115,7 @@
     <optgroup label="N/A">
         {%for peep in peeps%}
         {%if peep.orgName == 'N/A'%}
-            <option value="{{peep.id}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
+            <option value="{{peep.pk}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
         {%endif%}
         {%endfor%}
     </optgroup>
@@ -161,9 +161,9 @@ $('#personNode').selectize({
 <ul class="breadcrumb">
 	<li><a href="{% url 'rolodex_home' %}">Home</a></li>
     {%if orgNode%}
-    <li><a href="{% url 'rolodex_org' orgNode.pk %}">{{orgNode.orgName}}</a></li>
+    <li><a href="{% url 'rolodex_org' orgNode.slug %}">{{orgNode.orgName}}</a></li>
     {%else%}
-    <li><a href="{% url 'rolodex_person' peepNode.pk %}">{{peepNode.lastName}}, {{peepNode.firstName}}</a></li>
+    <li><a href="{% url 'rolodex_person' peepNode.slug %}">{{peepNode.lastName}}, {{peepNode.firstName}}</a></li>
     {%endif%}
 	<li><a>Add</a></li>
 </ul>

@@ -36,14 +36,14 @@ class PersonSerializer(serializers.HyperlinkedModelSerializer):
 	person_role = serializers.HyperlinkedRelatedField(many=True, read_only=False,view_name='roles',queryset=PersonRole.objects.all())
 	class Meta:
 		model = Person
-		fields = ('id','firstName', 'lastName',  'position','department','gender','p_relations','org_relations','role','person_contact')
+		fields = ('id','slug','firstName', 'lastName',  'position','department','gender','p_relations','org_relations','role','person_contact')
 
 class OrgSerializer(serializers.HyperlinkedModelSerializer):
 	people = serializers.HyperlinkedRelatedField(many=True, read_only=True,view_name='person-relations')
 	orgs = serializers.HyperlinkedRelatedField(many=True, read_only=True,view_name='org-relations')
 	class Meta:
 		model = Org
-		fields = ('id','orgName','org_relations','p_relations','org_contact')
+		fields = ('id','slug','orgName','org_relations','p_relations','org_contact')
 
 class ContactSerializer(serializers.HyperlinkedModelSerializer):
 	person_contact = serializers.HyperlinkedRelatedField( read_only=False,view_name='person',queryset=Person.objects.all())

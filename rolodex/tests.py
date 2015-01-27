@@ -14,10 +14,10 @@ class RolodexModelsTestCase(TestCase):
 	fixtures = ['rolodex_models_testdata.json']
 	
 	def setUp(self):
-		self.o1 = Org.objects.get(pk="acme-corp")
-		self.p1 = Person.objects.get(pk="john-doe")
-		self.o2 = Org.objects.get(pk="ajax-corp")
-		self.p2 = Person.objects.get(pk="jane-doe")
+		self.o1 = Org.objects.get(slug="acme-corp")
+		self.p1 = Person.objects.get(slug="john-doe")
+		self.o2 = Org.objects.get(slug="ajax-corp")
+		self.p2 = Person.objects.get(slug="jane-doe")
 
 	def test_getter_methods(self):
 		self.assertEqual(list(self.p1.get_relations()['orgs']),[self.o1])
@@ -70,10 +70,10 @@ class RolodexViewsTestCase(WebTest):
 	fixtures = ['rolodex_views_testdata.json']
 	
 	def setUp(self):
-		self.o1 = Org.objects.get(pk="acme-corp")
-		self.p1 = Person.objects.get(pk="john-doe")
-		self.o2 = Org.objects.get(pk="ajax-corp")
-		self.p2 = Person.objects.get(pk="jane-doe")
+		self.o1 = Org.objects.get(slug="acme-corp")
+		self.p1 = Person.objects.get(slug="john-doe")
+		self.o2 = Org.objects.get(slug="ajax-corp")
+		self.p2 = Person.objects.get(slug="jane-doe")
 
 	def test_home(self):	
 		response = client.get(reverse('rolodex_home'))
@@ -81,9 +81,9 @@ class RolodexViewsTestCase(WebTest):
 		print " >> Passed home"
 	
 	def test_search(self):
-		response = client.get(reverse('rolodex_org',args=[self.o1.pk]))
+		response = client.get(reverse('rolodex_org',args=[self.o1.slug]))
 		self.assertContains(response, self.o1.orgName , status_code=200)
-		response = client.get(reverse('rolodex_person',args=[self.p1.pk]))
+		response = client.get(reverse('rolodex_person',args=[self.p1.slug]))
 		self.assertContains(response, self.p1.lastName , status_code=200)
 		print " >> Passed entity pages"
 
@@ -91,7 +91,7 @@ class RolodexViewsTestCase(WebTest):
 		'''
 		Add a person with a bad email address. Fix the email and check for successful resubmit.
 		'''
-		form = self.app.get(reverse('rolodex_new_person',args=[self.o2.pk])).form
+		form = self.app.get(reverse('rolodex_new_person',args=[self.o2.slug])).form
 		form['lastName'] = 'Rabbit'
 		form['firstName'] = 'Roger'
 		form['person_contact-0-contact'] = 'nobugsbunny'
@@ -106,7 +106,7 @@ class RolodexViewsTestCase(WebTest):
 		'''
 		Edit Person
 		'''
-		form = self.app.get(reverse('rolodex_edit_person',args=[self.p2.pk])).form
+		form = self.app.get(reverse('rolodex_edit_person',args=[self.p2.slug])).form
 		form['lastName'] = 'Doe, Jr.'
 		form['position'] = 'Scientist'
 		response = form.submit().follow()
@@ -114,7 +114,7 @@ class RolodexViewsTestCase(WebTest):
 		'''
 		Edit Org
 		'''
-		form = self.app.get(reverse('rolodex_edit_org',args=[self.o2.pk])).form
+		form = self.app.get(reverse('rolodex_edit_org',args=[self.o2.slug])).form
 		form['orgName'] = 'AJAX, Inc.'
 		response = form.submit().follow()
 		self.assertContains(response, 'AJAX, Inc.' , status_code=200)
@@ -138,7 +138,7 @@ class RolodexViewsTestCase(WebTest):
 
 		Org2Org
 		'''
-		form = self.app.get(reverse('rolodex_new_org_relation',args=[self.o1.pk])).forms[0]
+		form = self.app.get(reverse('rolodex_new_org_relation',args=[self.o1.slug])).forms[0]
 		form['to_ent'] = self.o2.pk
 		form['hierarchy'] = 'parent'
 		response = form.submit()
@@ -147,7 +147,7 @@ class RolodexViewsTestCase(WebTest):
 		'''
 		Check no duplicate relationships
 		'''
-		form = self.app.get(reverse('rolodex_new_org_relation',args=[self.o1.pk])).forms[0]
+		form = self.app.get(reverse('rolodex_new_org_relation',args=[self.o1.slug])).forms[0]
 		form['to_ent'] = self.o2.pk
 		response = form.submit()
 		self.assertContains(response, 'That relationship already exists.')
@@ -155,21 +155,21 @@ class RolodexViewsTestCase(WebTest):
 		'''
 		Org2P
 		'''
-		form = self.app.get(reverse('rolodex_new_org_relation',args=[self.o2.pk])).forms[1]
+		form = self.app.get(reverse('rolodex_new_org_relation',args=[self.o2.slug])).forms[1]
 		form['to_ent'] = self.p2.pk
 		response = form.submit()
 		self.assertEqual(response.context['saved'],True)
 		'''
 		P2P
 		'''
-		form = self.app.get(reverse('rolodex_new_person_relation',args=[self.p2.pk])).forms[1]
+		form = self.app.get(reverse('rolodex_new_person_relation',args=[self.p2.slug])).forms[1]
 		form['to_ent'] = self.p1.pk
 		response = form.submit()
 		self.assertEqual(response.context['saved'],True)
 		'''
 		P2Org
 		'''
-		form = self.app.get(reverse('rolodex_new_person_relation',args=[self.p2.pk])).forms[0]
+		form = self.app.get(reverse('rolodex_new_person_relation',args=[self.p2.slug])).forms[0]
 		form['to_ent'] = self.o1.pk
 		response = form.submit()
 		self.assertEqual(response.context['saved'],True)
@@ -177,9 +177,9 @@ class RolodexViewsTestCase(WebTest):
 		print " >> Passed relationship create page"
 
 	def test_delete(self):
-		response = client.post(reverse('rolodex_delete_person',args=[self.p2.pk]))
+		response = client.post(reverse('rolodex_delete_person',args=[self.p2.slug]))
 		self.assertEqual(response.status_code , 302)
-		response = client.post(reverse('rolodex_delete_org',args=[self.o2.pk]))
+		response = client.post(reverse('rolodex_delete_org',args=[self.o2.slug]))
 		self.assertEqual(response.status_code , 302)
 		print " >> Passed delete page"
 

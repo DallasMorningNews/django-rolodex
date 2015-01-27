@@ -1,29 +1,33 @@
 [
 {
     "fields": {
+        "slug": "boss",
         "role": "boss",
         "description": null
     },
     "model": "rolodex.personrole",
-    "pk": "boss"
+    "pk": 1
 },
 {
     "fields": {
+        "slug": "front-desk",
         "role": "front desk",
         "description": null
     },
     "model": "rolodex.orgcontactrole",
-    "pk": "front-desk"
+    "pk": 1
 },
 {
     "fields": {
+        "slug": "employment",
         "relationship_type": "employment"
     },
     "model": "rolodex.p2org_type",
-    "pk": "employment"
+    "pk": 1
 },
 {
     "fields": {
+        "slug": "jane-doe",
         "firstName": "Jane",
         "tags": [],
         "lastName": "Doe",
@@ -34,49 +38,52 @@
         "position": null
     },
     "model": "rolodex.person",
-    "pk": "jane-doe"
+    "pk": 1
 },
 {
     "fields": {
+        "slug": "john-doe",
         "firstName": "John",
         "tags": [],
         "lastName": "Doe",
         "notes": null,
-        "role": "boss",
+        "role": 1,
         "gender": null,
         "department": null,
         "position": null
     },
     "model": "rolodex.person",
-    "pk": "john-doe"
+    "pk": 2
 },
 {
     "fields": {
+        "slug": "acme-corp",
         "orgName": "ACME, Corp.",
         "openRecordsLaw": null,
         "notes": null,
         "tags": []
     },
     "model": "rolodex.org",
-    "pk": "acme-corp"
+    "pk": 1
 },
 {
     "fields": {
+        "slug": "ajax-corp",
         "orgName": "AJAX, Corp.",
         "openRecordsLaw": null,
         "notes": null,
         "tags": []
     },
     "model": "rolodex.org",
-    "pk": "ajax-corp"
+    "pk": 2
 },
 {
     "fields": {
         "description": null,
-        "from_ent": "john-doe",
+        "from_ent": 2,
         "from_date": null,
-        "to_ent": "acme-corp",
-        "relation": "employment",
+        "to_ent": 1,
+        "relation": 1,
         "to_date": null
     },
     "model": "rolodex.p2org",
@@ -85,10 +92,10 @@
 {
     "fields": {
         "description": null,
-        "from_ent": "acme-corp",
+        "from_ent": 1,
         "from_date": null,
-        "to_ent": "john-doe",
-        "relation": "employment",
+        "to_ent": 2,
+        "relation": 1,
         "to_date": null
     },
     "model": "rolodex.org2p",

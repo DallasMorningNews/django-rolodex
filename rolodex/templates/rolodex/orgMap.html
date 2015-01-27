@@ -29,7 +29,7 @@
 
 <div id="networkCanvas"></div>
 <div class="change">
-<a href="{%url 'rolodex_org' node.pk%}">Back to Page</a>
+<a href="{%url 'rolodex_org' node.slug%}">Back to Page</a>
 </div>
 
 
@@ -52,7 +52,7 @@ var replaceP = '{% url "rolodex_person" "foobarbaz" %}',
   $.ajax({
     type:"GET",
     dataType:"json",
-    url:"{%url 'rolodex_adv_org_network' node.pk %}?hops={{hops}}",
+    url:"{%url 'rolodex_adv_org_network' node.slug %}?hops={{hops}}",
     success: function(d){
       $('#networkCanvas').html("");
       graphData = d;
@@ -100,7 +100,7 @@ $(document).ready(function(){
 <div class="breadcrumb-container">
 <ul class="breadcrumb">
 	<li><a href="{% url 'rolodex_home' %}">Home</a></li>
-	<li><a href="{%url 'rolodex_org' node.pk%}">{{node.orgName}}</a></li>
+	<li><a href="{%url 'rolodex_org' node.slug%}">{{node.orgName}}</a></li>
   <li><a>Graph</a></li>
 </ul>
 </div>

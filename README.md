@@ -8,7 +8,7 @@ At _The News_ we use it as a drop-in backend for projects that require us to man
 
 The stand-alone app provides a clean, intuitive interface for our reporters to enter and search basic information about people and orgs and the relationships between them, while the API and django plug-in lets us cut out quick graphs of related entities.
 
-This is a development release, with more detailed docs, annotated (and probably cleaner) code and other niceties on the way. Suggestions for features are welcome.
+This is a development release, with more detailed docs, annotated (and probably cleaner) code and other niceties on the way. Suggestions for features and pull requests are welcome.
 
 Quick start
 -----------
@@ -41,7 +41,7 @@ urlpatterns = patterns('',
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout'),
 )
 ```
-It's also a good idea to set django rest framework's auth to django model permissions in settings.py. You may also add anonymous read only like this:
+It's a good idea to set django rest framework's auth to django model permissions in settings.py. You may also add anonymous read only like this:
 ```python
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -49,7 +49,7 @@ REST_FRAMEWORK = {
     ]
 }
 ```
-- Optionally, create a `'rolodex'` database in your DATABASES settings or use a `ROLODEX_DB` environment variable (à la  `DATABASE_URL`) to route the app to a dedicated database. __REMEMBER:__ Django does not support [cross-database relationships](https://docs.djangoproject.com/en/dev/topics/db/multi-db/#cross-database-relations), so forget foreign keys. Instead, we often just use the built in API.
+- Optionally, create a `'rolodex'` database in your DATABASES settings or use a `ROLODEX_DB` environment variable (à la  `DATABASE_URL`) to route the app to a dedicated database. __REMEMBER:__ Django does not support [cross-database relationships](https://docs.djangoproject.com/en/dev/topics/db/multi-db/#cross-database-relations), so [forget foreign keys](#dbnote). Instead, we often just use the built in API.
 - Run `python manage.py migrate` (or `python manage.py migrate --database=rolodex` if you set up routing) to create the models and load fixtures.
 - `python manage.py runserver` and checkout [http://localhost:8000/rolodex](http://localhost:8000/rolodex) to create your first people and orgs (see docs). 
 - Optionally, use the rest framework API at [http://localhost:8000/rolodex/api/](http://localhost:8000/rolodex/api/)
@@ -57,8 +57,6 @@ REST_FRAMEWORK = {
 
 Adding people & orgs to Rolodex
 --------------------------------
-People and orgs can easily be added through Rolodex. 
-
 Rolodex forces users to choose the primary organization a person belongs to before they can be created. This relationship is set as type `'employment'`, which is pre-loaded as a [P2Org](#types_and_roles) relationship type fixture.
 
 Developers can also use the RESTful API to create people, orgs and their relationships and contact details. Browse the API to see what parameters can be passed when creating objects.
@@ -68,7 +66,7 @@ The API uses Django rest framework's hyperlinked serializers, so use URLs for fo
 
 Relationships
 -------------
-Relationships in Rolodex are undirected (facebook not twitter), so when you create a relationship from one person or org to another person or org, the relationship is reciprocally created the other way. 
+Relationships in Rolodex are undirected (facebook not twitter), so when you create a relationship from one person or org to another person or org, the relationship is reciprocated the other way. 
 
 There are different relationship models for each permuation of person/org relationship, e.g. person-to-person,person-to-org, etc.
 
@@ -90,7 +88,7 @@ Org2Org relationships are allowed hierarchy. Pass a `hierarchy` parameter `"pare
 
 For example, if org1 is parent to org2, `org1.add_org2org(org2,**{hierarchy:"parent"})` will create the relationship with the correct hierarchy. 
 
-Hierarchy is not available for other types of relationships. Generally, we think of hierarchy as implying a general sense of ownership, which obviously doesn't apply to the other relationship types. 
+Hierarchy is not available for other types of relationships. Generally, we think of hierarchy as implying ownership, which obviously doesn't apply to the other relationship types. 
 
 __Note__: If you modify an existing Org2Org relationship's hierarchy (for that matter, any relationship porperty), a duplicate will be created. Instead delete the current relationship and re-create it with the correct hierarchy or other properties.
 
@@ -113,12 +111,33 @@ People and orgs also have object methods for retrieving related objects:
 
 - `get_relations()` : gets related person & org objects
 - `get_relations_with_type()` : gets related person & org objects with type of relationship
-- `get_relations_by_type(type)` : related objects filtered by type name (a string)
+- `get_relations_by_type('type')` : related objects filtered by type name (a string)
 - `get_employer()` : primary orgs associated with person object
 - `get_employees()` : gets person objects primarily associated with org
-- `get_employees_by_role(role)` : role is a string
+- `get_employees_by_role('role')` : role is a string
 - `get_children()` : get children in Org2Org relationships
 - `get_parents()` : get parents in Org2Org relationships
+
+
+<a name="dbnote"></a>A note on using a separate database
+---------------------------------------------------------
+If you plan on using a separate database for rolodex, remember that django does not allow crossdatabase relationships. Instead, you can use lazy queries.
+
+For example, in a recent project we needed to create a pseudo-foreign key to rolodex's Org model from a model hosted on a different database:
+
+```python
+from django.utils.functional import lazy
+from rolodex.models import Org
+
+class SomeModel(models.Model):
+    org = models.IntegerField(choices=lazy(org_list,tuple)())
+
+
+def org_list():
+    #Create a list of tuple choices
+    org_list = [ (org.pk, org.orgName) for org in Org.objects.all() ]
+    return tuple(org_list)
+```
 
 
 Graph Analysis
@@ -133,3 +152,5 @@ See the [NetworkX documentation](http://networkx.github.io/documentation/latest/
 The "Full Page Graph" for each person or org, also provides a quick and dirty visualization of centrality measures for a graph N hops from the origin node. You can pass the number of hops as a GET parameter, e.g. `?hops=4`, or it will default to 3.
 
 ![Rolodex](screenshot.png)
+
+**Note:** All styling on Rolodex was done by our data team, not our extremely talented staff of designers. 

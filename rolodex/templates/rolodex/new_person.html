@@ -28,7 +28,7 @@
 <h2>Identify</h2>
 
 {% if edit %}
-<form action="/rolodex/edit-person/{{personNode.id}}/" method="Post">
+<form action="/rolodex/edit-person/{{personNode.slug}}/" method="Post">
 {% else %}
 <form action="/rolodex/add-person/{{orgNode}}/" method="Post">
 {% endif %}

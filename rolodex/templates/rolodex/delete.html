@@ -13,9 +13,9 @@
 {%endif%}
 <div id="midrail">
 {%if org%}
-<form action="{%url 'rolodex_delete_org' org.pk %}" method="Post">
+<form action="{%url 'rolodex_delete_org' org.slug %}" method="Post">
 {% else %}
-<form action="{%url 'rolodex_delete_person' peep.pk %}" method="Post">
+<form action="{%url 'rolodex_delete_person' peep.slug %}" method="Post">
 {%endif%}
   {% csrf_token %}
   <div class="buttonsDiv">
