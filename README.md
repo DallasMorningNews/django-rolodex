@@ -29,9 +29,9 @@ urlpatterns = patterns('',
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 )
 ```
-- If you'd like to restrict views to only logged in users, set Rolodex's security variable in settings.py:
+- By default, Rolodex is restricted to only logged-in users. If you want to allow anyone to have a look around, set Rolodex's security variable in settings.py:
 ```python
-ROLODEX_SECURE = True 
+ROLODEX_SECURE = False 
 ```
 Also add django's auth views to your project's urls.py:
 ```python
