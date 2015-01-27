@@ -139,6 +139,14 @@ def org_list():
     return tuple(org_list)
 ```
 
+Testing
+---------
+To run tests, be sure you've installed the webtest and django-webtest modules.
+
+```
+pip install django-webtest
+pip install webtest
+```
 
 Graph Analysis
 --------------
