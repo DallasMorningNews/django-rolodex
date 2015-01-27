@@ -8,13 +8,13 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='django-rolodex',
-    version='0.1.0.dev1',
+    version='0.1.0',
     packages=['rolodex'],
     include_package_data=True,
     license='MIT License',
     description='A Django app for managing relationships between people and organizations.',
     long_description=README,
-    url='http://www.example.com/',
+    url='https://github.com/DallasMorningNews/django-rolodex/',
     author='Jon McClure',
     author_email='jon.r.mcclure@gmail.com',
     classifiers=[
