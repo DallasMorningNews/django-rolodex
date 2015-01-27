@@ -15,13 +15,13 @@ relationships =[]
 for doc in edge_docs:
     
     with open(base+doc,'r+') as file:
-	print doc
+	print(doc)
         for line in file:
             ents=line.split()
             ent1, get = Person.objects.get_or_create(firstName='node',lastName=ents[0])
             ent2, get = Person.objects.get_or_create(firstName='node',lastName=ents[1])
             if 'n'+ents[0]+'-n'+ents[1] not in relationships:
-                print "added "+ents[0]+">>"+ents[1]
+                print("added "+ents[0]+">>"+ents[1])
                 ent1.add_p2p(ent2)            
                 relationships.append('n'+ents[0]+'-n'+ents[1])
                 relationships.append('n'+ents[1]+'-n'+ents[0])
