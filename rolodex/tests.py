@@ -42,7 +42,7 @@ class RolodexModelsTestCase(TestCase):
 
 	def test_delete_relationships(self):
 		self.p1.remove_p2p(self.p2)
-		self.assertEqual(list(self.p2.get_relations()['people']),[])
+		self.assertEqual(list(self.p2.get_relations_with_type()['people']),[])
 
 		self.o1.remove_org2org(self.o2)
 		self.assertEqual(list(self.o2.get_relations()['orgs']),[])

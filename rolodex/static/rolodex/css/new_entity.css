@@ -1,8 +1,8 @@
-@import url(http://fonts.googleapis.com/css?family=Carter+One|Special+Elite|Raleway);
+@import url(http://fonts.googleapis.com/css?family=Carter+One|Raleway);
 
 h1{
 	text-align: center;
-	font-family: 'Special Elite';
+	font-family: 'Montserrat', arial, sans-serif;
 	font-size: 70px;
 }
 
@@ -10,6 +10,10 @@ p input{
 	font-family: arial,sans-serif;
 }
 
+label{
+	display:block;
+	margin-bottom: 0px;
+}
 
 #name{
 	padding:10px;
@@ -22,7 +26,7 @@ p input{
 h4{
 	font-size: 20px;
 	text-align: center;
-	font-family: 'Special Elite';
+	font-family: 'Montserrat';
 	font-style:italic;
 }
 h5{
@@ -36,7 +40,7 @@ input.submit{
 	width:300px;
 	text-align: center;
 	margin:10px 30px;
-	font-family: 'Special Elite';
+	font-family: 'Montserrat';
 }
 
 input.submit:hover{
@@ -77,9 +81,15 @@ div.alignR{
 .addform ul{
 	max-width:300px;
 	margin:10px auto;
-	text-align: right;
 	list-style-type: none;
 }
+.addform ul li{
+	margin-left:15px;
+}
+.addform ul li.title{
+	margin:10px auto;
+}
+
 .addform input, .addform select, .addform textarea{
 	width:200px;
 }
@@ -111,14 +121,13 @@ ul.contact{
 }
 ul.center li input,ul.center li select{
 	display:block;
-	margin:0 auto;
 	min-width: 240px;
 }
 ul.center li input{
 }
 .addform li.title{
 	text-align: center;
-	font-family: 'Special Elite',serif;
+	font-family: 'Montserrat',serif;
 	color:white;
 	font-size: 18px;
 	background:#36788e;
@@ -196,11 +205,9 @@ input.add{
 }
 
 .addform .entity_notes textarea{
-	width:280px;
-	max-width:280px;
+	width:260px;
 	max-height:150px; 
 	height:50px;
-	margin:0 auto;
 	display:block;
 }
 

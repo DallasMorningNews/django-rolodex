@@ -32,19 +32,24 @@
   {{node.position}}<br/>
   {%endif%}
   {%if node.department%}
-  {{node.department|title}}<br/>
+  {{node.department|title}} department<br/>
   {%endif%}
 </div>
 
+{%if node.notes%}
+<div class="entity_notes">
+{{node.notes|linebreaks}}
+</div>
+{%endif%}
 
 <div class="change">
-<a href="{%url 'rolodex_edit_person' node.slug%}">Edit Info</a>
+<a href="{%url 'rolodex_edit_person' node.slug%}"><i class="fa fa-pencil"></i> Add/edit basic info</a>
 </div>
 
 
 
 
-<div id="contactHead" class="clickable">Contacts</div>
+<div id="contactHead" class="clickable"><i class="fa fa-envelope-o"></i> Contacts</div>
 <div id="contactSlide" class="bioBank">
 
 {%for contact in node.contacts%}
@@ -52,11 +57,17 @@
 <h6>{{contact.role}}</h6>
 {%endif%}
 <ul>
-  <li><span class="type">{{contact.type}}:</span> 
+  <li>
   {%if contact.type == "email"%}
-  <a href="mailto:{{contact.contact}}">{{contact.contact}}</a>
+  <span class="type"><i class="fa fa-envelope-o"></i></span> 
+   <a href="mailto:{{contact.contact}}">{{contact.contact}}</a>
   {%elif contact.type == "link" %}
+  <span class="type"><i class="fa fa-link"></i></span> 
   <a href="{{contact.contact}}">{{contact.contact}}</a>
+  {%elif contact.type == "address" %}
+  <span class="type"><i class="fa fa-home"></i></span> {{contact.contact}}
+  {%elif contact.type == "phone"%}
+  <span class="type"><i class="fa fa-phone"></i></span> {{contact.contact}}
   {%else%}
   {{contact.contact}}
   {%endif%}
@@ -66,27 +77,25 @@
   {%endif%}
 </ul>
 
-
-
-
 {%endfor%}
   <div class="change">
-    <a href="{%url 'rolodex_edit_person' node.slug%}">Edit Contacts</a>
+    <a href="{%url 'rolodex_edit_person' node.slug%}"><i class="fa fa-pencil"></i> Add/edit contacts</a>
   </div>
 </div>
 
 
-<div id="relationHead" class="clickable">Relationships</div>
+<div id="relationHead" class="clickable"><i class="fa fa-users"></i> Relationships</div>
 <div id="relationSlide" class="bioBank">
-<h6>Organizations</h6>
+
 <div class="relation_container clearfix">
 <div class="relations">
 
 {%for r in node.relations.orgs%}
 {% spaceless %}
 <div class="rel_O{{r.relation.pk}}">
-<span><a href="{%url 'rolodex_org' r.relation.slug%}">{{r.relation.orgName}}</a></span><br/><div class="relation_type">{{r.type}}</div>
-<div class="relation_delete">Delete this relationship</div><br/>
+<span><a href="{%url 'rolodex_org' r.relation.slug%}"><i class="fa fa-university"></i>  {{r.relation.orgName}}</a> <i class="fa fa-times relation_delete" title="Delete relationship?"></i></span> <br/>
+
+<div class="relation_type">{{r.type|capfirst}}</div>
 </div>
 <script type="text/javascript">
   $(".rel_O{{r.relation.pk}} .relation_delete").click(function(){
@@ -107,15 +116,17 @@
 
 </div>
 </div>
-<h6>People</h6>
+
 <div class="relation_container clearfix">
 <div class="relations">
 
 {%for r in node.relations.people%}
 {% spaceless %}
 <div class="rel_P{{r.relation.pk}}">
-<span><a href="{%url 'rolodex_person' r.relation.slug%}">{{r.relation.firstName}} {{r.relation.lastName}}</a></span><br/><div class="relation_type">{{r.type}}{%if r.relation.role%}{%if r.type%} - {%endif%}{{r.relation.role.role}}{%endif%}</div>
-<div class="relation_delete">Delete this relationship</div><br/>
+<span><a href="{%url 'rolodex_person' r.relation.slug%}"><i class="fa fa-user"></i>  {{r.relation.firstName}} {{r.relation.lastName}}</a> <i class="fa fa-times relation_delete" title="Delete relationship?"></i></span> <br/>
+
+<div class="relation_type">{{r.type|capfirst }}{%if r.relation.role%}{%if r.type%} - {%endif%}{{r.relation.role.role|capfirst }}{%endif%}</div>
+
 </div>
 <script type="text/javascript">
   $(".rel_P{{r.relation.pk}} .relation_delete").click(function(){
@@ -137,19 +148,14 @@
 </div>
 </div>
   <div class="change">
-    <a href="{%url 'rolodex_new_person_relation' node.slug%}">Add Relationship</a>
+    <a href="{%url 'rolodex_new_person_relation' node.slug%}"><i class="fa fa-user-plus"></i> Add a relationship</a>
   </div>
 </div>
 
-{%if node.notes%}
-<div class="entity_notes">
-<h4>Notes</h4>
-{{node.notes|linebreaks}}
-</div>
-{%endif%}
+
 
 <div class="change delete">
-<a href="{%url 'rolodex_delete_person' node.slug%}">Delete {{node.firstName}}?</a>
+<a href="{%url 'rolodex_delete_person' node.slug%}"><i class="fa fa-times"></i> Delete {{node.firstName}}?</a>
 </div>
 
 

@@ -1,17 +1,19 @@
 @import url(http://fonts.googleapis.com/css?family=Carter+One|Special+Elite|Raleway);
 
-h1,h2,h3,h4,h5{
-	text-align: center;
-	font-family: 'Special Elite';
-}
+
 h1{
 	font-size: 70px;
+	padding-left: 20px;
 }
 h2{
 	font-size:45px;
 }
 h5{
 	font-size: 24px;
+}
+
+.clickable{
+	padding:4px 25px 0px;
 }
 
 .waitingGIF{
@@ -35,11 +37,12 @@ h5{
 }
 
 .professional{
-	text-align: center;
-	font-size: 12px;
-	color: #333;
-	font-family: 'Raleway',sans-serif;
-	line-height: 12px;
+text-align: left;
+font-size: 14px;
+color: #333;
+font-family: 'Raleway',sans-serif;
+line-height: 18px;
+padding-left: 20px;
 }
 
 .professional span{
@@ -48,21 +51,22 @@ h5{
 	color:#8C1717;
 }
 .entity_notes{
-	font:12px 'Raleway',sans-serif;
-	width:250px;
-	text-align: left;
-	display:block;
-	margin:40px auto 25px;
+font: 14px 'Raleway',sans-serif;
+max-width: 500px;
+text-align: left;
+padding-left: 20px;
+margin-top: 15px;
 }
 
 .bioBank{
 	margin:0 auto;
-	text-align:center;
+	text-align:left;
+	padding-left: 20px;
 }
 
 .change{
 	text-align: center;
-	font-family: 'Special Elite';
+	font-family: 'Raleway', sans-serif;
 	font-size: 20px;
 	margin-top: 15px;
 }
@@ -91,10 +95,18 @@ h5{
 	margin:0 auto;
 }
 
+.contact_role{
+	font-family: 'Raleway', sans-serif;
+	font-size: 10px;
+	font-style: italic;
+	padding-left:25px;
+	width:100%;
+	margin-top: -2px;
+}
 
 .bioBank h6{
 	text-align: center;
-	font-family:'Special Elite',serif;
+	font-family:'Montserrat',serif;
 	color:#333;
 	font-size: 18px;
 	text-decoration: underline;
@@ -111,24 +123,27 @@ h5{
 	color:black;
 }
 .bioBank li .type{
-	color:#333;
-	font-size: 12px;
-	margin-right:10px;
+	color: #333;
+	font-size: 16px;
+	margin-right: 5px;
 }
 .bioBank li.notes{
-	color:#333;
+	color: #333;
 	font-size: 12px;
-	font-weight: bold;
+	padding-left: 25px;
 }
 .bioBank .relation_container{
 	max-width:500px;
-	margin:0 auto;
+	text-align: left;
 }
+
+.bioBank .relation_container i.fa.fa-user {
+	padding:0px 4px 0px 3px;
+}
+
 .bioBank .relations{
 	font-family: 'Raleway', sans-serif;
 	font-size: 10px;
-	text-align: center;
-	margin:1px auto;
 	font-style: italic;
 	display:inline-block;
 }
@@ -138,25 +153,25 @@ h5{
 }
 .bioBank .relations span a{
 	color:#36788e;
+	font-weight: normal;
+}
+.bioBank .relations span a:hover{
+	text-decoration: none;
 	font-weight: bolder;
 }
 .bioBank .relations .relation_type{
-	text-align: center;
+	padding-left:25px;
 	width:100%;
 	margin-top: -5px;
 }
 .bioBank .relations .relation_delete{
-	color:#880000;
+	color:lightgrey;
 	cursor:pointer;
 	font-style: normal;
-	border: 1px solid grey;
-	border-radius: 5px;
-	margin: 0px auto;
-	width: 110px;
+	margin-left: 5px;
 }
 .bioBank .relations .relation_delete:hover{
-
-	box-shadow: 0 0 5px red;
+	color:#880000;
 }
 #networkCanvas{
 		display: inline;
@@ -165,6 +180,7 @@ h5{
 .change.delete{
 	font-size: 12px;
 	margin-top: 50px;
+	text-align:right;
 }
 
 @media (max-width: 550px){
@@ -180,5 +196,9 @@ h5{
 		margin-top: 32px;
 		margin-bottom: 0px;
 	}
+	.relation_delete, .change.delete{
+		display:none;
+	}
+
 	
 }

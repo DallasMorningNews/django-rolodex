@@ -17,6 +17,8 @@ else:
 if not hasattr(settings, 'ROLODEX_SECURE'):
 	settings.ROLODEX_SECURE = True
 
+settings.TEMPLATE_CONTEXT_PROCESSORS += ('rolodex.context_processors.modal_context',)
+
 ###################
 ## Custom Config ##
 ###################

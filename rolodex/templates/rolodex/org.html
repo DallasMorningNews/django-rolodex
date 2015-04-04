@@ -24,47 +24,61 @@
 
 <h1>{{node.orgName}}</h1>
 
+{%if node.notes%}
+<div class="entity_notes">
+{{node.notes|linebreaks}}
+</div>
+{%endif%}
+
 <div class="change">
-<a href="{%url 'rolodex_edit_org' node.slug%}">Edit Info</a>
+<a href="{%url 'rolodex_edit_org' node.slug%}"><i class="fa fa-pencil"></i> Add/edit basic info</a>
 </div>
 
 
 
-<div id="contactHead" class="clickable">Contacts</div>
+
+
+<div id="contactHead" class="clickable"><i class="fa fa-envelope-o"></i> Contacts</div>
 <div id="contactSlide" class="bioBank">
 
 {%for contact in node.contacts%}
-{%if contact.role%}
-<h6>{{contact.role}}</h6>
-{%endif%}
+
 <ul>
-  <li><span class="type">{{contact.type}}<br></span> 
+  <li>
   {%if contact.type == "email"%}
-  <a href="mailto:{{contact.contact}}">{{contact.contact}}</a>
+  <span class="type"><i class="fa fa-envelope-o"></i></span> 
+   <a href="mailto:{{contact.contact}}">{{contact.contact}}</a>
   {%elif contact.type == "link" %}
+  <span class="type"><i class="fa fa-link"></i></span> 
   <a href="{{contact.contact}}">{{contact.contact}}</a>
+  {%elif contact.type == "address" %}
+  <span class="type"><i class="fa fa-home"></i></span> {{contact.contact}}
+  {%elif contact.type == "phone"%}
+  <span class="type"><i class="fa fa-phone"></i></span> {{contact.contact}}
   {%else%}
   {{contact.contact}}
   {%endif%}
+  {%if contact.role%}
+  <div class="contact_role">{{contact.role}}</div>
+  {%endif%}
+  
   </li>
   {%if contact.notes%}
   <li class="notes">{{contact.notes}}</li>
   {%endif%}
 </ul>
 
-
-
-
 {%endfor%}
   <div class="change">
-    <a href="{%url 'rolodex_edit_org' node.slug%}">Edit Contacts</a>
+    <a href="{%url 'rolodex_edit_person' node.slug%}"><i class="fa fa-pencil"></i> Add/edit contacts</a>
   </div>
 </div>
 
 
-<div id="relationHead" class="clickable">Relationships</div>
+
+<div id="relationHead" class="clickable"><i class="fa fa-users"></i> Relationships</div>
 <div id="relationSlide" class="bioBank">
-<h6>Organizations</h6>
+
 <div class="relation_container clearfix">
 <div class="relations">
 
@@ -72,8 +86,9 @@
 {%for r in node.relations.orgs%}
 {% spaceless %}
 <div class="rel_O{{r.relation.pk}}">
-<span><a href="{%url 'rolodex_org' r.relation.slug%}">{{r.relation.orgName}}</a></span><br/><div class="relation_type">{{r.type}}</div>
-<div class="relation_delete">Delete this relationship</div><br/>
+<span><a href="{%url 'rolodex_org' r.relation.slug%}"><i class="fa fa-university"></i>  {{r.relation.orgName}}</a> <i class="fa fa-times relation_delete" title="Delete relationship?"></i></span> <br/>
+
+<div class="relation_type">{{r.type}}</div>
 </div>
 <script type="text/javascript">
   $(".rel_O{{r.relation.pk}} .relation_delete").click(function(){
@@ -95,7 +110,7 @@
 
 </div>
 </div>
-<h6>People</h6>
+
 <div class="relation_container clearfix">
 <div class="relations">
 
@@ -103,8 +118,10 @@
 {%for r in node.relations.people%}
 {% spaceless %}
 <div class="rel_P{{r.relation.pk}}">
-<span><a href="{%url 'rolodex_person' r.relation.slug%}">{{r.relation.firstName}} {{r.relation.lastName}}</a></span><br/><div class="relation_type">{{r.type}}{%if r.relation.role%}{%if r.type%} - {%endif%}{{r.relation.role.role}}{%endif%}</div>
-<div class="relation_delete">Delete this relationship</div><br/>
+<span><a href="{%url 'rolodex_person' r.relation.slug%}"><i class="fa fa-user"></i>  {{r.relation.firstName}} {{r.relation.lastName}}</a> <i class="fa fa-times relation_delete" title="Delete relationship?"></i></span> <br/>
+
+<div class="relation_type">{{r.type}}{%if r.relation.role%}{%if r.type%} - {%endif%}{{r.relation.role.role}}{%endif%}</div>
+
 </div>
 <script type="text/javascript">
   $(".rel_P{{r.relation.pk}} .relation_delete").click(function(){
@@ -127,35 +144,30 @@
 </div>
 </div>
   <div class="change">
-    <a href="{%url 'rolodex_new_org_relation' node.slug%}">Add Relationship</a>
+    <a href="{%url 'rolodex_new_org_relation' node.slug%}"><i class="fa fa-user-plus"></i> Add a relationship</a>
   </div>
 </div>
 
-<div id="searchPosition" class="clickable">Search Employees</div>
+<div id="searchPosition" class="clickable"><i class="fa fa-search"></i> Employees</div>
 <div id="peepPosition" class="bioBank">
           <div id="peepDiv" class="searchbox">
         <select id="peepSelect">
             <option value=""></option>
             {%for peep in node.employees%}
-             <option value="{{peep.id}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
+             <option value="{{peep.id}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role|capfirst}}){%endif%}</option>
             {%endfor%}    
         </select>
         <div class="buttonDiv">
-        <a class="goLink" href="">Go</a>
+        <a class="goLink" href=""><i class="fa fa-angle-double-right"></i> <i class="fa fa-user"></i></a>
         </div>
         </div>
-        <div><a href="{%url 'rolodex_new_person' node.slug %}">Add an employee</a></div>
+        <div class="change"><a href="{%url 'rolodex_new_person' node.slug %}"><i class="fa fa-user-plus"></i> Add employee</a></div>
 </div>
 
-{%if node.notes%}
-<div class="entity_notes">
-<h4>Notes</h4>
-{{node.notes|linebreaks}}
-</div>
-{%endif%}
+
 
 <div class="change delete">
-<a href="{%url 'rolodex_delete_org' node.slug%}">Delete {{node.orgName}}?</a>
+<a href="{%url 'rolodex_delete_org' node.slug%}"><i class="fa fa-times"></i> Delete {{node.firstName}}?</a>
 </div>
 
 

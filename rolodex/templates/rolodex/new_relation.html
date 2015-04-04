@@ -57,7 +57,7 @@
 
 
 
-<div class="clickable" id="2Org_select">Organization</div>
+<div class="clickable" id="2Org_select"><i class="fa fa-university"></i> Organization</div>
 <div id="2Org_formDiv" class="relationform">
 {%if orgNode%}
 <form action="/rolodex/add-relationship/org/{{orgNode.slug}}/" method="Post">
@@ -69,9 +69,10 @@
 
 {% csrf_token %}
 
-<input type="hidden" value="2Org" name="formType">
+<input type="hidden" value="2Org" name="formType" class="form-control">
 
 <div id="node2org">
+    <label>Organization</label>
     <select id="orgNode" name="to_ent">
          <option value=""></option>
     {%for org in orgs%}
@@ -79,17 +80,17 @@
     {%endfor%}
     </select>
 </div>
-<div class="type">Type: {{orgForm.relation}}</div>
+<label>Type</label>{{orgForm.relation}}
 {%if orgNode%}
 <div class="instruction">If the relationship has a business hierarchy (e.g., subsidiaries), select whether {{orgNode.orgName}} is parent or child in the relationship. Leave as "none" if it doesn't apply.</div>
 <div class="hierarchy">Heirarchy: {{orgForm.hierarchy}}</div> 
 {%endif%}
-<br><input class="button" type="submit" value="Add Relationship" />
+<button type="submit" class="btn btn-default"><i class="fa fa-user-plus"></i> Add</button>
 </form>
 </div>
 
 
-<div class="clickable" id="2P_select">Person</div>
+<div class="clickable" id="2P_select"><i class="fa fa-user"></i> Person</div>
 <div id="2P_formDiv" class="relationform">
 {%if orgNode%}
 <form action="/rolodex/add-relationship/org/{{orgNode.slug}}/" method="Post">
@@ -99,8 +100,9 @@
 <input type="hidden" value="{{peepNode.pk}}" name="from_ent">
 {%endif%}
 {% csrf_token %}
-<input type="hidden" value="2P" name="formType">
+<input type="hidden" value="2P" name="formType" class="form-control">
 <div id="node2p">
+    <label>Person</label>
 	<select id="personNode" name="to_ent">
         <option value=""></option>
     {%for org in orgs%}
@@ -121,8 +123,9 @@
     </optgroup>
     </select>
 </div>
-<div class="type">Type: {{pForm.relation}}</div>
-<br><input class="button" type="submit" value="Add Relationship" />
+<label>Type</label>{{pForm.relation}}
+<button type="submit" class="btn btn-default"><i class="fa fa-user-plus"></i> Add</button>
+
 </form>
 </div>
 

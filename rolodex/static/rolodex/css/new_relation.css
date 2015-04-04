@@ -1,9 +1,10 @@
 h1,h2,h3,h4,h5{
-	text-align: center;
-	font-family: 'Special Elite';
+	text-align: left;
+	font-family: 'Montserrat', sans-serif;
 }
 h1{
 	font-size: 70px;
+	padding-left: 20px;
 }
 h2{
 	font-size:45px;
@@ -17,11 +18,12 @@ h4{
 	color:#333;
 }
 
-
+.clickable{
+	padding-left:20px;
+}
 .relationform{
-	margin: 0px auto;
-	padding: 0px 5px;
-	max-width: 370px;
+	padding: 0px 5px 0px 20px;
+	max-width: 350px;
 	font-family: 'Raleway',sans-serif;
 }
 .relationform .type select{
@@ -79,7 +81,14 @@ h4{
 	text-align: left;
 }
 
+select#id_relation{
+	width:auto;
+	min-width:125px;
+}
 
+button.btn.btn-default {
+margin-top: 10px;
+}
 
 @media (max-width: 400px) {
 	h1{
@@ -89,6 +98,9 @@ h4{
 	}
 	h4{
 		font-size: 16px;
+	}
+	.relationform{
+		padding-left: 10px;
 	}
 	
 }

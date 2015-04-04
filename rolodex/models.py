@@ -245,8 +245,7 @@ class P2P(models.Model):
 			to_date=self.to_date,
 			description=self.description)
 
-	def delete(self,*args,**kwargs):
-		super(P2P, self).delete(*args, **kwargs)
+	def delete(self):
 		relation = P2P.objects.get_or_none(
 			from_ent=self.to_ent,
 			to_ent=self.from_ent,
@@ -254,8 +253,10 @@ class P2P(models.Model):
 			from_date=self.from_date,
 			to_date=self.to_date,
 			description=self.description)
+		super(P2P, self).delete()
 		if relation:
-			relation.delete();
+			relation.delete()
+		
 
 
 '''
@@ -311,7 +312,6 @@ class Org2Org(models.Model):
 			hierarchy=hierarchy_test(self))
 	
 	def delete(self,*args,**kwargs):
-		super(Org2Org, self).delete(*args, **kwargs)
 		#Enforce Symmetry
 		relation = Org2Org.objects.get_or_none(
 			from_ent=self.to_ent,
@@ -320,6 +320,7 @@ class Org2Org(models.Model):
 			from_date=self.from_date,
 			to_date=self.to_date,
 			description=self.description )
+		super(Org2Org, self).delete(*args, **kwargs)
 		if relation:
 			relation.delete()
 
@@ -353,7 +354,6 @@ class P2Org(models.Model):
 			description=self.description)
 	
 	def delete(self,*args,**kwargs):
-		super(P2Org, self).delete(*args, **kwargs)
 		#Enforce Symmetry
 		relation = Org2P.objects.get_or_none(
 			from_ent=self.to_ent,
@@ -362,6 +362,7 @@ class P2Org(models.Model):
 			from_date=self.from_date,
 			to_date=self.to_date,
 			description=self.description)
+		super(P2Org, self).delete(*args, **kwargs)
 		if relation:
 			relation.delete()
 
@@ -394,7 +395,6 @@ class Org2P(models.Model):
 			description=self.description)
 
 	def delete(self,*args,**kwargs):
-		super(Org2P, self).delete(*args, **kwargs)
 		#Enforce Symmetry
 		relation = P2Org.objects.get_or_none(
 			from_ent=self.to_ent,
@@ -403,6 +403,7 @@ class Org2P(models.Model):
 			from_date=self.from_date,
 			to_date=self.to_date,
 			description=self.description)
+		super(Org2P, self).delete(*args, **kwargs)
 		if relation:
 			relation.delete()
 
@@ -417,10 +418,12 @@ def add_p2p(self, person,symm=True,**kwargs):
         **kwargs)
     return relationship
 def remove_p2p(self, person, symm=True,**kwargs):
-    P2P.objects.filter(
+	relation = P2P.objects.get_or_none(
         from_ent=self, 
         to_ent=person,
-        **kwargs).delete()
+        **kwargs)
+	if relation:
+		relation.delete()
 def add_org2org(self,org,symm=True,**kwargs):
 	relationship = Org2Org.objects.get_or_create(
 		from_ent=self,
@@ -428,10 +431,12 @@ def add_org2org(self,org,symm=True,**kwargs):
 		**kwargs)
 	return relationship
 def remove_org2org(self,org,symm=True,**kwargs):
-	Org2Org.objects.filter(
-		from_ent=self,
-		to_ent=org,
-		**kwargs).delete()
+	relation = Org2Org.objects.get_or_none(
+        from_ent=self, 
+        to_ent=org,
+        **kwargs)
+	if relation:
+		relation.delete()
 def add_p2org(self,org,symm=True,**kwargs):
 	relationship = P2Org.objects.get_or_create(
 		from_ent=self,
@@ -439,10 +444,12 @@ def add_p2org(self,org,symm=True,**kwargs):
 		**kwargs)
 	return relationship
 def remove_p2org(self,org,symm=True,**kwargs):
-	P2Org.objects.filter(
-		from_ent=self,
-		to_ent=org,
-		**kwargs).delete()
+	relation = P2Org.objects.get_or_none(
+        from_ent=self, 
+        to_ent=org,
+        **kwargs)
+	if relation:
+		relation.delete()
 def add_org2p(self,person,symm=True,**kwargs):
 	relationship = Org2P.objects.get_or_create(
 		from_ent=self,
@@ -450,10 +457,12 @@ def add_org2p(self,person,symm=True,**kwargs):
 		**kwargs)
 	return relationship
 def remove_org2p(self,person,symm=True,**kwargs):
-	Org2P.objects.filter(
-		from_ent=self,
-		to_ent=person,
-		**kwargs).delete()
+	relation = Org2P.objects.get_or_none(
+        from_ent=self, 
+        to_ent=person,
+        **kwargs)
+	if relation:
+		relation.delete()
 
 
 ##################

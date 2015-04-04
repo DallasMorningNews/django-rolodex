@@ -2,7 +2,7 @@
 {%load staticfiles%}
 {%block head%}
 <script src="{% static 'rolodex/js/selectize.min.js' %}"></script>
-<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/selectize.css'%}">
+
 <link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/home.css'%}">
 
 {%endblock%}
@@ -24,49 +24,11 @@
 
 <div id="selectors">
 
-    <div id="searchPerson" class="clickable">Search People</div>
-        <div id="peepDiv" class="searchbox">
-        <select id="peepSelect">
-            <option value=""></option>
-        {%for org in orgs%}
-        <optgroup label="{{org.orgName}}">
-            {%for peep in peeps%}
-            {%if peep.orgID == org.pk%}
-                <option value="{{peep.pk}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
-            {%endif%}
-            {%endfor%}    
-        </optgroup>
-        {%endfor%}
-        <optgroup label="N/A">
-            {%for peep in peeps%}
-            {%if peep.orgName == 'N/A'%}
-                <option value="{{peep.pk}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
-            {%endif%}
-            {%endfor%}
-        </optgroup>
-        </select>
-        <div class="buttonDiv">
-        <a class="goLink" href="">Go</a>
-        </div>
-        </div>
 
-    <div id="searchOrg" class="clickable">Search Orgs</div>
-        <div id="orgDiv" class="searchbox">
-        <select id="orgSelect">
-             <option value=""></option>
-        {%for org in orgs%}
-            <option value="{{org.pk}}">{{org.orgName}}</option>
-        {%endfor%}
-        </select>
-        <div class="buttonDiv">
-        <a class="goLink" href="">Go</a>
-        
-        </div>
-        </div>
 
-    <div id="addPerson" class="clickable">Add a Person</div>
+    <div id="addPerson" class="clickable"><i class="fa fa-plus-square"></i> Add a Person</div>
         <div id="orgDiv2" class="searchbox">
-         <h4>First choose the primary organization the person belongs to.</h4>
+         <div class="instruct">First choose the primary organization the person belongs to.</div>
         <select id="orgSelect2">
              <option value=""></option>
         {%for org in orgs%}
@@ -74,78 +36,48 @@
         {%endfor%}
         </select>
         <div class="buttonDiv">
-        <a class="goLink" href="">Go</a>
+        <a class="goLink" href=""><i class="fa fa-user-plus"></i></a>
         <a class="addLink" href="{%url 'rolodex_new_org'%}">Not listed? Add a new Org.</a>
         </div>
         </div>
 
-    <a class="noUnderline"href="{%url 'rolodex_new_org'%}"><div id="addPerson" class="clickable">Add an Org</div></a>
+    <a class="noUnderline"href="{%url 'rolodex_new_org'%}"><div id="addPerson" class="clickable"><i class="fa fa-plus-square"></i> Add an Org</div></a>
 
 </div>
 
 
 </div>
 
-<div class="creditText">Rolodex was produced at</div>
+<div class="creditText">Rolodex was developed at</div>
 <img class="dmnLogo" src="{%static 'rolodex/images/dmnlogo.jpg'%}">
 
 <script>
-var NewOrgDict = {},SearchOrgDict={},PeepDict={};
-{%for org in orgs%}
-NewOrgDict['{{org.pk}}']="{% url 'rolodex_new_person' org.slug%}";
-SearchOrgDict['{{org.pk}}']="{% url 'rolodex_org' org.slug%}";
-{%endfor%}
-{%for peep in peeps%}
-PeepDict['{{peep.pk}}']="{%url 'rolodex_person' peep.slug%}";
-{%endfor%}
+var NewOrgDict = {};
+{%spaceless%}
+{%for org in orgs%}NewOrgDict['{{org.pk}}']="{% url 'rolodex_new_person' org.slug%}";{%endfor%}
+{%endspaceless%}
 
 
-var $orgSelect = $('#orgSelect').selectize({
-    placeholder: 'Search organizations...',
-    maxOptions:10,
-    selectOnTab:true,
-    onChange: function(value){
-        var option =SearchOrgDict[$("#orgSelect").find(':selected').val()]; 
-        $("#orgDiv .goLink").attr("href",option);
-    },
-});
 var $orgSelect2 = $('#orgSelect2').selectize({
     placeholder: 'Search organizations...',
     maxOptions:10,
     selectOnTab:true,
     onChange: function(value){
-        var option =NewOrgDict[$("#orgSelect2").find(':selected').val()]; 
+        var option =NewOrgDict[$("#orgSelect2").val()]; 
         $("#orgDiv2 .goLink").attr("href",option);
     },
 });
-var $peepSelect = $('#peepSelect').selectize({
-    placeholder: 'Search people...',
-    maxOptions:10,
-    optgroupLabelField:'org',
-    optgroupValueField:'org',
-    selectOnTab:true,
-    searchField:['org','text'],
-    onChange: function(value){
-        var option =PeepDict[$("#peepSelect").find(':selected').val()]; 
-        $("#peepDiv .goLink").attr("href",option);
-    },
-});
 
-var orgSelect  = $orgSelect[0].selectize,
-    orgSelect2 = $orgSelect2[0].selectize,
-    peepSelect = $peepSelect[0].selectize;
+
+
+var orgSelect2 = $orgSelect2[0].selectize;
+
+
+
 
 $(".searchbox").hide();
 $(document).ready(function(){
 
-    $("#searchPerson").click(function(){
-        $(".searchbox").hide("slow");
-        $("#peepDiv").slideToggle("slow");
-    });
-    $("#searchOrg").click(function(){
-        $(".searchbox").hide("slow");
-        $("#orgDiv").slideToggle("slow");
-    });
     $("#addPerson").click(function(){
         $(".searchbox").hide("slow");
         $("#orgDiv2").slideToggle("slow");
