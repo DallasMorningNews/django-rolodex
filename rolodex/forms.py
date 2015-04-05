@@ -65,4 +65,5 @@ class Org2OrgForm(ModelForm):
 	class Meta:
 		model = Org2Org
 		fields = ['from_ent','to_ent','relation','from_date','to_date','hierarchy','description']
-		widgets = {'relation': forms.Select(attrs={'class': 'form-control'}),}
+		widgets = {'relation': forms.Select(attrs={'class': 'form-control'}),
+					'hierarchy':forms.Select(attrs={'class':'form-control'})}

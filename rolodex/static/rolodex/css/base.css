@@ -84,6 +84,7 @@ h1,h2,h3,h4,h5{
 }
 #stickyNav a#searchNav {
 	color:#fff;
+	font-family: 'Montserrat', sans-serif;
 }
 #stickyNav a#searchNav:hover{
 	color:#36788e;
@@ -279,6 +280,16 @@ h1,h2,h3,h4,h5{
 	font-style: normal;
 }
 
+
+#search-modal .modal-body{
+	padding-bottom: 7px;
+}
+
+#search-modal a.goLink{
+	margin-top: 5px;
+	width:80px;
+}
+
 .switch-candy{
 	background-color: lightgrey;
 	text-shadow:none;
@@ -316,6 +327,9 @@ div.optgroup .option{
 @media (max-width:540px){
 	.clickable{
 		padding-left:25px;
+	}
+	#stickyNav a#searchNav span{
+		display:none;
 	}
 }
 

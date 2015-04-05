@@ -2,6 +2,26 @@
 <html class="no-js"> 
     <head>
     {%load staticfiles%}
+
+    <link rel="apple-touch-icon" sizes="57x57"         href="{% static 'rolodex/images/favicon/apple-icon-57x57.png'%}">
+    <link rel="apple-touch-icon" sizes="60x60"         href="{% static 'rolodex/images/favicon/apple-icon-60x60.png'%}">
+    <link rel="apple-touch-icon" sizes="72x72"         href="{% static 'rolodex/images/favicon/apple-icon-72x72.png'%}">
+    <link rel="apple-touch-icon" sizes="76x76"         href="{% static 'rolodex/images/favicon/apple-icon-76x76.png'%}">
+    <link rel="apple-touch-icon" sizes="114x114"       href="{% static 'rolodex/images/favicon/apple-icon-114x114.png'%}">
+    <link rel="apple-touch-icon" sizes="120x120"       href="{% static 'rolodex/images/favicon/apple-icon-120x120.png'%}">
+    <link rel="apple-touch-icon" sizes="144x144"       href="{% static 'rolodex/images/favicon/apple-icon-144x144.png'%}">
+    <link rel="apple-touch-icon" sizes="152x152"       href="{% static 'rolodex/images/favicon/apple-icon-152x152.png'%}">
+    <link rel="apple-touch-icon" sizes="180x180"       href="{% static 'rolodex/images/favicon/apple-icon-180x180.png'%}">
+    <link rel="icon" type="image/png" sizes="192x192"  href="{% static 'rolodex/images/favicon/android-icon-192x192.png'%}">
+    <link rel="icon" type="image/png" sizes="32x32"    href="{% static 'rolodex/images/favicon/favicon-32x32.png'%}">
+    <link rel="icon" type="image/png" sizes="96x96"    href="{% static 'rolodex/images/favicon/favicon-96x96.png'%}">
+    <link rel="icon" type="image/png" sizes="16x16"    href="{% static 'rolodex/images/favicon/favicon-16x16.png'%}">
+    <link rel="manifest" href="{% static 'rolodex/images/favicon/manifest.json'%}">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
+
+
+
     <script src="{% static 'rolodex/js/jquery-1.11.1.min.js'%}"></script>
     <script src="{% static 'rolodex/js/jquery-ui.min.js' %}"></script>
     <script src="{%static 'rolodex/js/jquery.formset.min.js'%}"></script>
@@ -20,7 +40,7 @@
     {%endblock%}
     <script src="{% static 'rolodex/js/selectize.min.js' %}"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/selectize.css'%}">
-    
+
     <title>Rolodex</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -31,7 +51,7 @@
 <div id="stickyNav">
 	<img src="{%static 'rolodex/images/card.png'%}">
 	<a href="{% url 'rolodex_home' %}">Rolodex</a>
-    <a id="searchNav"><i class="fa fa-search"></i></a>
+    <a id="searchNav"><i class="fa fa-search"></i> <span>Search</span></a>
 </div>
 {%endblock%}
 
@@ -131,7 +151,6 @@
             searchField:['org','text'],
             onChange: function(value){
                 var option =modalPeepDict[$("#modal-peepSelect").val()]; 
-                console.log(option);
                 $("#modal-peopleDiv .goLink").attr("href",option);
             },
         });
