@@ -4,14 +4,16 @@
 Rolodex
 =======
 
+<img align="right" src="screenshot2.png">
+
 Rolodex is a directory of people and the organizations they belong to. It's also a space where you can model relationships.
 
 
-####An example rolodex [here](http://django-rolodex.herokuapp.com/rolodex/)*.
+####An [example rolodex](http://django-rolodex.herokuapp.com/rolodex/).*
 
 *Network data by [moviegalaxies.com](http://moviegalaxies.com/movies/356-The-Godfather:-Part-II).
 
-<img align="right" src="screenshot2.png">
+
 
 At _The News_ we use Rolodex as a drop-in backend for projects that require us to manage networks of related people and organizations. We also maintain our contacts with it on a dedicated app.
 
