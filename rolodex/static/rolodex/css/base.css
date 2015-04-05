@@ -270,9 +270,13 @@ h1,h2,h3,h4,h5{
 #search-modal{
 	margin-top: 42px;
 }
+#search-modal .modal-dialog{
+	max-width:500px;
+}
 #search-modal .modal-title{
 	line-height: 1;
 	font-family:'Audiowide',sans-serif;
+	font-style: normal;
 }
 
 .switch-candy{
