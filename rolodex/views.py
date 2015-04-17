@@ -50,6 +50,8 @@ def new_org(request):
 		form = OrgForm(request.POST)
 		if form.is_valid():
 			org = form.save()
+			org.last_edited_by = user_check(request.user)
+			org.save()
 			formset = OrgFormSet(request.POST,instance=org)
 			if formset.is_valid():
 				formset.save()
@@ -73,6 +75,8 @@ def edit_org(request,org_slug):
 			formset = OrgFormSet(request.POST,instance=org)
 			if formset.is_valid():
 				formset.save()
+				orgNODE.last_edited_by = user_check(request.user)
+				orgNODE.save()
 				return redirect('rolodex_org',org.slug)
 
 	return render_to_response('rolodex/new_org.html',{'form':form,'formset':formset,'orgNode':orgNODE,'edit':True},context_instance=RequestContext(request))
@@ -151,7 +155,7 @@ def new_org_relation(request,org_slug):
 ######################
 
 @secure
-def new_person(request, org_slug): 
+def new_person(request, org_slug=None): 
 	form=PersonForm()
 	formset=PersonFormSet(instance=Person())
 	success = False
@@ -159,6 +163,7 @@ def new_person(request, org_slug):
 		form = PersonForm(request.POST) 
 		if form.is_valid():
 			person = form.save()
+			person.last_edited_by = user_check(request.user)
 			formset = PersonFormSet(request.POST,instance=person)
 			if formset.is_valid():
 				formset.save()
@@ -174,11 +179,39 @@ def new_person(request, org_slug):
 			else:
 				person.delete()
 				form = PersonForm(request.POST)
-
+	
 	primary = Org.objects.get(slug=org_slug)
 	orgs = Org.objects.all()
 	tags = Tag.objects.all()
 	return render_to_response('rolodex/new_person.html',{'form':form,'formset':formset,'orgNode':org_slug,'orgs':orgs,'tags':tags,'primary':primary,'success':success},context_instance=RequestContext(request))
+
+@secure
+def new_person_no_org(request, org_slug=None): 
+	form=PersonForm()
+	formset=PersonFormSet(instance=Person())
+	success = False
+	if request.method == "POST":
+		form = PersonForm(request.POST)
+		if form.is_valid():
+			person = form.save()
+			person.last_edited_by = user_check(request.user)
+			formset = PersonFormSet(request.POST,instance=person)
+			if formset.is_valid():
+				formset.save()
+
+				person.save()
+
+				form=PersonForm()
+				formset=PersonFormSet(instance=Person())
+				success = True
+			else:
+				person.delete()
+				form = PersonForm(request.POST)
+	
+	orgs = Org.objects.all()
+	tags = Tag.objects.all()
+	return render_to_response('rolodex/new_person.html',{'form':form,'formset':formset,'orgNode':org_slug,'orgs':orgs,'tags':tags,'primary':None,'success':success},context_instance=RequestContext(request))
+
 
 @secure
 def edit_person(request, person_slug):
@@ -194,6 +227,8 @@ def edit_person(request, person_slug):
 			formset = PersonFormSet(request.POST, instance=person)
 			if formset.is_valid():
 				formset.save()
+				person.last_edited_by = user_check(request.user)
+				person.save()
 				return redirect('rolodex_person',person.slug)
 	
 	employer = peep.org_from_p.filter(relation=EMPLOYMENT)
@@ -404,3 +439,9 @@ def adv_compile(node, hops):
 						'betweenness':betweenness[node],
 						'closeness':closeness[node]}
 	return data
+
+def user_check(user):
+	if user.is_authenticated():
+		return user.get_username()
+	else:
+		return "AnonymousUser"

@@ -41,7 +41,7 @@ OrgFormSet = inlineformset_factory(Org,Contact,extra=1,can_delete=True,
 		  'contact': forms.TextInput(attrs={'class':'form-control','placeholder':'Enter contact'}),
           'notes': forms.Textarea(attrs={'rows':5, 'cols':35, 'class':'form-control','placeholder':'Notes'}),
           'type': forms.Select(attrs={'class':'form-control'}),
-          'role': forms.Select(attrs={'class':'form-control'}),
+          'role': forms.Select(attrs={'class':'form-control role'}),
         })
 ########################
 ## Relationship Forms ##

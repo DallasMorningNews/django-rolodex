@@ -11,6 +11,7 @@ urlpatterns = patterns('',
 
     #Entity maintenance
     url(r'^add-person/(.+)/$',views.new_person,name='rolodex_new_person'),
+    url(r'^add-person/$',views.new_person_no_org,name='rolodex_new_person_no_org'),
     url(r'^edit-person/(.+)/$',views.edit_person,name='rolodex_edit_person'),
     url(r'^delete-person/(.+)/$',views.delete_person,name='rolodex_delete_person'),
     url(r'^add-org/$',views.new_org,name='rolodex_new_org'),

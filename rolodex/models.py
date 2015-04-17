@@ -182,6 +182,8 @@ class Person(models.Model):
 
 	notes = models.TextField(blank=True, null=True)
 
+	last_edited_by = models.CharField(max_length=250,blank=True,null=True)
+
 	#2.0 feature
 	tags = models.ManyToManyField(Tag,blank=True)
 
@@ -201,6 +203,8 @@ class Org(models.Model):
 	p_relations = models.ManyToManyField('Person',through="Org2P",related_name='orgs',blank=True)
 	
 	notes = models.TextField(blank=True, null=True)
+
+	last_edited_by = models.CharField(max_length=250,blank=True,null=True)
 
 	#2.0 feature
 	tags = models.ManyToManyField(Tag,blank=True)

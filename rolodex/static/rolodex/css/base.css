@@ -273,6 +273,7 @@ h1,h2,h3,h4,h5{
 }
 #search-modal .modal-dialog{
 	max-width:500px;
+	margin-top: 3px;
 }
 #search-modal .modal-title{
 	line-height: 1;
@@ -288,6 +289,10 @@ h1,h2,h3,h4,h5{
 #search-modal a.goLink{
 	margin-top: 5px;
 	width:80px;
+}
+
+#search-modal .modal-header{
+	padding: 5px 15px;
 }
 
 .switch-candy{
@@ -322,6 +327,10 @@ div.optgroup .option{
 	padding-left: 20px;
 }
 
+
+.bioBank .change a {
+	margin-left: -20px;
+}
 
 
 @media (max-width:540px){

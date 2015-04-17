@@ -86,11 +86,11 @@
                 {{ form.person }}
                 {{ form.org }}
                 <ul class="contact">
-                    <li class="required">{{ form.type }}</li>
-                    <li class="required">{{ form.contact }}</li>
+                    <li class="required">Type{{ form.type }}</li>
+                    <li class="required">Contact{{ form.contact }}</li>
                     <li><label>Role</label> {{form.role}}</li>
                     <li class="notes">{{ form.notes }}</li>
-                    <li class="delete">Check to delete this contact:{{form.DELETE}}</li>
+                    <li class="delete clearfix"><label>{{form.DELETE}}Delete <i class="fa fa-times"></i></label></li>
                 </ul>
 
             </div>
@@ -120,11 +120,11 @@
                 {{ formset.empty_form.person }}
                 {{ formset.empty_form.org }}
                 <ul class="contact">
-                    <li class="required">{{ formset.empty_form.type }}</li>
-                    <li class="required">{{ formset.empty_form.contact }}</li>
+                    <li class="required">Type{{ formset.empty_form.type }}</li>
+                    <li class="required">Contact{{ formset.empty_form.contact }}</li>
                     <li><label>Role</label> {{formset.empty_form.role}}</li>
                     <li class="notes">{{ formset.empty_form.notes }}</li>
-                    <li class="delete">Check to delete this contact:{{formset.empty_form.DELETE}}</li>
+                    <li class="delete clearfix"><label>{{formset.empty_form.DELETE}}Delete <i class="fa fa-times"></i></label></li>
 
                 </ul>
 
@@ -134,7 +134,9 @@
     </script>
 
     <!-- This button will add a new form when clicked -->
-    <input class="add btn btn-default" type="button" value="Add a contact" data-formset-add>
+    <div id="addContact">
+    <a data-formset-add><i class="fa fa-plus" ></i> Contact</a>
+    </div>
 
 <script>jQuery(function($) {
     $("#formset").formset({
@@ -148,9 +150,9 @@
 
 <div class="form-actions">
 {% if edit %}
-    <button type="submit" class="btn btn-primary add-btn"><i class="fa fa-check"></i> Update Organization</button>
+    <button type="submit" class="btn btn-primary add-btn"><i class="fa fa-check"></i> Update Org</button>
 {% else %}
-    <button type="submit" class="btn btn-primary add-btn"><i class="fa fa-plus"></i> Add Organization</button>
+    <button type="submit" class="btn btn-primary add-btn"><i class="fa fa-plus"></i> Add Org</button>
 {% endif %}
 </div>
 

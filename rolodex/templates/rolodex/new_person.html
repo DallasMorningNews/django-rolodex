@@ -29,8 +29,10 @@
 
 {% if edit %}
 <form action="/rolodex/edit-person/{{personNode.slug}}/" method="Post">
-{% else %}
+{% elif orgNode %}
 <form action="/rolodex/add-person/{{orgNode}}/" method="Post">
+{%else%}
+<form action="/rolodex/add-person/" method="Post">
 {% endif %}
 
 {%csrf_token%}
@@ -55,8 +57,16 @@
 {% endif %}
 <ul>
     <li class="title">Personal</li>
-    <li class="required">{{form.lastName}}</li>
+    <div>
+    <div class="floatLeft">
+    <li><label>First Name</label></li>
     <li class="required">{{form.firstName}} </li>
+    </div>
+    <div>
+    <li><label>Last name</label></li>
+    <li class="required">{{form.lastName}}</li>
+    </div>
+    </div>
     <li><label>Gender</label></li>
     <li>{{form.gender}}</li>
 </ul>
@@ -64,11 +74,17 @@
 <div class="professional addform">
     <ul>
         <li class="title">Professional</li>
-        <li class="primary">@ {{primary.orgName}}</li>
+        {%if primary%}<li class="primary">@ {{primary.orgName}}</li>{%endif%}
         <li><label>Role</label> {{form.role}}</li>
+
+        <div>
+        <div class="floatLeft">
         <li><label>Position</label> {{form.position}}</li>
-        
+        </div>
+        <div>
         <li><label>Department*</label> {{form.department}}</li>
+        </div>
+        </div>
         <li class="instruction">Pro-tip: Consider whether a department should be its own org, linked to a parent org.</li>
         <li class="title"><label>Notes</label></li>
         <li class="entity_notes">{{form.notes}}</li>
@@ -106,10 +122,10 @@
                 {{ form.person }}
                 {{ form.org }}
                 <ul class="contact">
-                    <li class="required">{{ form.type }}</li>
-                    <li class="required">{{ form.contact }}</li>
+                    <li class="required">Type{{ form.type }}</li>
+                    <li class="required">Contact{{ form.contact }}</li>
                     <li class="notes">{{ form.notes }}</li>
-                    <li class="delete">Check to delete this contact: {{form.DELETE}}</li>
+                    <li class="delete clearfix"><label>{{form.DELETE}}Delete <i class="fa fa-times"></i></label></li>
                 </ul>
 
             </div>
@@ -138,10 +154,10 @@
                 {{ formset.empty_form.person }}
                 {{ formset.empty_form.org }}
                 <ul class="contact">
-                    <li class="required">{{ formset.empty_form.type }}</li>
-                    <li class="required">{{ formset.empty_form.contact }}</li>
+                    <li class="required">Type{{ formset.empty_form.type }}</li>
+                    <li class="required">Contact{{ formset.empty_form.contact }}</li>
                     <li class="notes">{{ formset.empty_form.notes }}</li>
-                    <li class="delete">Check to delete this contact: {{formset.empty_form.DELETE}}</li>
+                    <li class="delete clearfix"><label>{{formset.empty_form.DELETE}}Delete <i class="fa fa-times"></i></label></li>
 
                 </ul>
 
@@ -150,8 +166,10 @@
         {% endescapescript %}
     </script>
 
-    <!-- This button will add a new form when clicked -->
-    <input class="add btn btn-default" type="button" value="Add a contact" data-formset-add>
+    <div id="addContact">
+    <a data-formset-add><i class="fa fa-plus" ></i> Contact</a>
+    </div>
+
 
 <script>jQuery(function($) {
     $("#formset").formset({
