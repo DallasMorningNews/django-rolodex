@@ -30,6 +30,7 @@ class PersonForm(ModelForm):
 				}
 
 PersonFormSet = inlineformset_factory(Person,Contact,extra=1,can_delete=True,
+	exclude=(),
 	widgets = {
 		  'contact': forms.TextInput(attrs={'class':'form-control','placeholder':'Enter contact'}),
           'notes': forms.Textarea(attrs={'rows':5, 'cols':35, 'class':'form-control','placeholder':'Notes'}),
@@ -37,6 +38,7 @@ PersonFormSet = inlineformset_factory(Person,Contact,extra=1,can_delete=True,
         })
 
 OrgFormSet = inlineformset_factory(Org,Contact,extra=1,can_delete=True,
+	exclude=(),
 	widgets = {
 		  'contact': forms.TextInput(attrs={'class':'form-control','placeholder':'Enter contact'}),
           'notes': forms.Textarea(attrs={'rows':5, 'cols':35, 'class':'form-control','placeholder':'Notes'}),
