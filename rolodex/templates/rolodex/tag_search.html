@@ -1,0 +1,73 @@
+{%extends "rolodex/base.html" %}
+{%load staticfiles%}
+{%block head%}
+
+
+<script src="{% static 'rolodex/js/selectize.min.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/selectize.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/home.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/new_relation.css' %}">
+
+{%endblock%}
+
+{%block content%}
+<div id="midrail">
+
+<h2><i class="fa fa-tag"></i>{{tag.name}}</h2>  
+
+
+<div class="input-group">
+  <input id="searchTags" name="tagInput" type="text" class="form-control" placeholder="Search another tag">
+  <span class="input-group-btn">
+    <button id="search" class="btn btn-default" type="button" style="margin-top:0px;">Search</button>
+  </span>
+</div>
+
+<br>
+
+
+<div class="relation_container clearfix">
+<div class="relations">
+
+{%for org in tag.orgs%}
+
+<span style="font-size:18px;"><a href="{%url 'rolodex_org' org.slug%}"><i class="fa fa-university"></i>  {{org.orgName}}</a></span> <br/>
+{%endfor%}
+
+{%for peep in tag.peeps%}
+
+<span style="font-size:18px;"><a href="{%url 'rolodex_person' peep.slug%}"><i class="fa fa-user"></i>  {{peep.firstName}} {{peep.lastName}}</a></span> <br/>
+{%endfor%}
+
+</div>
+</div>
+
+</div>
+
+<script type="text/javascript">
+$(function() {
+  
+  var availableTags = [{%for t in tag.all_tags%}"{{t.name}}",{%endfor%}];
+  $( "#searchTags" ).autocomplete({
+    source: availableTags
+  });
+
+
+  $("#search").click(function(){
+    var redirect = "{%url 'rolodex_search_tag' 'foobar'%}".replace("foobar", encodeURIComponent($("#searchTags").val()));
+    window.location.href = redirect;
+  })
+
+
+})
+</script>
+
+
+
+<div class="breadcrumb-container">
+<ul class="breadcrumb">
+	<li><a href="{% url 'rolodex_home' %}">Home</a></li>
+	<li><a>Tag search</a></li>
+</ul>
+</div>
+{%endblock%}

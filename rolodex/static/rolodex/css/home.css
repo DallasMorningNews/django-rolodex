@@ -29,3 +29,8 @@ a.noUnderline:hover{
 h4{
 	font
 }
+
+.ui-menu .ui-menu-item a{
+	border: 1px solid #ddd !important;
+    background: #eee !important;
+}

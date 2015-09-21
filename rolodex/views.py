@@ -2,14 +2,16 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import redirect, render, render_to_response, HttpResponseRedirect,get_object_or_404
 from django.template import RequestContext
 from django.http import HttpResponse
-from rolodex.models import Tag,Org,Person,P2P,Org2Org,P2Org,Org2P,P2Org_Type,P2P_Type,Org2Org_Type
-from rolodex.forms import OrgForm,OrgFormSet,PersonForm,PersonFormSet,P2PForm,Org2OrgForm,P2OrgForm,Org2PForm
+from rolodex.models import Org,Person,P2P,Org2Org,P2Org,Org2P,P2Org_Type,P2P_Type,Org2Org_Type,SearchLog,Document
+from rolodex.forms import OrgForm,OrgFormSet,PersonForm,PersonFormSet,P2PForm,Org2OrgForm,P2OrgForm,Org2PForm,DocumentForm
 from datetime import datetime as dt
+from datetime import date, timedelta
 from operator import attrgetter
 from django.db.models import Q
 from itertools import chain
 import json
 from django.conf import settings
+from taggit.models import Tag
 import networkx as nx
 import pdb
 
@@ -18,6 +20,9 @@ Employment is the only required fixture.
 '''
 #using first right now to get around a testing bug where there seems to be a conflict on get between fixtures
 EMPLOYMENT = P2Org_Type.objects.filter(relationship_type='employment').first()
+
+#timedelta for search activity calendar
+minus_time = timedelta(days=-365/2)
 
 
 def secure(view):
@@ -96,6 +101,13 @@ def search_org(request,org_slug):
 	node.contacts = node.org_contact.all()
 	node.relations = node.get_relations_with_type()
 	node.net_length = len(net_compiler(Org.objects.filter(slug=org_slug),3))
+	#log the search
+	logger(user=request.user,org=node)
+	searches = SearchLog.objects.filter(org=node,datestamp__gt=date.today() - timedelta(days=365)).order_by('-datestamp')
+	node.searches = [{'date':s.datestamp.strftime("%Y-%m-%d"),'user':s.user} for s in searches]
+	node.calendar = json.dumps(node.searches)
+	node.documents = Document.objects.filter(org=node)
+	node.tags = node.tags.all()
 	return render_to_response('rolodex/org.html',{'node':node,},context_instance=RequestContext(request))
 
 @secure
@@ -148,6 +160,20 @@ def new_org_relation(request,org_slug):
 	peeps = org_relate_peep(peeps)
 	orgNode = Org.objects.get(slug=org_slug)
 	return render_to_response('rolodex/new_relation.html',{'orgNode':orgNode ,'pForm':org2pForm,'orgForm':org2orgForm,'saved':saved,'peeps':peeps,'orgs':orgs},context_instance=RequestContext(request))
+
+@secure
+def new_org_doc(request,org_slug=None):
+	if request.method == "POST":
+		docForm = DocumentForm(request.POST, request.FILES)
+		if docForm.is_valid():
+			docForm.save()
+			return redirect('rolodex_org',org_slug)
+		else:
+			node = Person.objects.get(pk=request.POST['org'])
+	else:
+		node = Org.objects.get(slug=org_slug)
+		docForm = DocumentForm(initial={'org': node})
+	return render_to_response('rolodex/new_doc.html',{'node':node,'entity':'org','docForm':docForm},context_instance=RequestContext(request))
 
 
 ############################################################################
@@ -259,7 +285,15 @@ def search_person(request,person_slug):
 	node.contacts = node.person_contact.all()
 	node.relations = node.get_relations_with_type()
 	node.net_length = len(net_compiler(Person.objects.filter(slug=person_slug),3))
-	return render_to_response('rolodex/person.html',{'node':node,},context_instance=RequestContext(request))
+	#log the search
+	logger(user=request.user,person=node)
+	searches = SearchLog.objects.filter(person=node,datestamp__gt=date.today() - timedelta(days=365)).order_by('-datestamp')
+	node.searches = [{'date':s.datestamp.strftime("%Y-%m-%d"),'user':s.user} for s in searches]
+	node.calendar = json.dumps(node.searches)
+	node.documents = Document.objects.filter(person=node)
+	node.tags = node.tags.all()
+	tags = Tag.objects.all()
+	return render_to_response('rolodex/person.html',{'node':node,'tags':tags,},context_instance=RequestContext(request))
 
 @secure
 def person_map(request,person_slug):
@@ -316,7 +350,20 @@ def new_person_relation(request,person_slug):
 	peepNode = Person.objects.get(slug=person_slug)
 	return render_to_response('rolodex/new_relation.html',{'peepNode':peepNode,'pForm':p2pForm,'orgForm':p2orgForm,'saved':saved,'peeps':peeps,'orgs':orgs},context_instance=RequestContext(request))
 
-
+@secure
+def new_person_doc(request,person_slug=None):
+	if request.method == "POST":
+		print(request.FILES)
+		docForm = DocumentForm(request.POST, request.FILES)
+		if docForm.is_valid():
+			docForm.save()
+			return redirect('rolodex_person',person_slug)
+		else:
+			node = Person.objects.get(pk=request.POST['person'])
+	else:
+		node = Person.objects.get(slug=person_slug)
+		docForm = DocumentForm(initial={'person': node})
+	return render_to_response('rolodex/new_doc.html',{'node':node,'entity':'person','docForm':docForm},context_instance=RequestContext(request))
 
 @secure
 def delete_relationship(request):
@@ -345,6 +392,44 @@ def delete_relationship(request):
 	return HttpResponse("Done.")
 
 
+@secure
+def delete_doc(request):
+	if request.POST:
+		doc = Document.objects.get(pk=request.POST['id'])
+		doc.delete()
+		return HttpResponse("Done.")
+
+
+@secure
+def add_tag(request):
+	if request.POST:
+		if request.POST['entity'] == 'person':
+			p = Person.objects.get(pk=request.POST['pk'])
+			p.tags.add(request.POST['tag'])
+		else:
+			o = Org.objects.get(pk=request.POST['pk'])
+			o.tags.add(request.POST['tag'])
+		return HttpResponse("Done.")
+
+@secure
+def remove_tag(request):
+	if request.POST:
+		if request.POST['entity'] == 'person':
+			p = Person.objects.get(pk=request.POST['pk'])
+			p.tags.remove(request.POST['tag'])
+		else:
+			o = Org.objects.get(pk=request.POST['pk'])
+			o.tags.remove(request.POST['tag'])
+		return HttpResponse("Done.")
+
+@secure
+def search_tag(request, tag_name=None):
+	tag = {}
+	tag['name'] = tag_name
+	tag['peeps'] = Person.objects.filter(tags__name=tag_name)
+	tag['orgs'] = Org.objects.filter(tags__name=tag_name)
+	tag['all_tags'] = Tag.objects.all()
+	return render_to_response('rolodex/tag_search.html',{'tag':tag,},context_instance=RequestContext(request))
 
 #################################################################
 ##### GRAPH HELPER FUNCTIONS ######
@@ -445,3 +530,13 @@ def user_check(user):
 		return user.get_username()
 	else:
 		return "AnonymousUser"
+
+def logger(user,person=None,org=None):
+	user = user_check(user)
+	if person:
+		if not SearchLog.objects.filter(person=person,user=user,datestamp=date.today()).exists():
+			SearchLog.objects.create(person=person,user=user)
+	if org:
+		if not SearchLog.objects.filter(org=org,user=user,datestamp=date.today()).exists():
+			SearchLog.objects.create(org=org,user=user)
+

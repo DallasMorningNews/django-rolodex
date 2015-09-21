@@ -1,5 +1,6 @@
 {%extends "rolodex/base.html" %}
 {%load staticfiles%}
+{% load rolodex_tags %}
 {%block head%}
 
 <script src="{% static 'rolodex/js/selectize.min.js' %}"></script>
@@ -165,6 +166,57 @@
 </div>
 
 
+<div id="docHead" class="clickable"><i class="fa fa-files-o"></i> Documents</div>
+<div id="docSlide" class="bioBank">
+
+<ul id="docList">
+{% for doc in node.documents %}
+{%if doc.link%}
+  <li><a href="{{doc.link}}" target="_blank"><i class="fa fa-link"></i> {{doc.link|truncatechars:25}}</a> <i class="fa fa-times doc_delete" data-id="{{doc.pk}}" title="Delete document?"></i></span></li>
+{%else%}
+  <li><a href="{{doc.doc.path}}" target="_blank"><i class="fa fa-file-o"></i> {{doc.doc.path|fileBaseName}}</a> <i class="fa fa-times doc_delete" data-id="{{doc.pk}}" title="Delete document?"></i></li>
+{%endif%}
+  <li class="notes">{{doc.notes}}</li>
+{%endfor%}
+</ul>
+
+<script type="text/javascript">
+  $(".doc_delete").click(function(){
+      $(this).parent().next("li").slideUp("slow");
+      $(this).parent().slideUp("slow");
+      $.post("{%url 'rolodex_delete_doc'%}",
+          {
+            id:$(this).data("id"),
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+          }
+      );
+  });
+</script>
+
+  <div class="change">
+    <a href="{%url 'rolodex_new_org_doc' node.slug%}"><i class="fa fa-plus"></i> Add docs</a>
+  </div>
+
+</div>
+
+
+
+<div id="logHead" class="clickable"><i class="fa fa-book"></i> Search log</div>
+<div id="logSlide" class="bioBank">
+<div id="SearchCalendar"></div>
+<ul>
+{%for search in node.searches%}
+<li>{{search.date}} - {{search.user}}</li>
+{%endfor%}
+</ul>
+</div>
+
+<script src="{%static 'rolodex/js/logCal.js'%}"></script>
+<script type="text/javascript">
+  var calData =JSON.parse('{{node.calendar|safe}}');
+  calDraw(calData);
+</script>
+
 
 <div class="change delete">
 Last edited by: {{node.last_edited_by}}<br>
@@ -180,6 +232,8 @@ Last edited by: {{node.last_edited_by}}<br>
 
   $("#contactHead").click(function(){$("#contactSlide").slideToggle("slow");scrolldown();});
   $("#relationHead").click(function(){$("#relationSlide").slideToggle("slow");scrolldown();});
+  $("#logHead").click(function(){$("#logSlide").slideToggle("slow");scrolldown();});
+  $("#docHead").click(function(){$("#docSlide").slideToggle("slow");scrolldown();});
   $("#searchPosition").click(function(){$("#peepPosition").slideToggle("slow");scrolldown();});
 
 

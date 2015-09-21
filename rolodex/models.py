@@ -9,6 +9,8 @@ from django.core.validators import URLValidator,validate_email
 
 from rolodex.slug import unique_slugify
 
+from taggit.managers import TaggableManager
+
 class GetOrNoneManager(models.Manager):
     def get_or_none(self, **kwargs):
         try:
@@ -20,7 +22,6 @@ class GetOrNoneManager(models.Manager):
 ###################
 ## Choice Models ##
 ###################
-
 '''
 Choice models are registered in the admin and are designed to be set by user prior to entering entities into Rolodex.
 '''
@@ -109,20 +110,35 @@ class P2Org_Type(models.Model):
 	def save(self, *args, **kwargs):
 		unique_slugify(self,self.relationship_type)
 		super(P2Org_Type, self).save(*args, **kwargs)
-'''
-2.0 feature??? 
-'''
-class Tag(models.Model):
-	slug = models.SlugField(unique=True,editable=False)
-	tag_name = models.CharField(max_length=250)
-	objects = GetOrNoneManager()
 
-	def __unicode__(self):
-		return tag_name
 
-	def save(self, *args, **kwargs):
-		unique_slugify(self,self.tag_name)
-		super(Tag, self).save(*args, **kwargs)
+###################
+##   Documents   ##
+###################
+
+def upload_doc_directory(self,filename):
+	if self.person:
+		url = "rolodex-docs/%s/%s" % (self.person.slug,filename)
+	else:
+		url = "rolodex-docs/%s/%s" % (self.org.slug,filename)
+	return url
+
+class Document(models.Model):
+	'''
+	General document storage on entities.
+	'''
+	person = models.ForeignKey('Person',blank=True,null=True,editable=True,related_name='person_doc')
+	org = models.ForeignKey('Org',blank=True,null=True,editable=True,related_name='org_doc')
+	doc = models.FileField(upload_to=upload_doc_directory,blank=True,null=True)
+	link = models.URLField(blank=True,null=True)
+	notes = models.TextField(blank=True,null=True)
+
+	def clean(self):
+		if not self.person and not self.org:
+			raise ValidationError(_('Contact information must be associated with either a person or an organization.'),code='no_ent')
+		if self.person and self.org:
+			raise ValidationError(_('Contact information should be associated with only one person or organization.'),code='too_many_ents')
+		
 
 ###################
 ## Contact Forms ##
@@ -166,7 +182,11 @@ class Contact(models.Model):
 ## Entity Models ##
 ###################
 
-gender_types=((1,'Female'),(2,'Male'),(3,'Other'))
+gender_types=(('Female','Female'),('Male','Male'),('Other','Other'))
+#2000 census race categories
+race_types = (('White','White'),('Black','Black'),('American Indian','American Indian'),('Asian','Asian'),('Native Hawaiian and other Pacific Islander','Native Hawaiian and other Pacific Islander'),('Other','Other'),('Two or more races','Two or more races'))
+ethnicity_types = (('Hispanic','Hispanic'),('Non-Hispanic','Non-Hispanic'),)
+
 
 class Person(models.Model):
 	slug = models.SlugField(unique=True,editable=False)
@@ -175,7 +195,11 @@ class Person(models.Model):
 	role = models.ForeignKey('PersonRole',blank=True,null=True,related_name='person_role')
 	position = models.CharField(max_length=250,blank=True,null=True)
 	department = models.CharField(max_length=250,blank=True,null=True)
-	gender = models.IntegerField(blank=True,null=True,choices=gender_types)
+	gender = models.CharField(max_length=250,blank=True,null=True,choices=gender_types)
+	birthdate = models.CharField(blank=True,null=True,max_length=50)
+	race = models.CharField(max_length=250,blank=True,null=True,choices=race_types)
+	#Minimum ethnicity category of US fed gov't
+	ethnicity = models.CharField(max_length=250,blank=True,null=True,choices=ethnicity_types)
 	#Relationships
 	p_relations = models.ManyToManyField('self',through='P2P',symmetrical=False,related_name='+',blank=True)
 	org_relations = models.ManyToManyField('Org',through='P2Org',related_name='people',blank=True)
@@ -184,8 +208,7 @@ class Person(models.Model):
 
 	last_edited_by = models.CharField(max_length=250,blank=True,null=True)
 
-	#2.0 feature
-	tags = models.ManyToManyField(Tag,blank=True)
+	tags = TaggableManager()
 
 	def __unicode__(self):
 		return self.lastName+", "+self.firstName
@@ -206,8 +229,7 @@ class Org(models.Model):
 
 	last_edited_by = models.CharField(max_length=250,blank=True,null=True)
 
-	#2.0 feature
-	tags = models.ManyToManyField(Tag,blank=True)
+	tags = TaggableManager()
 
 	def __unicode__(self):
 		return self.orgName
@@ -215,6 +237,25 @@ class Org(models.Model):
 	def save(self, *args, **kwargs):
 		unique_slugify(self,self.orgName)
 		super(Org, self).save(*args, **kwargs)
+
+
+###################
+##   Search Log  ##
+###################
+
+class SearchLog(models.Model):
+	person = models.ForeignKey('Person',blank=True,null=True,editable=False,related_name='person_log')
+	org = models.ForeignKey('Org',blank=True,null=True,editable=False,related_name='org_log')
+	user = models.CharField(max_length=250)
+	datestamp = models.DateField(auto_now=True)
+
+	def clean(self):
+		if not self.person and not self.org:
+			raise ValidationError(_('Log must be associated with either a person or an organization.'),code='no_ent')
+		if self.person and self.org:
+			raise ValidationError(_('Log should be associated with only one person or organization.'),code='too_many_ents')
+		
+
 
 ###################
 ## Relationships ##
@@ -410,6 +451,10 @@ class Org2P(models.Model):
 		super(Org2P, self).delete(*args, **kwargs)
 		if relation:
 			relation.delete()
+
+
+
+
 
 ##################
 ## Setter Funcs ##

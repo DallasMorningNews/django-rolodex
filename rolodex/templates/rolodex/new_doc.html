@@ -1,0 +1,97 @@
+{%extends "rolodex/base.html" %}
+{%load staticfiles%}
+{%block head%}
+
+
+<script src="{% static 'rolodex/js/selectize.min.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/selectize.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/home.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/new_relation.css' %}">
+
+{%endblock%}
+
+{%block content%}
+<div id="midrail">
+
+{%if entity == 'org'%}
+<h1>{{node.orgName}}</h1>
+{%else%}
+<h1>{{node.firstName}} {{node.lastName}}</h1>
+{%endif%}
+
+
+
+{% if docForm.errors %}
+<div id="form-error">
+    <p>Whoops, there was a mistake...</p>
+    <ul>
+    <li>{{ docForm.non_field_errors|striptags }}</li>
+    {% for field in docForm %}
+    {%if field.errors%}
+    <li>{{field.label}}: {{ field.errors|striptags }}</li>
+    {%endif%}
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<br>
+<h4>Add a document or a link below.</h4>
+
+
+
+{%if entity == 'org'%}
+<form action="/rolodex/add-doc/org/{{node.slug}}/" enctype="multipart/form-data" method="Post">
+{%else%}
+<form action="/rolodex/add-doc/person/{{node.slug}}/" enctype="multipart/form-data" method="Post">
+{%endif%}
+
+{%csrf_token%}
+
+{{docForm.person.as_hidden }}
+{{docForm.org.as_hidden }}
+<ul>
+    <li><label>Document</label></li>
+    <li class="required">{{docForm.doc}}</li>
+    <li><label>Link</label></li>
+    <li class="required">{{docForm.link}}</li>
+    <br>
+    <li><label>Notes</label></li>
+    <li class="required">{{docForm.notes}}</li>
+</ul>
+
+<button type="submit" class="btn btn-primary add-btn"><i class="fa fa-plus"></i> Add Doc</button>
+
+</form>
+</div>
+
+<script type="text/javascript">
+    $("#id_doc").change(function(){
+        if($(this).val() === ''){
+            $("#id_link").prop("disabled",false);
+        }else{
+            $("#id_link").prop("disabled",true);
+        }
+    });
+    $("#id_link").change(function(){
+        if($(this).val() === ''){
+            $("#id_doc").prop("disabled",false);
+        }else{
+            $("#id_doc").prop("disabled",true);
+        }
+    });
+</script>
+
+
+<div class="breadcrumb-container">
+<ul class="breadcrumb">
+	<li><a href="{% url 'rolodex_home' %}">Home</a></li>
+    {%if entity == 'org'%}
+    <li><a href="{% url 'rolodex_org' node.slug %}">{{node.orgName}}</a></li>
+    {%else%}
+    <li><a href="{% url 'rolodex_person' node.slug %}">{{node.lastName}}, {{node.firstName}}</a></li>
+    {%endif%}
+	<li><a>Add</a></li>
+</ul>
+</div>
+{%endblock%}

@@ -17,12 +17,20 @@ urlpatterns = patterns('',
     url(r'^add-org/$',views.new_org,name='rolodex_new_org'),
     url(r'^edit-org/(.+)/$',views.edit_org,name='rolodex_edit_org'),
     url(r'^delete-org/(.+)/$',views.delete_org,name='rolodex_delete_org'),
+
+    #Doc adds
+    url(r'^add-doc/org/(.+)/$',views.new_org_doc,name='rolodex_new_org_doc'),
+    url(r'^add-doc/person/(.+)/$',views.new_person_doc,name='rolodex_new_person_doc'),
+    url(r'^delete-doc/$',views.delete_doc,name='rolodex_delete_doc'),
     
     #Relationship maintenance
     url(r'^add-relationship/org/(.+)/$',views.new_org_relation,name='rolodex_new_org_relation'),
     url(r'^add-relationship/person/(.+)/$',views.new_person_relation,name='rolodex_new_person_relation'),
     url(r'^delete-relationship/$',views.delete_relationship,name='rolodex_delete_relation'),
 
+    url(r'^add-tag/$',views.add_tag,name='rolodex_add_tag'),
+    url(r'^remove-tag/$',views.remove_tag,name='rolodex_remove_tag'),
+    url(r'^search-tag/(.+)/$',views.search_tag,name='rolodex_search_tag'),
 
     #network graphs
     url(r'^person-map/(.+)/$',views.person_map,name='rolodex_person_map'),

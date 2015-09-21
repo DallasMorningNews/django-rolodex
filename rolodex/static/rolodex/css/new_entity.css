@@ -226,7 +226,7 @@ div.floatLeft{
 	margin-top: -5px;
 }
 
-#id_lastName, #id_department{
+#id_lastName, #id_department, #id_birthdate{
 	width:55%;
 }
 #id_gender{

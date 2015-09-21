@@ -1,5 +1,6 @@
 {%extends "rolodex/base.html" %}
 {%load staticfiles%}
+{% load rolodex_tags %}
 {%block head%}
 
 <script src="{% static 'rolodex/js/selectize.min.js' %}"></script>
@@ -23,6 +24,21 @@
 {%endif%}
 
 <h1>{{node.firstName}} {{node.lastName}}</h1>
+
+<div class="personal">
+{%if node.birthdate%}
+  born {{node.birthdate}}<br/>
+{%endif%}
+{%if node.race%}
+  {{node.race}} 
+{%endif%}
+{%if node.gender%}
+  {{node.gender|title}}
+{%endif%}
+{%if node.ethnicity%}
+  {{node.ethnicity}}<br/>
+{%endif%}
+</div>
 <div class="professional">
   {%if node.role%}
   <span>
@@ -34,6 +50,7 @@
   {%if node.department%}
   {{node.department|title}} department<br/>
   {%endif%}
+
 </div>
 
 {%if node.notes%}
@@ -41,6 +58,72 @@
 {{node.notes|linebreaks}}
 </div>
 {%endif%}
+
+
+<div id="tagContainer" class="clearfix">
+{%for tag in node.tags%}
+<div class="tag"><a href="{%url 'rolodex_search_tag' tag.name%}"><i class="fa fa-tag"></i> {{tag.name}}</a> <i data-tag="{{tag.name}}" class="fa fa-times tagRemove"></i></div>
+{%endfor%}
+</div>
+
+<div class="tagAdds">
+<div class="input-group">
+  <input id="addTags" type="text" class="form-control" placeholder="Add a tag">
+  <span class="input-group-btn">
+    <button id="tagAdd" class="btn btn-default" type="button"><i class="fa fa-plus"></i> <i class="fa fa-tag"></i></button>
+  </span>
+</div>
+</div>
+<script type="text/javascript">
+$(function() {
+  
+  var availableTags = [{%for tag in tags%}"{{tag.name}}",{%endfor%}];
+  $( "#addTags" ).autocomplete({
+    source: availableTags
+  });
+
+  $("#tagAdd").click(function(){
+      if($("#addTags").val() != ''){
+        $.post("{%url 'rolodex_add_tag'%}",
+            {
+              pk:"{{node.pk}}",
+              entity:"person",
+              tag: $("#addTags").val(),
+              csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            function(){
+              $("#tagContainer").append('<div class="tag"><a href=""><i class="fa fa-tag"></i> '+$("#addTags").val()+'</a> <i data-tag="'+$("#addTags").val()+'" class="fa fa-times tagRemove"></i></div>');
+              $("#addTags").val("");
+              tagRemover();
+            } 
+        );
+      }      
+  })
+
+  function tagRemover(){
+    $(".tagRemove").click(function(){
+        var that = this;
+        $.post("{%url 'rolodex_remove_tag'%}",
+            {
+              pk:"{{node.pk}}",
+              entity:"person",
+              tag: $(this).data("tag"),
+              csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            function(){
+              $(that).parent(".tag").remove();
+            } 
+        );   
+    });
+  };
+
+  tagRemover();
+
+});
+</script>
+
+
+
 
 <div class="change">
 <a href="{%url 'rolodex_edit_person' node.slug%}"><i class="fa fa-pencil"></i> Add/edit basic info</a>
@@ -152,6 +235,58 @@
   </div>
 </div>
 
+<div id="docHead" class="clickable"><i class="fa fa-files-o"></i> Documents</div>
+<div id="docSlide" class="bioBank">
+
+<ul id="docList">
+{% for doc in node.documents %}
+{%if doc.link%}
+  <li><a href="{{doc.link}}" target="_blank"><i class="fa fa-link"></i> {{doc.link|truncatechars:25}}</a> <i class="fa fa-times doc_delete" data-id="{{doc.pk}}" title="Delete document?"></i></span></li>
+{%else%}
+  <li><a href="{{doc.doc.path}}" target="_blank"><i class="fa fa-file-o"></i> {{doc.doc.path|fileBaseName}}</a> <i class="fa fa-times doc_delete" data-id="{{doc.pk}}" title="Delete document?"></i></li>
+{%endif%}
+  <li class="notes">{{doc.notes}}</li>
+{%endfor%}
+</ul>
+
+<script type="text/javascript">
+  $(".doc_delete").click(function(){
+      $(this).parent().next("li").slideUp("slow");
+      $(this).parent().slideUp("slow");
+      $.post("{%url 'rolodex_delete_doc'%}",
+          {
+            id:$(this).data("id"),
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+          }
+      );
+  });
+</script>
+
+  <div class="change">
+    <a href="{%url 'rolodex_new_person_doc' node.slug%}"><i class="fa fa-plus"></i> Add docs</a>
+  </div>
+
+</div>
+
+<div id="logHead" class="clickable"><i class="fa fa-book"></i> Search log</div>
+<div id="logSlide" class="bioBank">
+<div id="SearchCalendar"></div>
+<ul>
+{%for search in node.searches%}
+<li>{{search.date}} - {{search.user}}</li>
+{%endfor%}
+</ul>
+</div>
+
+<script src="{%static 'rolodex/js/logCal.js'%}"></script>
+<script type="text/javascript">
+  var calData =JSON.parse('{{node.calendar|safe}}');
+  calDraw(calData);
+</script>
+
+
+
+
 
 
 <div class="change delete">
@@ -166,7 +301,10 @@ Last edited by: {{node.last_edited_by}}<br>
   $(".bioBank").hide();
   $("#contactHead").click(function(){$("#contactSlide").slideToggle("slow");scrolldown();});
   $("#relationHead").click(function(){$("#relationSlide").slideToggle("slow");scrolldown();});
+  $("#logHead").click(function(){$("#logSlide").slideToggle("slow");scrolldown();});
+  $("#docHead").click(function(){$("#docSlide").slideToggle("slow");scrolldown();});
   $("#searchPosition").click(function(){$("#peepPosition").slideToggle("slow");scrolldown();});
+
 
 
 
