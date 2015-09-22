@@ -108,7 +108,8 @@ def search_org(request,org_slug):
 	node.calendar = json.dumps(node.searches)
 	node.documents = Document.objects.filter(org=node)
 	node.tags = node.tags.all()
-	return render_to_response('rolodex/org.html',{'node':node,},context_instance=RequestContext(request))
+	tags = Tag.objects.all()
+	return render_to_response('rolodex/org.html',{'node':node,'tags':tags,},context_instance=RequestContext(request))
 
 @secure
 def org_map(request,org_slug):

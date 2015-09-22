@@ -31,6 +31,73 @@
 </div>
 {%endif%}
 
+
+
+<div id="tagContainer" class="clearfix">
+{%for tag in node.tags%}
+<div class="tag"><a href="{%url 'rolodex_search_tag' tag.name%}"><i class="fa fa-tag"></i> {{tag.name}}</a> <i data-tag="{{tag.name}}" class="fa fa-times tagRemove"></i></div>
+{%endfor%}
+</div>
+
+<div class="tagAdds">
+<div class="input-group">
+  <input id="addTags" type="text" class="form-control" placeholder="Add a tag">
+  <span class="input-group-btn">
+    <button id="tagAdd" class="btn btn-default" type="button"><i class="fa fa-plus"></i> <i class="fa fa-tag"></i></button>
+  </span>
+</div>
+</div>
+<script type="text/javascript">
+$(function() {
+  
+  var availableTags = [{%for tag in tags%}"{{tag.name}}",{%endfor%}];
+  $( "#addTags" ).autocomplete({
+    source: availableTags
+  });
+
+  $("#tagAdd").click(function(){
+      if($("#addTags").val() != ''){
+        $.post("{%url 'rolodex_add_tag'%}",
+            {
+              pk:"{{node.pk}}",
+              entity:"org",
+              tag: $("#addTags").val(),
+              csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            function(){
+              $("#tagContainer").append('<div class="tag"><a href=""><i class="fa fa-tag"></i> '+$("#addTags").val()+'</a> <i data-tag="'+$("#addTags").val()+'" class="fa fa-times tagRemove"></i></div>');
+              $("#addTags").val("");
+              tagRemover();
+            } 
+        );
+      }      
+  })
+
+  function tagRemover(){
+    $(".tagRemove").click(function(){
+        var that = this;
+        $.post("{%url 'rolodex_remove_tag'%}",
+            {
+              pk:"{{node.pk}}",
+              entity:"org",
+              tag: $(this).data("tag"),
+              csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            function(){
+              $(that).parent(".tag").remove();
+            } 
+        );   
+    });
+  };
+
+  tagRemover();
+
+});
+</script>
+
+
+
+
 <div class="change">
 <a href="{%url 'rolodex_edit_org' node.slug%}"><i class="fa fa-pencil"></i> Add/edit basic info</a>
 </div>
@@ -174,7 +241,7 @@
 {%if doc.link%}
   <li><a href="{{doc.link}}" target="_blank"><i class="fa fa-link"></i> {{doc.link|truncatechars:25}}</a> <i class="fa fa-times doc_delete" data-id="{{doc.pk}}" title="Delete document?"></i></span></li>
 {%else%}
-  <li><a href="{{doc.doc.path}}" target="_blank"><i class="fa fa-file-o"></i> {{doc.doc.path|fileBaseName}}</a> <i class="fa fa-times doc_delete" data-id="{{doc.pk}}" title="Delete document?"></i></li>
+  <li><a href="{{doc.doc.url}}" target="_blank"><i class="fa fa-file-o"></i> {{doc.doc.path|fileBaseName}}</a> <i class="fa fa-times doc_delete" data-id="{{doc.pk}}" title="Delete document?"></i></li>
 {%endif%}
   <li class="notes">{{doc.notes}}</li>
 {%endfor%}

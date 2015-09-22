@@ -24,21 +24,22 @@ This is a development release, with more detailed docs, annotated (and probably 
 Quick start
 -----------
 - `pip install django-rolodex`
-- Add rolodex and the django rest framework to your `INSTALLED_APPS` setting:
+- Add rolodex, django-taggit and the django rest framework to your `INSTALLED_APPS` setting:
 ```python
 INSTALLED_APPS = (
     ...
     'rolodex',
     'rest_framework',
+    'taggit',
 )
 ```
 - Include the rolodex and rest framework auth URLconf in your project urls.py:
 ```python
-urlpatterns = patterns('',
+urlpatterns = [
     ...
     url(r'^rolodex/', include('rolodex.urls')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
 - By default, Rolodex is restricted to only logged-in users. If you want to allow anyone to have a look around, set Rolodex's security variable in settings.py:
 ```python
@@ -46,11 +47,11 @@ ROLODEX_SECURE = False
 ```
 Also add django's auth views to your project's urls.py:
 ```python
-urlpatterns = patterns('',
+urlpatterns = [
     ...
     url(r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name':'admin/login.html'}),
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout'),
-)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
 It's a good idea to set django rest framework's auth to django model permissions in settings.py. You may also add anonymous read only like this:
 ```python

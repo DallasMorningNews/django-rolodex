@@ -34,3 +34,39 @@ h4{
 	border: 1px solid #ddd !important;
     background: #eee !important;
 }
+
+#bigSearch{
+	margin-bottom: 25px;
+}
+
+.twitter-typeahead{
+	width:100%;
+}
+
+input.typeahead.tt-input, input.typeahead.tt-hint {
+    border: 0px;
+    border-bottom: 3px solid grey;
+    width: 100%;
+    font-family: 'Montserrat';
+    font-size:32px;
+    padding:5px 10px;
+    background-color: #E9E9E9 !important;
+}
+input.typeahead.tt-hint{
+	color:lightgrey;
+}
+input.typeahead.tt-input:focus{
+	outline: 0;
+}
+.tt-suggestion{
+	cursor:pointer;
+}
+.tt-dataset{
+	background-color: #fff;
+	border:1px solid lightgrey;
+	padding:2px 5px;
+	width:100%;
+}
+.tt-menu{
+	width:100%;
+}

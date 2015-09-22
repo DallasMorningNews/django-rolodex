@@ -2,11 +2,14 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+import taggit.managers
+import rolodex.models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('taggit', '0002_auto_20150616_2121'),
     ]
 
     operations = [
@@ -16,6 +19,18 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('type', models.CharField(max_length=100, choices=[(b'email', b'email'), (b'phone', b'phone'), (b'link', b'link'), (b'address', b'address')])),
                 ('contact', models.CharField(max_length=250, null=True, blank=True)),
+                ('notes', models.TextField(null=True, blank=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Document',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('doc', models.FileField(null=True, upload_to=rolodex.models.upload_doc_directory, blank=True)),
+                ('link', models.URLField(null=True, blank=True)),
                 ('notes', models.TextField(null=True, blank=True)),
             ],
             options={
@@ -41,6 +56,7 @@ class Migration(migrations.Migration):
                 ('slug', models.SlugField(unique=True, editable=False)),
                 ('orgName', models.CharField(max_length=200)),
                 ('notes', models.TextField(null=True, blank=True)),
+                ('last_edited_by', models.CharField(max_length=250, null=True, blank=True)),
                 ('openRecordsLaw', models.ForeignKey(blank=True, to='rolodex.OpenRecordsLaw', null=True)),
             ],
             options={
@@ -152,8 +168,12 @@ class Migration(migrations.Migration):
                 ('firstName', models.CharField(max_length=100)),
                 ('position', models.CharField(max_length=250, null=True, blank=True)),
                 ('department', models.CharField(max_length=250, null=True, blank=True)),
-                ('gender', models.IntegerField(blank=True, null=True, choices=[(1, b'Female'), (2, b'Male'), (3, b'Other')])),
+                ('gender', models.CharField(blank=True, max_length=250, null=True, choices=[(b'Female', b'Female'), (b'Male', b'Male'), (b'Other', b'Other')])),
+                ('birthdate', models.CharField(max_length=50, null=True, blank=True)),
+                ('race', models.CharField(blank=True, max_length=250, null=True, choices=[(b'White', b'White'), (b'Black', b'Black'), (b'American Indian', b'American Indian'), (b'Asian', b'Asian'), (b'Native Hawaiian and other Pacific Islander', b'Native Hawaiian and other Pacific Islander'), (b'Other', b'Other'), (b'Two or more races', b'Two or more races')])),
+                ('ethnicity', models.CharField(blank=True, max_length=250, null=True, choices=[(b'Hispanic', b'Hispanic'), (b'Non-Hispanic', b'Non-Hispanic')])),
                 ('notes', models.TextField(null=True, blank=True)),
+                ('last_edited_by', models.CharField(max_length=250, null=True, blank=True)),
                 ('org_relations', models.ManyToManyField(related_name='people', through='rolodex.P2Org', to='rolodex.Org', blank=True)),
                 ('p_relations', models.ManyToManyField(related_name='+', through='rolodex.P2P', to='rolodex.Person', blank=True)),
             ],
@@ -174,11 +194,13 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
-            name='Tag',
+            name='SearchLog',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('slug', models.SlugField(unique=True, editable=False)),
-                ('tag_name', models.CharField(max_length=250)),
+                ('user', models.CharField(max_length=250)),
+                ('datestamp', models.DateField(auto_now=True)),
+                ('org', models.ForeignKey(related_name='org_log', blank=True, editable=False, to='rolodex.Org', null=True)),
+                ('person', models.ForeignKey(related_name='person_log', blank=True, editable=False, to='rolodex.Person', null=True)),
             ],
             options={
             },
@@ -193,7 +215,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='person',
             name='tags',
-            field=models.ManyToManyField(to='rolodex.Tag', blank=True),
+            field=taggit.managers.TaggableManager(to='taggit.Tag', through='taggit.TaggedItem', help_text='A comma-separated list of tags.', verbose_name='Tags'),
             preserve_default=True,
         ),
         migrations.AddField(
@@ -271,7 +293,19 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='org',
             name='tags',
-            field=models.ManyToManyField(to='rolodex.Tag', blank=True),
+            field=taggit.managers.TaggableManager(to='taggit.Tag', through='taggit.TaggedItem', help_text='A comma-separated list of tags.', verbose_name='Tags'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='document',
+            name='org',
+            field=models.ForeignKey(related_name='org_doc', blank=True, to='rolodex.Org', null=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='document',
+            name='person',
+            field=models.ForeignKey(related_name='person_doc', blank=True, to='rolodex.Person', null=True),
             preserve_default=True,
         ),
         migrations.AddField(

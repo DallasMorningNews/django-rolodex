@@ -5,6 +5,8 @@
 
 <link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/home.css'%}">
 
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+
 {%endblock%}
 
 {%block content%}
@@ -13,14 +15,59 @@
     .bolder{
         font-weight: bold;
     }
+    h2{
+        font-size: 40px;
+        text-align: center;
+    }
 </style>
 
 <div id="midrail">
 
 <h1>Rolodex</h1>
+
 <div class="outside freetext">
-    <p>Rolodex is a directory of people and the organizations they belong to. It's also a space where you can model relationships.
+    <p>Rolodex is a directory of people and the organizations they belong to. It's also a space where you can model relationships.</p>
+    <p></p>
 </div>
+
+<div id="bigSearch">
+<input class="typeahead" type="text" placeholder="Search Rolodex"> 
+
+</div>
+
+<script type="text/javascript">
+$(function(){
+    var entities = [{%for org in orgs%}{url:"{%url 'rolodex_org' org.slug%}", name:"{{org.orgName}}"},{%endfor%}{%for peep in peeps%}{url:"{%url 'rolodex_person' peep.slug%}",name:"{{peep.lastName}}, {{peep.firstName}}"},{%endfor%}];
+
+    var engine = new Bloodhound({
+      identify: function(obj) { return obj.url; },
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      // `states` is an array of state names defined in "The Basics"
+      local: entities
+    });
+
+    $('#bigSearch .typeahead').typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1,
+
+    },
+    {
+      name: 'engine',
+      source: engine,
+      display: 'name',
+    }).on('typeahead:selected', function($e, datum){
+        window.location.href=datum["url"];
+        }
+    );
+})
+</script>
+
+
+
+<h2>or</h2>
+
 
 <div id="selectors">
 
