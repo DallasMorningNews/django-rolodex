@@ -243,7 +243,7 @@ $(function() {
 {%if doc.link%}
   <li><a href="{{doc.link}}" target="_blank"><i class="fa fa-link"></i> {{doc.link|truncatechars:25}}</a> <i class="fa fa-times doc_delete" data-id="{{doc.pk}}" title="Delete document?"></i></span></li>
 {%else%}
-  <li><a href="{{doc.doc.url}}" target="_blank"><i class="fa fa-file-o"></i> {{doc.doc.path|fileBaseName}}</a> <i class="fa fa-times doc_delete" data-id="{{doc.pk}}" title="Delete document?"></i></li>
+  <li><a href="{{doc.doc.url}}" target="_blank"><i class="fa fa-file-o"></i> {{doc.doc.url|fileBaseName}}</a> <i class="fa fa-times doc_delete" data-id="{{doc.pk}}" title="Delete document?"></i></li>
 {%endif%}
   <li class="notes">{{doc.notes}}</li>
 {%endfor%}
