@@ -22,8 +22,8 @@ h4{
 	padding-left:20px;
 }
 .relationform{
-	padding: 0px 5px 0px 20px;
-	max-width: 350px;
+	padding: 0px 15px;
+	width: 100%;
 	font-family: 'Raleway',sans-serif;
 }
 .relationform .type select{

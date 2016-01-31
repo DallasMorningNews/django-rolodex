@@ -25,11 +25,11 @@
     <script src="{% static 'rolodex/js/jquery-1.11.1.min.js'%}"></script>
     <script src="{% static 'rolodex/js/jquery-ui.min.js' %}"></script>
     <script src="{%static 'rolodex/js/jquery.formset.min.js'%}"></script>
-    <script src="{% static 'rolodex/js/jquery.sticky.js'%}"></script>
     <script src="{%static 'rolodex/js/jQuery.succinct.min.js'%}"></script>
     <script src="{% static 'rolodex/js/bootstrap.min.js' %}"></script>
 
     <link rel="stylesheet" href="{% static 'rolodex/css/toggle.css'%}">
+    <link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/selectize.css'%}">
     <link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/base.css'%}"\>
     <link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/bootstrap.css'%}"\>
     <link rel="stylesheet" href="{% static 'rolodex/css/jquery-ui.min.css'%}" />
@@ -39,7 +39,7 @@
     {%block head%}
     {%endblock%}
     <script src="{% static 'rolodex/js/selectize.min.js' %}"></script>
-    <link rel="stylesheet" type="text/css" href="{% static 'rolodex/css/selectize.css'%}">
+    
 
     <title>Rolodex</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -55,30 +55,9 @@
 </div>
 {%endblock%}
 
-<div class="body">
-    {% block content %}{%endblock%}
-</div>
+<div id="search-gutter">
 
-<script>
-  $(document).ready(function(){
-    $("#stickyNav").sticky({topSpacing:0});
-    $('.breadcrumb li a').succinct({size: 12});
-    $("#searchNav").click(function(){
-        $("#search-modal").modal('show');
-    });
-        
-  });
-
-</script>
-
-<div id="search-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      <h4 class="modal-title" >Rolodex</h4>
-    </div>
-    <div class="modal-body">
+    <div class="search-form">
         <div class="switch-toggle switch-candy">
           <input id="search-people" class="rebuild" name="search-ents" type="radio" checked>
           <label for="search-people" onclick="">People</label>
@@ -94,24 +73,41 @@
             <select id="modal-peepSelect">
                 <option value=""></option>
             </select>
-            <div class="buttonDiv">
-            <a class="goLink" href=""><i class="fa fa-angle-double-right"></i> <i class="fa fa-user"></i></a>
-            </div>
         </div>
         <div id="modal-orgsDiv" class="modal-search" style="display:none;">
             <select id="modal-orgSelect">
                  <option value=""></option>
             </select>
-            <div class="buttonDiv">
-            <a class="goLink" href=""><i class="fa fa-angle-double-right"></i> <i class="fa fa-university"></i></a>
-            </div>
-
         </div>
-
-
-
-
     </div>
+
+</div>
+
+<div class="body">
+    
+    {% block content %}{%endblock%}
+</div>
+
+<script>
+  $(document).ready(function(){
+    $('.breadcrumb li a').succinct({size: 12});
+    $("#searchNav").click(function(){
+        $("#search-gutter").slideToggle('200');
+        /*$("#search-modal").modal('show');*/
+    });
+        
+  });
+
+</script>
+
+<div id="search-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <h4 class="modal-title" >Rolodex</h4>
+    </div>
+
     </div>
   </div>
 </div>
@@ -130,7 +126,13 @@
             maxOptions:10,
             selectOnTab:true,
             onChange: function(value){
-                $("#modal-peopleDiv .goLink").attr("href",$("#modal-peepSelect").val());
+                window.location = $("#modal-peepSelect").val();
+            },
+            render:{
+                option: function(item, escape) {
+                    var role = item.role != "" ? " - <span class='role'>" + escape(item.role.charAt(0).toUpperCase() + item.role.slice(1))+"</span>" : "";
+                    return "<div>" + escape(item.name)+ role +"</div>";
+                }
             },
             create: false,
             load: function(query, callback) {
@@ -161,7 +163,7 @@
             maxOptions:10,
             selectOnTab:true,
             onChange: function(value){
-                $("#modal-orgsDiv .goLink").attr("href",$("#modal-orgSelect").val());
+                window.location = $("#modal-orgSelect").val();
             },
             create: false,
             load: function(query, callback) {
@@ -180,7 +182,7 @@
         });
 
         $("input[name='search-ents']").change(function(){
-            if($("#search-modal #search-people").is(":checked")){
+            if($("#search-gutter #search-people").is(":checked")){
                 $("#modal-peopleDiv").show();
                 $("#modal-orgsDiv").hide();
             }else{

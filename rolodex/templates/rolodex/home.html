@@ -32,7 +32,6 @@
 
 <div id="bigSearch">
 <input class="typeahead" type="text" placeholder="Search Rolodex"> 
-
 </div>
 
 <script type="text/javascript">
@@ -73,6 +72,7 @@
 <script>
 $(function(){
  
+
     // Big search box
     var engine = new Bloodhound({
       identify: function(obj) { return obj.url; },
@@ -96,10 +96,29 @@ $(function(){
       name: 'engine',
       source: engine,
       display: 'name',
-    }).on('typeahead:selected', function($e, datum){
+      templates: {
+              empty: [
+                '<div class="empty-message">',
+                  'No results...',
+                '</div>'
+              ].join('\n')
+      }
+    })
+    .on('typeahead:selected', function($e, datum){
         window.location.href=datum["url"];
         }
-    );
+    )
+    .on('typeahead:autocompleted', function($e, datum){
+        window.location.href=datum["url"];
+        }
+    )
+    .on('typeahead:asyncrequest', function() {
+        $('.typeahead.tt-input').addClass("loading");
+    })
+    .on('typeahead:asynccancel typeahead:asyncreceive', function() {
+        $('.typeahead.tt-input').removeClass("loading");
+    });
+
 
     // New person org select
     var $orgSelect2 = $('#orgSelect2').selectize({

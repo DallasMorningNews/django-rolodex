@@ -50,7 +50,7 @@ input.typeahead.tt-input, input.typeahead.tt-hint {
     font-family: 'Montserrat';
     font-size:32px;
     padding:5px 10px;
-    background-color: #E9E9E9 !important;
+    background-color: #E9E9E9 ;
 }
 input.typeahead.tt-hint{
 	color:lightgrey;
@@ -69,4 +69,14 @@ input.typeahead.tt-input:focus{
 }
 .tt-menu{
 	width:100%;
+}
+
+.empty-message{
+	font-style: italic;
+}
+
+.typeahead.tt-input.loading{
+	background-image: url(../images/spinner.gif) !important;
+	background-repeat: no-repeat;
+    background-position: 98% 14px;
 }
