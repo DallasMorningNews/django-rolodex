@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html class="no-js"> 
     <head>
     {%load staticfiles%}
@@ -93,22 +93,6 @@
         <div id="modal-peopleDiv" class="modal-search">
             <select id="modal-peepSelect">
                 <option value=""></option>
-            {%for org in modal_orgs%}
-            <optgroup label="{{org.orgName}}">
-                {%for peep in modal_peeps%}
-                {%if peep.orgID == org.pk%}
-                    <option value="{{peep.pk}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
-                {%endif%}
-                {%endfor%}    
-            </optgroup>
-            {%endfor%}
-            <optgroup label="N/A">
-                {%for peep in modal_peeps%}
-                {%if peep.orgName == 'N/A'%}
-                    <option value="{{peep.pk}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
-                {%endif%}
-                {%endfor%}
-            </optgroup>
             </select>
             <div class="buttonDiv">
             <a class="goLink" href=""><i class="fa fa-angle-double-right"></i> <i class="fa fa-user"></i></a>
@@ -117,9 +101,6 @@
         <div id="modal-orgsDiv" class="modal-search" style="display:none;">
             <select id="modal-orgSelect">
                  <option value=""></option>
-            {%for org in modal_orgs%}
-                <option value="{{org.pk}}">{{org.orgName}}</option>
-            {%endfor%}
             </select>
             <div class="buttonDiv">
             <a class="goLink" href=""><i class="fa fa-angle-double-right"></i> <i class="fa fa-university"></i></a>
@@ -136,33 +117,66 @@
 </div>
 
     <script type="text/javascript">
-        var modalOrgDict = {},modalPeepDict={};
-        {%spaceless%}
-        {%for org in modal_orgs%}modalOrgDict['{{org.pk}}']="{% url 'rolodex_org' org.slug%}";{%endfor%}
-        {%for peep in modal_peeps%}modalPeepDict['{{peep.pk}}']="{%url 'rolodex_person' peep.slug%}";{%endfor%}
-        {%endspaceless%}
+    $(function(){
 
         var $modalPeepSelect = $('#modal-peepSelect').selectize({
             placeholder: 'Search people...',
+            valueField: 'p-url',
+            labelField: 'name',
+            searchField: ['name','org','role'],
+            optgroupField: 'org',
+            optgroupLabelField: 'org',
+            optgroupValueField: 'org',
             maxOptions:10,
-            optgroupLabelField:'org',
-            optgroupValueField:'org',
             selectOnTab:true,
-            searchField:['org','text'],
             onChange: function(value){
-                var option =modalPeepDict[$("#modal-peepSelect").val()]; 
-                $("#modal-peopleDiv .goLink").attr("href",option);
+                $("#modal-peopleDiv .goLink").attr("href",$("#modal-peepSelect").val());
             },
+            create: false,
+            load: function(query, callback) {
+                self = this;
+                if (query.length < 3) return callback();
+                $.ajax({
+                    url: "{%url 'rolodex_person_remote_search'%}?q=" + encodeURIComponent(query),
+                    type: 'GET',
+                    error: function() {
+                        callback();
+                    },
+                    success: function(response) {
+                        $.each(response, function(index, value) {
+                            self.addOptionGroup(value['org'], { org: value['org'] });
+                            });
+                        self.refreshOptions();
+                        callback(response);
+                    }
+                });
+            }
         });
 
         var $orgSelect = $('#modal-orgSelect').selectize({
             placeholder: 'Search organizations...',
+            valueField: 'org-url',
+            labelField: 'name',
+            searchField: ['name'],
             maxOptions:10,
             selectOnTab:true,
             onChange: function(value){
-                var option =modalOrgDict[$("#modal-orgSelect").val()]; 
-                $("#modal-orgsDiv .goLink").attr("href",option);
+                $("#modal-orgsDiv .goLink").attr("href",$("#modal-orgSelect").val());
             },
+            create: false,
+            load: function(query, callback) {
+                if (query.length < 3) return callback();
+                $.ajax({
+                    url: "{%url 'rolodex_org_remote_search'%}?q=" + encodeURIComponent(query),
+                    type: 'GET',
+                    error: function() {
+                        callback();
+                    },
+                    success: function(response) {
+                        callback(response);
+                    }
+                });
+            }
         });
 
         $("input[name='search-ents']").change(function(){
@@ -175,6 +189,7 @@
             }
         })
 
+    });
     </script>
 
     </body>

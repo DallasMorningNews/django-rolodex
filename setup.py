@@ -8,7 +8,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='django-rolodex',
-    version='0.1.3.1',
+    version='0.1.3.2',
     packages=['rolodex'],
     include_package_data=True,
     license='MIT License',
@@ -30,5 +30,5 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
-    install_requires = ['Django>=1.7','djangorestframework>=2.4.4', 'dj-database-url>=0.3.0','networkx>=1.9.1','django-taggit>=0.17.1',],
+    install_requires=['Django>=1.9', 'djangorestframework>=2.4.4', 'dj-database-url>=0.3.0', 'networkx>=1.9.1', 'django-taggit>=0.17.1'],
 )

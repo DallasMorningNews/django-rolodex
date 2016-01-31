@@ -36,32 +36,7 @@
 </div>
 
 <script type="text/javascript">
-$(function(){
-    var entities = [{%for org in orgs%}{url:"{%url 'rolodex_org' org.slug%}", name:"{{org.orgName}}"},{%endfor%}{%for peep in peeps%}{url:"{%url 'rolodex_person' peep.slug%}",name:"{{peep.lastName}}, {{peep.firstName}}"},{%endfor%}];
 
-    var engine = new Bloodhound({
-      identify: function(obj) { return obj.url; },
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      // `states` is an array of state names defined in "The Basics"
-      local: entities
-    });
-
-    $('#bigSearch .typeahead').typeahead({
-        hint: true,
-        highlight: true,
-        minLength: 1,
-
-    },
-    {
-      name: 'engine',
-      source: engine,
-      display: 'name',
-    }).on('typeahead:selected', function($e, datum){
-        window.location.href=datum["url"];
-        }
-    );
-})
 </script>
 
 
@@ -78,9 +53,6 @@ $(function(){
          <div class="instruct">First choose the primary organization the person belongs to.</div>
         <select id="orgSelect2">
              <option value=""></option>
-        {%for org in orgs%}
-            <option value="{{org.pk}}">{{org.orgName}}</option>
-        {%endfor%}
         </select>
         <div class="buttonDiv">
         <a class="goLink" href=""><i class="fa fa-user-plus"></i></a>
@@ -99,37 +71,73 @@ $(function(){
 <img class="dmnLogo" src="{%static 'rolodex/images/dmnlogo.jpg'%}">
 
 <script>
-var NewOrgDict = {};
-{%spaceless%}
-{%for org in orgs%}NewOrgDict['{{org.pk}}']="{% url 'rolodex_new_person' org.slug%}";{%endfor%}
-{%endspaceless%}
+$(function(){
+ 
+    // Big search box
+    var engine = new Bloodhound({
+      identify: function(obj) { return obj.url; },
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      remote: {
+        url:"{%url 'rolodex_entity_remote_search'%}?q=%QUERY", 
+        wildcard: '%QUERY',
+        filter: function(response) {
+          return response;
+        }
+      }
+    });
 
-
-var $orgSelect2 = $('#orgSelect2').selectize({
-    placeholder: 'Search organizations...',
-    maxOptions:10,
-    selectOnTab:true,
-    onChange: function(value){
-        var option =NewOrgDict[$("#orgSelect2").val()]; 
-        $("#orgDiv2 .goLink").attr("href",option);
+    $('#bigSearch .typeahead').typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 3,
     },
-});
+    {
+      name: 'engine',
+      source: engine,
+      display: 'name',
+    }).on('typeahead:selected', function($e, datum){
+        window.location.href=datum["url"];
+        }
+    );
+
+    // New person org select
+    var $orgSelect2 = $('#orgSelect2').selectize({
+        placeholder: 'Search organizations...',
+        valueField: 'new-p-url',
+        labelField: 'name',
+        searchField: ['name'],
+        maxOptions:10,
+        selectOnTab:true,
+        onChange: function(value){
+            $("#orgDiv2 .goLink").attr("href",$("#orgSelect2").val());
+        },
+        create: false,
+        load: function(query, callback) {
+            if (query.length < 3) return callback();
+            $.ajax({
+                url: "{%url 'rolodex_org_remote_search'%}?q=" + encodeURIComponent(query),
+                type: 'GET',
+                error: function() {
+                    callback();
+                },
+                success: function(response) {
+                    callback(response);
+                }
+            });
+        }
+    });
+    var orgSelect2 = $orgSelect2[0].selectize;
 
 
-
-var orgSelect2 = $orgSelect2[0].selectize;
-
-
-
-
-$(".searchbox").hide();
-$(document).ready(function(){
+    $(".searchbox").hide();
 
     $("#addPerson").click(function(){
         $(".searchbox").hide("slow");
         $("#orgDiv2").slideToggle("slow");
     });
     $("#orgSelect2").change(function(){});
+
 });
 
 </script>

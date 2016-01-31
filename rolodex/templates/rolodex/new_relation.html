@@ -55,8 +55,6 @@
 
 
 
-
-
 <div class="clickable" id="2Org_select"><i class="fa fa-university"></i> Organization</div>
 <div id="2Org_formDiv" class="relationform">
 {%if orgNode%}
@@ -75,9 +73,6 @@
     <label>Organization</label>
     <select id="orgNode" name="to_ent">
          <option value=""></option>
-    {%for org in orgs%}
-        <option value="{{org.pk}}">{{org.orgName}}</option>
-    {%endfor%}
     </select>
 </div>
 <label>Type</label>{{orgForm.relation}}
@@ -105,22 +100,6 @@
     <label>Person</label>
 	<select id="personNode" name="to_ent">
         <option value=""></option>
-    {%for org in orgs%}
-    <optgroup label="{{org.orgName}}">
-        {%for peep in peeps%}
-        {%if peep.orgID == org.pk%}
-            <option value="{{peep.pk}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
-        {%endif%}
-        {%endfor%}    
-    </optgroup>
-    {%endfor%}
-    <optgroup label="N/A">
-        {%for peep in peeps%}
-        {%if peep.orgName == 'N/A'%}
-            <option value="{{peep.pk}}" org="{{peep.orgName}}" data-data='{"org":"{{peep.orgName}}"}'>{{peep.lastName}}, {{peep.firstName}}{%if peep.role%} ({{peep.role}}){%endif%}</option>
-        {%endif%}
-        {%endfor%}
-    </optgroup>
     </select>
 </div>
 <label>Type</label>{{pForm.relation}}
@@ -133,31 +112,89 @@
 </div>
 
 <script>
-$(".relationform").hide();
-$("#2Org_select").click(function(){$("#2Org_formDiv").slideToggle("slow");$("#2P_formDiv").slideUp("slow");scrolldown();});
-$("#2P_select").click(function(){$("#2P_formDiv").slideToggle("slow");$("#2Org_formDiv").slideUp("slow");scrolldown();});
+$(function(){
 
-function scrolldown(){
-  var y = $(window).scrollTop();  
-    $("html, body").animate({ scrollTop: y + 75 }, 600);
-};
+    $(".relationform").hide();
+    $("#2Org_select").click(function(){$("#2Org_formDiv").slideToggle("slow");$("#2P_formDiv").slideUp("slow");scrolldown();});
+    $("#2P_select").click(function(){$("#2P_formDiv").slideToggle("slow");$("#2Org_formDiv").slideUp("slow");scrolldown();});
+
+    function scrolldown(){
+      var y = $(window).scrollTop();  
+        $("html, body").animate({ scrollTop: y + 75 }, 600);
+    };
 
 
-$('#orgNode').selectize({
-    placeholder: 'Search organizations...',
-    maxOptions:10,
-    selectOnTab:true,
+    var $formPeepSelect = $('#personNode').selectize({
+            placeholder: 'Search people...',
+            valueField: 'pk',
+            labelField: 'name',
+            searchField: ['name','org','role'],
+            optgroupField: 'org',
+            optgroupLabelField: 'org',
+            optgroupValueField: 'org',
+            maxOptions:10,
+            selectOnTab:true,
+            onChange: function(value){
+                $("#modal-peopleDiv .goLink").attr("href",$("#modal-peepSelect").val());
+            },
+            create: false,
+            load: function(query, callback) {
+                self = this;
+                if (query.length < 3) return callback();
+                $.ajax({
+                    url: "{%url 'rolodex_person_remote_search'%}?q=" + encodeURIComponent(query){%if peepNode%}+"&ignore="+encodeURIComponent({{peepNode.pk}}){%endif%},
+                    type: 'GET',
+                    error: function() {
+                        callback();
+                    },
+                    success: function(response) {
+                        $.each(response, function(index, value) {
+                            self.addOptionGroup(value['org'], { org: value['org'] });
+                            });
+                        self.refreshOptions();
+                        callback(response);
+                    }
+                });
+            }
+        });
+
+        var $formOrgSelect = $('#orgNode').selectize({
+            placeholder: 'Search organizations...',
+            valueField: 'pk',
+            labelField: 'name',
+            searchField: ['name'],
+            maxOptions:10,
+            selectOnTab:true,
+            onChange: function(value){
+                $("#modal-orgsDiv .goLink").attr("href",$("#modal-orgSelect").val());
+            },
+            create: false,
+            load: function(query, callback) {
+                if (query.length < 3) return callback();
+                $.ajax({
+                    url: "{%url 'rolodex_org_remote_search'%}?q=" + encodeURIComponent(query){%if orgNode%}+"&ignore="+encodeURIComponent({{orgNode.pk}}){%endif%},
+                    type: 'GET',
+                    error: function() {
+                        callback();
+                    },
+                    success: function(response) {
+                        callback(response);
+                    }
+                });
+            }
+        });
+
+        $("input[name='search-ents']").change(function(){
+            if($("#search-modal #search-people").is(":checked")){
+                $("#modal-peopleDiv").show();
+                $("#modal-orgsDiv").hide();
+            }else{
+                $("#modal-peopleDiv").hide();
+                $("#modal-orgsDiv").show();
+            }
+        });
+
 });
-
-$('#personNode').selectize({
-    placeholder: 'Search people...',
-    maxOptions:10,
-    optgroupLabelField:'org',
-    selectOnTab:true,
-    searchField:['org','text'],
-});
-
-
 </script>
 
 <div class="breadcrumb-container">
